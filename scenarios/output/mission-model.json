@@ -1,0 +1,4510 @@
+{
+  "schema_version": "1.0",
+  "id": "83250f8c-18c3-48a5-b24f-531df8ef1a1f",
+  "name": "Pyra \u00b7 Wildfire CubeSat",
+  "brief": "Design a 12U CubeSat mission that detects and monitors wildfires over southern Europe. Deliver useful imagery within 30 minutes of acquisition, operate for at least two years, use a rideshare launch, and remain within a \u20ac12 million programme budget.",
+  "owner": "human",
+  "created_at": "2026-09-09T16:30:29.703938+00:00",
+  "modified_at": "2026-09-09T16:30:30.346629+00:00",
+  "revision": 11,
+  "phase": "Baselined",
+  "entities": {
+    "brief": {
+      "id": "brief",
+      "kind": "Mission",
+      "title": "Pyra \u00b7 Wildfire CubeSat",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:29.704606+00:00",
+      "modified_at": "2026-09-09T16:30:29.704616+00:00",
+      "revision": 0,
+      "classification": "Human decision",
+      "relations": [],
+      "data": {
+        "mission_statement": "Design a 12U CubeSat mission that detects and monitors wildfires over southern Europe. Deliver useful imagery within 30 minutes of acquisition, operate for at least two years, use a rideshare launch, and remain within a \u20ac12 million programme budget.",
+        "operating_domain": "southern Europe",
+        "objectives": [
+          "Detect and monitor wildfires"
+        ],
+        "constraints": {
+          "form_factor": {
+            "original": "12U",
+            "status": "stated"
+          },
+          "latency": {
+            "original": "30 minutes",
+            "status": "stated"
+          },
+          "programme_budget": {
+            "original": "\u20ac12 million",
+            "status": "stated"
+          },
+          "lifetime": {
+            "original": "two years",
+            "status": "stated"
+          },
+          "launch": {
+            "original": "rideshare",
+            "status": "stated"
+          }
+        },
+        "preferences": [
+          "No additional preferences extracted; confirm with mission owner"
+        ],
+        "stakeholders": [
+          "Civil protection teams \u2014 proposed assumption"
+        ],
+        "success_criteria": "Detection sensitivity, spatial sampling, swath and revisit need clarification",
+        "schedule_assumptions": "Launch date unknown",
+        "cost_assumptions": "Programme ceiling is a constraint, not a validated cost estimate",
+        "missing_information": [
+          "Detection sensitivity",
+          "Cloud tolerance",
+          "Revisit",
+          "Ground stations and contact timing",
+          "Launch date"
+        ],
+        "clarification_questions": [
+          "What fire size and detection probability are required?",
+          "What revisit and cloud availability are acceptable?",
+          "Which ground network can support worst-case 30-minute delivery?"
+        ],
+        "extraction_method": "Deterministic reference patterns v1.0; approve the explicit scenario assumptions before design"
+      }
+    },
+    "agent-science": {
+      "id": "agent-science",
+      "kind": "AgentDefinition",
+      "title": "Mission & Science",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.704815+00:00",
+      "modified_at": "2026-09-09T16:30:29.704821+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Mission & Science",
+        "objective": "Define mission value",
+        "responsibilities": [
+          "Objectives",
+          "stakeholders",
+          "verifiable needs"
+        ],
+        "authority": [
+          "Objective",
+          "Requirement",
+          "Assumption"
+        ],
+        "prohibited_actions": [
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "Proposal",
+        "permitted_tools": [],
+        "prompt_version": "1.0"
+      }
+    },
+    "agent-systems": {
+      "id": "agent-systems",
+      "kind": "AgentDefinition",
+      "title": "Systems Engineering",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.704849+00:00",
+      "modified_at": "2026-09-09T16:30:29.704852+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Systems Engineering",
+        "objective": "Integrate a consistent concept",
+        "responsibilities": [
+          "Allocations",
+          "interfaces",
+          "trade studies",
+          "preserve dissent"
+        ],
+        "authority": [
+          "Requirement",
+          "Function",
+          "Component",
+          "Interface",
+          "ArchitectureAlternative",
+          "TradeStudy",
+          "Decision",
+          "Risk",
+          "VerificationItem",
+          "Assumption",
+          "Claim"
+        ],
+        "prohibited_actions": [
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "Proposal",
+        "permitted_tools": [
+          "trade"
+        ],
+        "prompt_version": "1.0"
+      }
+    },
+    "agent-analysis": {
+      "id": "agent-analysis",
+      "kind": "AgentDefinition",
+      "title": "Mission Analysis",
+      "state": "accepted",
+      "owner": "analysis",
+      "created_at": "2026-09-09T16:30:29.704878+00:00",
+      "modified_at": "2026-09-09T16:30:29.704881+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Mission Analysis",
+        "objective": "Calculate orbital geometry",
+        "responsibilities": [
+          "Orbit and eclipse",
+          "expose coverage uncertainty"
+        ],
+        "authority": [
+          "Parameter",
+          "Assumption",
+          "Claim"
+        ],
+        "prohibited_actions": [
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "Proposal",
+        "permitted_tools": [
+          "orbit"
+        ],
+        "prompt_version": "1.0"
+      }
+    },
+    "agent-payload": {
+      "id": "agent-payload",
+      "kind": "AgentDefinition",
+      "title": "Payload",
+      "state": "accepted",
+      "owner": "payload",
+      "created_at": "2026-09-09T16:30:29.704899+00:00",
+      "modified_at": "2026-09-09T16:30:29.704902+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Payload",
+        "objective": "Define observation resource demands",
+        "responsibilities": [
+          "Resolution",
+          "swath",
+          "pointing",
+          "calibration",
+          "data production"
+        ],
+        "authority": [
+          "Component",
+          "Parameter",
+          "Assumption",
+          "Claim"
+        ],
+        "prohibited_actions": [
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "Proposal",
+        "permitted_tools": [
+          "data"
+        ],
+        "prompt_version": "1.0"
+      }
+    },
+    "agent-bus": {
+      "id": "agent-bus",
+      "kind": "AgentDefinition",
+      "title": "Spacecraft Bus & Ground",
+      "state": "accepted",
+      "owner": "bus",
+      "created_at": "2026-09-09T16:30:29.704919+00:00",
+      "modified_at": "2026-09-09T16:30:29.704922+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Spacecraft Bus & Ground",
+        "objective": "Support payload and deliver data",
+        "responsibilities": [
+          "Power",
+          "AOCS",
+          "storage",
+          "communications",
+          "ground operations"
+        ],
+        "authority": [
+          "Component",
+          "Interface",
+          "Parameter",
+          "Assumption",
+          "Claim"
+        ],
+        "prohibited_actions": [
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "Proposal",
+        "permitted_tools": [
+          "mass",
+          "power",
+          "data",
+          "link"
+        ],
+        "prompt_version": "1.0"
+      }
+    },
+    "agent-review": {
+      "id": "agent-review",
+      "kind": "AgentDefinition",
+      "title": "Independent Review",
+      "state": "accepted",
+      "owner": "review",
+      "created_at": "2026-09-09T16:30:29.704937+00:00",
+      "modified_at": "2026-09-09T16:30:29.704939+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "role": "Independent Review",
+        "objective": "Challenge evidence and feasibility",
+        "responsibilities": [
+          "Traceability",
+          "evidence",
+          "critical blockers",
+          "verify resolutions"
+        ],
+        "authority": [
+          "ReviewFinding"
+        ],
+        "prohibited_actions": [
+          "modify design",
+          "approve baseline",
+          "execute code",
+          "write database"
+        ],
+        "required_inputs": [
+          "current revision",
+          "approved assumptions",
+          "typed relationships"
+        ],
+        "structured_output_schema": "ReviewFinding",
+        "permitted_tools": [],
+        "prompt_version": "1.0"
+      }
+    },
+    "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca": {
+      "id": "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+      "kind": "AgentRun",
+      "title": "Mission & Science: assumptions",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.705416+00:00",
+      "modified_at": "2026-09-09T16:30:29.705418+00:00",
+      "revision": 0,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "mock",
+        "input_revision": 0,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review"
+        ],
+        "tool_calls": [],
+        "proposal": "e012781b-c8c5-4011-b6a4-adac3b0211bd",
+        "result": "submitted",
+        "tokens": 0,
+        "cost": 0,
+        "timestamp": "2026-09-09T16:30:29.705403+00:00"
+      }
+    },
+    "scope": {
+      "id": "scope",
+      "kind": "Assumption",
+      "title": "Reference scenario applies: 12U, southern Europe, 30 minutes, two years, rideshare, \u20ac12M",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.704953+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "rationale": "Incomplete brief requires a declared sizing basis",
+        "impact": "May invalidate payload, orbit or mission feasibility",
+        "confidence": 0.4,
+        "validation_plan": "Confirm these constraints against the supplied brief; custom missions need edited requirements."
+      }
+    },
+    "observation": {
+      "id": "observation",
+      "kind": "Assumption",
+      "title": "Thermal anomalies and contextual images; assumed 100 m sampling and 100 km swath",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.704967+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "rationale": "Incomplete brief requires a declared sizing basis",
+        "impact": "May invalidate payload, orbit or mission feasibility",
+        "confidence": 0.4,
+        "validation_plan": "Validate detection sensitivity, geolocation, cloud effects and user needs with a payload study."
+      }
+    },
+    "orbit-assumption": {
+      "id": "orbit-assumption",
+      "kind": "Assumption",
+      "title": "Assume circular 550 km LEO; access windows and revisit remain unknown",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.704979+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "rationale": "Incomplete brief requires a declared sizing basis",
+        "impact": "May invalidate payload, orbit or mission feasibility",
+        "confidence": 0.4,
+        "validation_plan": "Propagate actual orbit and ground stations before a preliminary design review."
+      }
+    },
+    "operations": {
+      "id": "operations",
+      "kind": "Assumption",
+      "title": "Assume 40 minutes of usable ground contact daily; this does not prove 30-minute delivery",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.704993+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "rationale": "Incomplete brief requires a declared sizing basis",
+        "impact": "May invalidate payload, orbit or mission feasibility",
+        "confidence": 0.4,
+        "validation_plan": "Simulate worst-case acquisition-to-user latency with actual station access and processing."
+      }
+    },
+    "resources": {
+      "id": "resources",
+      "kind": "Assumption",
+      "title": "Resource inputs are concept estimates with 20% mass contingency and 60% battery depth of discharge",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.705004+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "rationale": "Incomplete brief requires a declared sizing basis",
+        "impact": "May invalidate payload, orbit or mission feasibility",
+        "confidence": 0.4,
+        "validation_plan": "Replace with qualified supplier and environmental evidence."
+      }
+    },
+    "567b6fd6-b15a-4f6c-81db-27fe6275cd61": {
+      "id": "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+      "kind": "Decision",
+      "title": "Accept assumptions",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:29.739387+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "classification": "Human decision",
+      "relations": [],
+      "data": {
+        "rationale": "Simulated human acceptance for reproducible test fixture",
+        "alternatives": [
+          "accept",
+          "reject",
+          "challenge"
+        ],
+        "consequences": "Proposal e012781b-c8c5-4011-b6a4-adac3b0211bd accepted",
+        "context": "Mission & Science proposes assumptions from the current engineering model"
+      }
+    },
+    "51df662e-b690-4341-a880-2abb082f341a": {
+      "id": "51df662e-b690-4341-a880-2abb082f341a",
+      "kind": "AgentRun",
+      "title": "Mission & Science: requirements",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798564+00:00",
+      "modified_at": "2026-09-09T16:30:29.799778+00:00",
+      "revision": 2,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "mock",
+        "input_revision": 1,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61"
+        ],
+        "tool_calls": [],
+        "proposal": "50c421ab-aa35-4a4c-838e-860670709b66",
+        "result": "submitted",
+        "tokens": 0,
+        "cost": 0,
+        "timestamp": "2026-09-09T16:30:29.798544+00:00"
+      }
+    },
+    "objective": {
+      "id": "objective",
+      "kind": "Objective",
+      "title": "Detect and monitor wildfires over southern Europe",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798014+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "scope"
+        }
+      ],
+      "data": {
+        "stakeholder": "Civil protection and wildfire monitoring teams",
+        "priority": "must",
+        "measure_of_success": "Useful thermal anomalies and contextual imagery"
+      }
+    },
+    "req-observe": {
+      "id": "req-observe",
+      "kind": "Requirement",
+      "title": "The mission shall acquire wildfire monitoring imagery over southern Europe.",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798051+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "derives_from",
+          "target": "objective"
+        }
+      ],
+      "data": {
+        "rationale": "Derived from the mission owner brief and approved scope",
+        "source": "Mission brief / scope assumption",
+        "level": "stakeholder",
+        "priority": "must",
+        "verification_method": "demonstration"
+      }
+    },
+    "req-latency": {
+      "id": "req-latency",
+      "kind": "Requirement",
+      "title": "The ground segment shall deliver useful imagery within 30 minutes of acquisition.",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798086+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "derives_from",
+          "target": "objective"
+        }
+      ],
+      "data": {
+        "rationale": "Derived from the mission owner brief and approved scope",
+        "source": "Mission brief / scope assumption",
+        "level": "system",
+        "priority": "must",
+        "verification_method": "analysis"
+      }
+    },
+    "req-life": {
+      "id": "req-life",
+      "kind": "Requirement",
+      "title": "The spacecraft shall support operations for at least two years.",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798110+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "derives_from",
+          "target": "objective"
+        }
+      ],
+      "data": {
+        "rationale": "Derived from the mission owner brief and approved scope",
+        "source": "Mission brief / scope assumption",
+        "level": "system",
+        "priority": "must",
+        "verification_method": "analysis"
+      }
+    },
+    "req-launch": {
+      "id": "req-launch",
+      "kind": "Requirement",
+      "title": "The spacecraft shall fit a 12U rideshare deployer envelope.",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798125+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "derives_from",
+          "target": "objective"
+        }
+      ],
+      "data": {
+        "rationale": "Derived from the mission owner brief and approved scope",
+        "source": "Mission brief / scope assumption",
+        "level": "system",
+        "priority": "must",
+        "verification_method": "inspection"
+      }
+    },
+    "req-cost": {
+      "id": "req-cost",
+      "kind": "Requirement",
+      "title": "The programme shall remain within \u20ac12 million.",
+      "state": "accepted",
+      "owner": "science",
+      "created_at": "2026-09-09T16:30:29.798142+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "derives_from",
+          "target": "objective"
+        }
+      ],
+      "data": {
+        "rationale": "Derived from the mission owner brief and approved scope",
+        "source": "Mission brief / scope assumption",
+        "level": "stakeholder",
+        "priority": "must",
+        "verification_method": "review"
+      }
+    },
+    "4ebf2af6-698a-429f-9312-f9cb16ad41d3": {
+      "id": "4ebf2af6-698a-429f-9312-f9cb16ad41d3",
+      "kind": "Decision",
+      "title": "Accept requirements",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:29.848179+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "classification": "Human decision",
+      "relations": [],
+      "data": {
+        "rationale": "Simulated human acceptance for reproducible test fixture",
+        "alternatives": [
+          "accept",
+          "reject",
+          "challenge"
+        ],
+        "consequences": "Proposal 50c421ab-aa35-4a4c-838e-860670709b66 accepted",
+        "context": "Mission & Science proposes requirements from the current engineering model"
+      }
+    },
+    "bb3376a8-811d-40ad-8284-26524a0f2571": {
+      "id": "bb3376a8-811d-40ad-8284-26524a0f2571",
+      "kind": "AgentRun",
+      "title": "Systems Engineering: architectures",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.881524+00:00",
+      "modified_at": "2026-09-09T16:30:29.881619+00:00",
+      "revision": 4,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "mock",
+        "input_revision": 3,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+          "51df662e-b690-4341-a880-2abb082f341a",
+          "objective",
+          "req-observe",
+          "req-latency",
+          "req-life",
+          "req-launch",
+          "req-cost",
+          "4ebf2af6-698a-429f-9312-f9cb16ad41d3"
+        ],
+        "tool_calls": [],
+        "proposal": "9ae97e64-de6e-4952-aa06-5bd4f3eb0cf7",
+        "result": "submitted",
+        "tokens": 0,
+        "cost": 0,
+        "timestamp": "2026-09-09T16:30:29.881508+00:00"
+      }
+    },
+    "wide": {
+      "id": "wide",
+      "kind": "ArchitectureAlternative",
+      "title": "A \u00b7 Wide-area continuous imaging",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880877+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-observe"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        }
+      ],
+      "data": {
+        "benefits": [
+          "More contextual imagery"
+        ],
+        "disadvantages": [
+          "Data volume exceeds S-band downlink"
+        ],
+        "risks": [
+          "Contact assumptions",
+          "Payload sensitivity unverified"
+        ],
+        "conops": "Acquire thermal strips and store complete imagery; daily S-band ground delivery.",
+        "payload": "Thermal imager with contextual channel; 5% observation duty cycle",
+        "ground": "Single-network S-band contacts",
+        "cost_estimate_eur": 10500000,
+        "cost_basis": "Explicit programme estimate, not a quotation"
+      }
+    },
+    "selective": {
+      "id": "selective",
+      "kind": "ArchitectureAlternative",
+      "title": "B \u00b7 Event-selective imaging + X-band",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880925+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-observe"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        }
+      ],
+      "data": {
+        "benefits": [
+          "Lower data demand",
+          "Higher downlink capacity"
+        ],
+        "disadvantages": [
+          "Onboard filtering can miss weak anomalies",
+          "Larger ground antenna dependency"
+        ],
+        "risks": [
+          "False negatives",
+          "Unverified latency and revisit"
+        ],
+        "conops": "Observe targeted strips, filter events onboard, retain context, downlink via X-band; S-band for TT&C.",
+        "payload": "Thermal imager with event filtering; 2% observation duty cycle",
+        "ground": "Scheduled X-band network",
+        "cost_estimate_eur": 11500000,
+        "cost_basis": "Explicit programme estimate, not a quotation"
+      }
+    },
+    "detect": {
+      "id": "detect",
+      "kind": "Function",
+      "title": "Detect, locate and prioritize thermal anomalies",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880943+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-observe"
+        }
+      ],
+      "data": {
+        "inputs": [
+          "Thermal radiance"
+        ],
+        "outputs": [
+          "Geolocated events"
+        ],
+        "performance": "Sensitivity unknown",
+        "allocated_element": "imager"
+      }
+    },
+    "deliver": {
+      "id": "deliver",
+      "kind": "Function",
+      "title": "Store and deliver imagery to mission users",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880959+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-latency"
+        }
+      ],
+      "data": {
+        "inputs": [
+          "Image products"
+        ],
+        "outputs": [
+          "Ground products"
+        ],
+        "performance": "30 minutes required; unverified",
+        "allocated_element": "bus-component"
+      }
+    },
+    "imager": {
+      "id": "imager",
+      "kind": "Component",
+      "title": "Thermal payload",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880973+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "detect"
+        }
+      ],
+      "data": {
+        "type": "payload",
+        "parent": "spacecraft",
+        "pointing": "Ground-target tracking; accuracy TBD",
+        "calibration": "Onboard reference and vicarious calibration; validation pending",
+        "maturity": "concept"
+      }
+    },
+    "bus-component": {
+      "id": "bus-component",
+      "kind": "Component",
+      "title": "12U platform and ground service",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.880992+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "deliver"
+        }
+      ],
+      "data": {
+        "type": "platform",
+        "parent": "spacecraft",
+        "aocs": "Three-axis stabilized; pointing budget TBD",
+        "thermal": "Passive concept; thermal balance unverified",
+        "obc": "Event filtering and solid-state storage",
+        "maturity": "concept"
+      }
+    },
+    "interface": {
+      "id": "interface",
+      "kind": "Interface",
+      "title": "Payload \u2192 onboard data handling",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.881009+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "imager"
+        },
+        {
+          "type": "depends_on",
+          "target": "bus-component"
+        }
+      ],
+      "data": {
+        "endpoints": [
+          "imager",
+          "bus-component"
+        ],
+        "exchanges": [
+          "Image packets",
+          "Time tags"
+        ],
+        "direction": "payload to bus",
+        "medium": "SpaceWire assumed",
+        "constraints": [
+          "Peak input rate 20 Mbit/s; verify hardware compatibility"
+        ]
+      }
+    },
+    "mission-risk": {
+      "id": "mission-risk",
+      "kind": "Risk",
+      "title": "Latency, coverage, lifetime and cost remain unverified",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.881032+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-latency"
+        },
+        {
+          "type": "depends_on",
+          "target": "req-life"
+        },
+        {
+          "type": "depends_on",
+          "target": "req-cost"
+        }
+      ],
+      "data": {
+        "cause": "Concept inputs lack detailed orbit, environmental and supplier analysis",
+        "event": "Mission cannot satisfy user constraints",
+        "consequence": "Concept redesign",
+        "likelihood": "medium",
+        "severity": "high",
+        "mitigation": "Complete access, radiation, reliability and cost studies",
+        "residual_risk": "open"
+      }
+    },
+    "2704fc03-c8c0-4c06-839b-a2491b7bf903": {
+      "id": "2704fc03-c8c0-4c06-839b-a2491b7bf903",
+      "kind": "Decision",
+      "title": "Accept architectures",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:29.924419+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "classification": "Human decision",
+      "relations": [],
+      "data": {
+        "rationale": "Simulated human acceptance for reproducible test fixture",
+        "alternatives": [
+          "accept",
+          "reject",
+          "challenge"
+        ],
+        "consequences": "Proposal 9ae97e64-de6e-4952-aa06-5bd4f3eb0cf7 accepted",
+        "context": "Systems Engineering proposes architectures from the current engineering model"
+      }
+    },
+    "mission-orbit-analysis": {
+      "id": "mission-orbit-analysis",
+      "kind": "AnalysisRun",
+      "title": "mission \u00b7 orbit calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.974737+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "orbit-assumption"
+        }
+      ],
+      "data": {
+        "tool": "orbit",
+        "version": "1.0",
+        "inputs": {
+          "altitude": {
+            "value": 550,
+            "unit": "km"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.974067+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "period": {
+            "value": 5730.127089,
+            "unit": "second"
+          },
+          "eclipse": {
+            "value": 2133.006041,
+            "unit": "second"
+          },
+          "coverage": "Unknown: no access propagation",
+          "latency": "Unknown: daily capacity is not latency"
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0006358099999488331
+      }
+    },
+    "mission-orbit-claim": {
+      "id": "mission-orbit-claim",
+      "kind": "Claim",
+      "title": "mission: preliminary orbit results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.974777+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "mission-orbit-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "period": {
+            "value": 5730.127089,
+            "unit": "second"
+          },
+          "eclipse": {
+            "value": 2133.006041,
+            "unit": "second"
+          },
+          "coverage": "Unknown: no access propagation",
+          "latency": "Unknown: daily capacity is not latency"
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "wide-mass-analysis": {
+      "id": "wide-mass-analysis",
+      "kind": "AnalysisRun",
+      "title": "wide \u00b7 mass calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.977922+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "mass",
+        "version": "1.0",
+        "inputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "mass": {
+                "value": 3,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "mass": {
+                "value": 2,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "mass": {
+                "value": 2.5,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "mass": {
+                "value": 2,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "mass": {
+                "value": 1,
+                "unit": "kg"
+              }
+            }
+          ],
+          "margin": {
+            "value": 0.2,
+            "unit": ""
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.974811+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "cbe": {
+                "value": 3,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.6,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "cbe": {
+                "value": 2.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.0,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "cbe": {
+                "value": 1,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 1.2,
+                "unit": "kg"
+              }
+            }
+          ],
+          "total": {
+            "value": 12.6,
+            "unit": "kg"
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          },
+          "margin": {
+            "value": 7.4,
+            "unit": "kg"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0030751509998481197
+      }
+    },
+    "wide-mass": {
+      "id": "wide-mass",
+      "kind": "Budget",
+      "title": "wide \u00b7 mass",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.977976+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "wide",
+        "entries": [
+          {
+            "name": "Payload",
+            "cbe": {
+              "value": 3,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 3.6,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Structure",
+            "cbe": {
+              "value": 2,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 2.4,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Power",
+            "cbe": {
+              "value": 2.5,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 3.0,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Avionics/AOCS",
+            "cbe": {
+              "value": 2,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 2.4,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Communications",
+            "cbe": {
+              "value": 1,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 1.2,
+              "unit": "kg"
+            }
+          }
+        ],
+        "total": {
+          "value": 12.6,
+          "unit": "kg"
+        },
+        "limit": {
+          "value": 20,
+          "unit": "kg"
+        },
+        "margin": {
+          "value": 7.4,
+          "unit": "kg"
+        },
+        "compliant": true
+      }
+    },
+    "wide-mass-claim": {
+      "id": "wide-mass-claim",
+      "kind": "Claim",
+      "title": "wide: preliminary mass results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.977997+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "cbe": {
+                "value": 3,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.6,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "cbe": {
+                "value": 2.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.0,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "cbe": {
+                "value": 1,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 1.2,
+                "unit": "kg"
+              }
+            }
+          ],
+          "total": {
+            "value": 12.6,
+            "unit": "kg"
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          },
+          "margin": {
+            "value": 7.4,
+            "unit": "kg"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "wide-mass-entry-0": {
+      "id": "wide-mass-entry-0",
+      "kind": "BudgetEntry",
+      "title": "Payload",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978020+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Payload",
+        "cbe": {
+          "value": 3,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 3.6,
+          "unit": "kg"
+        }
+      }
+    },
+    "wide-mass-entry-1": {
+      "id": "wide-mass-entry-1",
+      "kind": "BudgetEntry",
+      "title": "Structure",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978038+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Structure",
+        "cbe": {
+          "value": 2,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 2.4,
+          "unit": "kg"
+        }
+      }
+    },
+    "wide-mass-entry-2": {
+      "id": "wide-mass-entry-2",
+      "kind": "BudgetEntry",
+      "title": "Power",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978055+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Power",
+        "cbe": {
+          "value": 2.5,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 3.0,
+          "unit": "kg"
+        }
+      }
+    },
+    "wide-mass-entry-3": {
+      "id": "wide-mass-entry-3",
+      "kind": "BudgetEntry",
+      "title": "Avionics/AOCS",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978071+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Avionics/AOCS",
+        "cbe": {
+          "value": 2,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 2.4,
+          "unit": "kg"
+        }
+      }
+    },
+    "wide-mass-entry-4": {
+      "id": "wide-mass-entry-4",
+      "kind": "BudgetEntry",
+      "title": "Communications",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978086+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Communications",
+        "cbe": {
+          "value": 1,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 1.2,
+          "unit": "kg"
+        }
+      }
+    },
+    "wide-power-analysis": {
+      "id": "wide-power-analysis",
+      "kind": "AnalysisRun",
+      "title": "wide \u00b7 power calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978858+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "power",
+        "version": "1.0",
+        "inputs": {
+          "modes": [
+            {
+              "name": "observe",
+              "fraction": {
+                "value": 0.2,
+                "unit": ""
+              },
+              "loads": {
+                "payload": {
+                  "value": 20,
+                  "unit": "W"
+                },
+                "bus": {
+                  "value": 10,
+                  "unit": "W"
+                }
+              }
+            },
+            {
+              "name": "standby",
+              "fraction": {
+                "value": 0.8,
+                "unit": ""
+              },
+              "loads": {
+                "bus": {
+                  "value": 10,
+                  "unit": "W"
+                }
+              }
+            }
+          ],
+          "period": {
+            "value": 5730.127089,
+            "unit": "second"
+          },
+          "eclipse": {
+            "value": 2133.006041,
+            "unit": "second"
+          },
+          "solar": {
+            "value": 45,
+            "unit": "W"
+          },
+          "battery": {
+            "value": 40,
+            "unit": "Wh"
+          },
+          "depth_of_discharge": {
+            "value": 0.6,
+            "unit": ""
+          },
+          "eclipse_load": {
+            "value": 14,
+            "unit": "W"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.978102+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "average_load": {
+            "value": 14.0,
+            "unit": "W"
+          },
+          "generated": {
+            "value": 44.964013,
+            "unit": "Wh"
+          },
+          "consumed": {
+            "value": 22.283828,
+            "unit": "Wh"
+          },
+          "margin": {
+            "value": 22.680186,
+            "unit": "Wh"
+          },
+          "eclipse_energy": {
+            "value": 8.295023,
+            "unit": "Wh"
+          },
+          "usable_battery": {
+            "value": 24.0,
+            "unit": "Wh"
+          },
+          "battery_margin": {
+            "value": 15.704977,
+            "unit": "Wh"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0007274409999808995
+      }
+    },
+    "wide-power": {
+      "id": "wide-power",
+      "kind": "Budget",
+      "title": "wide \u00b7 power",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978894+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-power-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "wide",
+        "average_load": {
+          "value": 14.0,
+          "unit": "W"
+        },
+        "generated": {
+          "value": 44.964013,
+          "unit": "Wh"
+        },
+        "consumed": {
+          "value": 22.283828,
+          "unit": "Wh"
+        },
+        "margin": {
+          "value": 22.680186,
+          "unit": "Wh"
+        },
+        "eclipse_energy": {
+          "value": 8.295023,
+          "unit": "Wh"
+        },
+        "usable_battery": {
+          "value": 24.0,
+          "unit": "Wh"
+        },
+        "battery_margin": {
+          "value": 15.704977,
+          "unit": "Wh"
+        },
+        "compliant": true
+      }
+    },
+    "wide-power-claim": {
+      "id": "wide-power-claim",
+      "kind": "Claim",
+      "title": "wide: preliminary power results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.978913+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-power-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "average_load": {
+            "value": 14.0,
+            "unit": "W"
+          },
+          "generated": {
+            "value": 44.964013,
+            "unit": "Wh"
+          },
+          "consumed": {
+            "value": 22.283828,
+            "unit": "Wh"
+          },
+          "margin": {
+            "value": 22.680186,
+            "unit": "Wh"
+          },
+          "eclipse_energy": {
+            "value": 8.295023,
+            "unit": "Wh"
+          },
+          "usable_battery": {
+            "value": 24.0,
+            "unit": "Wh"
+          },
+          "battery_margin": {
+            "value": 15.704977,
+            "unit": "Wh"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "wide-data-analysis": {
+      "id": "wide-data-analysis",
+      "kind": "AnalysisRun",
+      "title": "wide \u00b7 data calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.979737+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "data",
+        "version": "1.0",
+        "inputs": {
+          "rate": {
+            "value": 20,
+            "unit": "Mbit/s"
+          },
+          "duty": {
+            "value": 0.05,
+            "unit": ""
+          },
+          "compression": {
+            "value": 2,
+            "unit": ""
+          },
+          "storage": {
+            "value": 32,
+            "unit": "Gbyte"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.978926+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "daily": {
+            "value": 43200000000.0,
+            "unit": "bit"
+          },
+          "storage": {
+            "value": 256000000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 212800000000.0,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0007880190000832954
+      }
+    },
+    "wide-data": {
+      "id": "wide-data",
+      "kind": "Budget",
+      "title": "wide \u00b7 data",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.979771+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-data-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "wide",
+        "daily": {
+          "value": 43200000000.0,
+          "unit": "bit"
+        },
+        "storage": {
+          "value": 256000000000.0,
+          "unit": "bit"
+        },
+        "margin": {
+          "value": 212800000000.0,
+          "unit": "bit"
+        },
+        "compliant": true
+      }
+    },
+    "wide-data-claim": {
+      "id": "wide-data-claim",
+      "kind": "Claim",
+      "title": "wide: preliminary data results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.979789+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-data-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "daily": {
+            "value": 43200000000.0,
+            "unit": "bit"
+          },
+          "storage": {
+            "value": 256000000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 212800000000.0,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "wide-link-analysis": {
+      "id": "wide-link-analysis",
+      "kind": "AnalysisRun",
+      "title": "wide \u00b7 link calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.980870+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-data"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "link",
+        "version": "1.0",
+        "inputs": {
+          "frequency": {
+            "value": 2.2,
+            "unit": "GHz"
+          },
+          "range": {
+            "value": 1500,
+            "unit": "km"
+          },
+          "rate": {
+            "value": 1,
+            "unit": "Mbit/s"
+          },
+          "tx_power": {
+            "value": 5,
+            "unit": "W"
+          },
+          "tx_gain_db": {
+            "value": 3,
+            "unit": ""
+          },
+          "rx_gain_db": {
+            "value": 30,
+            "unit": ""
+          },
+          "loss_db": {
+            "value": 3,
+            "unit": ""
+          },
+          "required_ebn0_db": {
+            "value": 5,
+            "unit": ""
+          },
+          "noise_temperature": {
+            "value": 300,
+            "unit": "K"
+          },
+          "contact": {
+            "value": 40,
+            "unit": "minute"
+          },
+          "efficiency": {
+            "value": 0.7,
+            "unit": ""
+          },
+          "demand": {
+            "value": 43200000000.0,
+            "unit": "bit"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.979802+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "fspl_db": {
+            "value": 162.818062,
+            "unit": "dimensionless"
+          },
+          "ebn0_db": {
+            "value": 17.999593,
+            "unit": "dimensionless"
+          },
+          "link_margin_db": {
+            "value": 12.999593,
+            "unit": "dimensionless"
+          },
+          "capacity": {
+            "value": 1680000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": -41520000000.0,
+            "unit": "bit"
+          },
+          "compliant": false
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0010371280000072147
+      }
+    },
+    "wide-link": {
+      "id": "wide-link",
+      "kind": "Budget",
+      "title": "wide \u00b7 link",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.980919+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-link-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "wide",
+        "fspl_db": {
+          "value": 162.818062,
+          "unit": "dimensionless"
+        },
+        "ebn0_db": {
+          "value": 17.999593,
+          "unit": "dimensionless"
+        },
+        "link_margin_db": {
+          "value": 12.999593,
+          "unit": "dimensionless"
+        },
+        "capacity": {
+          "value": 1680000000.0,
+          "unit": "bit"
+        },
+        "margin": {
+          "value": -41520000000.0,
+          "unit": "bit"
+        },
+        "compliant": false
+      }
+    },
+    "wide-link-claim": {
+      "id": "wide-link-claim",
+      "kind": "Claim",
+      "title": "wide: preliminary link results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.980941+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-link-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "fspl_db": {
+            "value": 162.818062,
+            "unit": "dimensionless"
+          },
+          "ebn0_db": {
+            "value": 17.999593,
+            "unit": "dimensionless"
+          },
+          "link_margin_db": {
+            "value": 12.999593,
+            "unit": "dimensionless"
+          },
+          "capacity": {
+            "value": 1680000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": -41520000000.0,
+            "unit": "bit"
+          },
+          "compliant": false
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "wide-conflict": {
+      "id": "wide-conflict",
+      "kind": "ReviewFinding",
+      "title": "Payload production exceeds daily downlink capacity",
+      "state": "resolved",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.980959+00:00",
+      "modified_at": "2026-09-09T16:30:30.031486+00:00",
+      "revision": 7,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-link"
+        },
+        {
+          "type": "depends_on",
+          "target": "wide-data"
+        }
+      ],
+      "data": {
+        "severity": "critical",
+        "resolution": "Selected selective; rejected candidate and payload dissent preserved in trade",
+        "disciplines": [
+          "Payload: preserve contextual imagery",
+          "Bus & Ground: finite contact capacity"
+        ]
+      }
+    },
+    "selective-mass-analysis": {
+      "id": "selective-mass-analysis",
+      "kind": "AnalysisRun",
+      "title": "selective \u00b7 mass calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984698+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "mass",
+        "version": "1.0",
+        "inputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "mass": {
+                "value": 3,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "mass": {
+                "value": 2,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "mass": {
+                "value": 2.5,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "mass": {
+                "value": 2,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "mass": {
+                "value": 1.5,
+                "unit": "kg"
+              }
+            }
+          ],
+          "margin": {
+            "value": 0.2,
+            "unit": ""
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.982006+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "cbe": {
+                "value": 3,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.6,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "cbe": {
+                "value": 2.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.0,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "cbe": {
+                "value": 1.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 1.8,
+                "unit": "kg"
+              }
+            }
+          ],
+          "total": {
+            "value": 13.2,
+            "unit": "kg"
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          },
+          "margin": {
+            "value": 6.8,
+            "unit": "kg"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0026564210002106847
+      }
+    },
+    "selective-mass": {
+      "id": "selective-mass",
+      "kind": "Budget",
+      "title": "selective \u00b7 mass",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984742+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "selective",
+        "entries": [
+          {
+            "name": "Payload",
+            "cbe": {
+              "value": 3,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 3.6,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Structure",
+            "cbe": {
+              "value": 2,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 2.4,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Power",
+            "cbe": {
+              "value": 2.5,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 3.0,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Avionics/AOCS",
+            "cbe": {
+              "value": 2,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 2.4,
+              "unit": "kg"
+            }
+          },
+          {
+            "name": "Communications",
+            "cbe": {
+              "value": 1.5,
+              "unit": "kg"
+            },
+            "allocated": {
+              "value": 1.8,
+              "unit": "kg"
+            }
+          }
+        ],
+        "total": {
+          "value": 13.2,
+          "unit": "kg"
+        },
+        "limit": {
+          "value": 20,
+          "unit": "kg"
+        },
+        "margin": {
+          "value": 6.8,
+          "unit": "kg"
+        },
+        "compliant": true
+      }
+    },
+    "selective-mass-claim": {
+      "id": "selective-mass-claim",
+      "kind": "Claim",
+      "title": "selective: preliminary mass results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984761+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "entries": [
+            {
+              "name": "Payload",
+              "cbe": {
+                "value": 3,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.6,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Structure",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Power",
+              "cbe": {
+                "value": 2.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 3.0,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Avionics/AOCS",
+              "cbe": {
+                "value": 2,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 2.4,
+                "unit": "kg"
+              }
+            },
+            {
+              "name": "Communications",
+              "cbe": {
+                "value": 1.5,
+                "unit": "kg"
+              },
+              "allocated": {
+                "value": 1.8,
+                "unit": "kg"
+              }
+            }
+          ],
+          "total": {
+            "value": 13.2,
+            "unit": "kg"
+          },
+          "limit": {
+            "value": 20,
+            "unit": "kg"
+          },
+          "margin": {
+            "value": 6.8,
+            "unit": "kg"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "selective-mass-entry-0": {
+      "id": "selective-mass-entry-0",
+      "kind": "BudgetEntry",
+      "title": "Payload",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984786+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Payload",
+        "cbe": {
+          "value": 3,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 3.6,
+          "unit": "kg"
+        }
+      }
+    },
+    "selective-mass-entry-1": {
+      "id": "selective-mass-entry-1",
+      "kind": "BudgetEntry",
+      "title": "Structure",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984808+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Structure",
+        "cbe": {
+          "value": 2,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 2.4,
+          "unit": "kg"
+        }
+      }
+    },
+    "selective-mass-entry-2": {
+      "id": "selective-mass-entry-2",
+      "kind": "BudgetEntry",
+      "title": "Power",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984823+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Power",
+        "cbe": {
+          "value": 2.5,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 3.0,
+          "unit": "kg"
+        }
+      }
+    },
+    "selective-mass-entry-3": {
+      "id": "selective-mass-entry-3",
+      "kind": "BudgetEntry",
+      "title": "Avionics/AOCS",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984842+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Avionics/AOCS",
+        "cbe": {
+          "value": 2,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 2.4,
+          "unit": "kg"
+        }
+      }
+    },
+    "selective-mass-entry-4": {
+      "id": "selective-mass-entry-4",
+      "kind": "BudgetEntry",
+      "title": "Communications",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.984857+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-mass"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-mass-analysis"
+        }
+      ],
+      "data": {
+        "name": "Communications",
+        "cbe": {
+          "value": 1.5,
+          "unit": "kg"
+        },
+        "allocated": {
+          "value": 1.8,
+          "unit": "kg"
+        }
+      }
+    },
+    "selective-power-analysis": {
+      "id": "selective-power-analysis",
+      "kind": "AnalysisRun",
+      "title": "selective \u00b7 power calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.985633+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "power",
+        "version": "1.0",
+        "inputs": {
+          "modes": [
+            {
+              "name": "observe",
+              "fraction": {
+                "value": 0.2,
+                "unit": ""
+              },
+              "loads": {
+                "payload": {
+                  "value": 20,
+                  "unit": "W"
+                },
+                "bus": {
+                  "value": 10,
+                  "unit": "W"
+                }
+              }
+            },
+            {
+              "name": "standby",
+              "fraction": {
+                "value": 0.8,
+                "unit": ""
+              },
+              "loads": {
+                "bus": {
+                  "value": 10,
+                  "unit": "W"
+                }
+              }
+            }
+          ],
+          "period": {
+            "value": 5730.127089,
+            "unit": "second"
+          },
+          "eclipse": {
+            "value": 2133.006041,
+            "unit": "second"
+          },
+          "solar": {
+            "value": 45,
+            "unit": "W"
+          },
+          "battery": {
+            "value": 40,
+            "unit": "Wh"
+          },
+          "depth_of_discharge": {
+            "value": 0.6,
+            "unit": ""
+          },
+          "eclipse_load": {
+            "value": 14,
+            "unit": "W"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.984872+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "average_load": {
+            "value": 14.0,
+            "unit": "W"
+          },
+          "generated": {
+            "value": 44.964013,
+            "unit": "Wh"
+          },
+          "consumed": {
+            "value": 22.283828,
+            "unit": "Wh"
+          },
+          "margin": {
+            "value": 22.680186,
+            "unit": "Wh"
+          },
+          "eclipse_energy": {
+            "value": 8.295023,
+            "unit": "Wh"
+          },
+          "usable_battery": {
+            "value": 24.0,
+            "unit": "Wh"
+          },
+          "battery_margin": {
+            "value": 15.704977,
+            "unit": "Wh"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0003842070000246167
+      }
+    },
+    "selective-power": {
+      "id": "selective-power",
+      "kind": "Budget",
+      "title": "selective \u00b7 power",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.985680+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-power-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "selective",
+        "average_load": {
+          "value": 14.0,
+          "unit": "W"
+        },
+        "generated": {
+          "value": 44.964013,
+          "unit": "Wh"
+        },
+        "consumed": {
+          "value": 22.283828,
+          "unit": "Wh"
+        },
+        "margin": {
+          "value": 22.680186,
+          "unit": "Wh"
+        },
+        "eclipse_energy": {
+          "value": 8.295023,
+          "unit": "Wh"
+        },
+        "usable_battery": {
+          "value": 24.0,
+          "unit": "Wh"
+        },
+        "battery_margin": {
+          "value": 15.704977,
+          "unit": "Wh"
+        },
+        "compliant": true
+      }
+    },
+    "selective-power-claim": {
+      "id": "selective-power-claim",
+      "kind": "Claim",
+      "title": "selective: preliminary power results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.985700+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-power-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "average_load": {
+            "value": 14.0,
+            "unit": "W"
+          },
+          "generated": {
+            "value": 44.964013,
+            "unit": "Wh"
+          },
+          "consumed": {
+            "value": 22.283828,
+            "unit": "Wh"
+          },
+          "margin": {
+            "value": 22.680186,
+            "unit": "Wh"
+          },
+          "eclipse_energy": {
+            "value": 8.295023,
+            "unit": "Wh"
+          },
+          "usable_battery": {
+            "value": 24.0,
+            "unit": "Wh"
+          },
+          "battery_margin": {
+            "value": 15.704977,
+            "unit": "Wh"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "selective-data-analysis": {
+      "id": "selective-data-analysis",
+      "kind": "AnalysisRun",
+      "title": "selective \u00b7 data calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.986132+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective"
+        },
+        {
+          "type": "depends_on",
+          "target": "resources"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "data",
+        "version": "1.0",
+        "inputs": {
+          "rate": {
+            "value": 20,
+            "unit": "Mbit/s"
+          },
+          "duty": {
+            "value": 0.02,
+            "unit": ""
+          },
+          "compression": {
+            "value": 4,
+            "unit": ""
+          },
+          "storage": {
+            "value": 32,
+            "unit": "Gbyte"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.985712+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "daily": {
+            "value": 8640000000.0,
+            "unit": "bit"
+          },
+          "storage": {
+            "value": 256000000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 247360000000.0,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0003998379997938173
+      }
+    },
+    "selective-data": {
+      "id": "selective-data",
+      "kind": "Budget",
+      "title": "selective \u00b7 data",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.987941+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-data-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "selective",
+        "daily": {
+          "value": 8640000000.0,
+          "unit": "bit"
+        },
+        "storage": {
+          "value": 256000000000.0,
+          "unit": "bit"
+        },
+        "margin": {
+          "value": 247360000000.0,
+          "unit": "bit"
+        },
+        "compliant": true
+      }
+    },
+    "selective-data-claim": {
+      "id": "selective-data-claim",
+      "kind": "Claim",
+      "title": "selective: preliminary data results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.987980+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-data-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "daily": {
+            "value": 8640000000.0,
+            "unit": "bit"
+          },
+          "storage": {
+            "value": 256000000000.0,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 247360000000.0,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "selective-link-analysis": {
+      "id": "selective-link-analysis",
+      "kind": "AnalysisRun",
+      "title": "selective \u00b7 link calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.989156+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-data"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "tool": "link",
+        "version": "1.0",
+        "inputs": {
+          "frequency": {
+            "value": 8.2,
+            "unit": "GHz"
+          },
+          "range": {
+            "value": 1500,
+            "unit": "km"
+          },
+          "rate": {
+            "value": 10,
+            "unit": "Mbit/s"
+          },
+          "tx_power": {
+            "value": 5,
+            "unit": "W"
+          },
+          "tx_gain_db": {
+            "value": 8,
+            "unit": ""
+          },
+          "rx_gain_db": {
+            "value": 42,
+            "unit": ""
+          },
+          "loss_db": {
+            "value": 3,
+            "unit": ""
+          },
+          "required_ebn0_db": {
+            "value": 5,
+            "unit": ""
+          },
+          "noise_temperature": {
+            "value": 300,
+            "unit": "K"
+          },
+          "contact": {
+            "value": 40,
+            "unit": "minute"
+          },
+          "efficiency": {
+            "value": 0.7,
+            "unit": ""
+          },
+          "demand": {
+            "value": 8640000000.0,
+            "unit": "bit"
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.988004+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "fspl_db": {
+            "value": 174.245885,
+            "unit": "dimensionless"
+          },
+          "ebn0_db": {
+            "value": 13.571769,
+            "unit": "dimensionless"
+          },
+          "link_margin_db": {
+            "value": 8.571769,
+            "unit": "dimensionless"
+          },
+          "capacity": {
+            "value": 16799999999.999998,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 8159999999.999998,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "status": "valid",
+        "elapsed_seconds": 0.0011080369999945106
+      }
+    },
+    "selective-link": {
+      "id": "selective-link",
+      "kind": "Budget",
+      "title": "selective \u00b7 link",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.989207+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-link-analysis"
+        }
+      ],
+      "data": {
+        "candidate": "selective",
+        "fspl_db": {
+          "value": 174.245885,
+          "unit": "dimensionless"
+        },
+        "ebn0_db": {
+          "value": 13.571769,
+          "unit": "dimensionless"
+        },
+        "link_margin_db": {
+          "value": 8.571769,
+          "unit": "dimensionless"
+        },
+        "capacity": {
+          "value": 16799999999.999998,
+          "unit": "bit"
+        },
+        "margin": {
+          "value": 8159999999.999998,
+          "unit": "bit"
+        },
+        "compliant": true
+      }
+    },
+    "selective-link-claim": {
+      "id": "selective-link-claim",
+      "kind": "Claim",
+      "title": "selective: preliminary link results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.989307+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selective-link-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "fspl_db": {
+            "value": 174.245885,
+            "unit": "dimensionless"
+          },
+          "ebn0_db": {
+            "value": 13.571769,
+            "unit": "dimensionless"
+          },
+          "link_margin_db": {
+            "value": 8.571769,
+            "unit": "dimensionless"
+          },
+          "capacity": {
+            "value": 16799999999.999998,
+            "unit": "bit"
+          },
+          "margin": {
+            "value": 8159999999.999998,
+            "unit": "bit"
+          },
+          "compliant": true
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "a90ce4a2-d64e-4e89-ba39-09f5cc0aa146": {
+      "id": "a90ce4a2-d64e-4e89-ba39-09f5cc0aa146",
+      "kind": "AgentRun",
+      "title": "Mission Analysis: deterministic analysis",
+      "state": "accepted",
+      "owner": "analysis",
+      "created_at": "2026-09-09T16:30:29.989367+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "deterministic mock",
+        "input_revision": 5,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+          "51df662e-b690-4341-a880-2abb082f341a",
+          "objective",
+          "req-observe",
+          "req-latency",
+          "req-life",
+          "req-launch",
+          "req-cost",
+          "4ebf2af6-698a-429f-9312-f9cb16ad41d3",
+          "bb3376a8-811d-40ad-8284-26524a0f2571",
+          "wide",
+          "selective",
+          "detect",
+          "deliver",
+          "imager",
+          "bus-component",
+          "interface",
+          "mission-risk",
+          "2704fc03-c8c0-4c06-839b-a2491b7bf903"
+        ],
+        "tool_calls": [
+          "orbit"
+        ],
+        "result": "completed",
+        "tokens": 0,
+        "cost": 0
+      }
+    },
+    "51c131da-a0c4-4ba9-8a7c-7a930cc24c80": {
+      "id": "51c131da-a0c4-4ba9-8a7c-7a930cc24c80",
+      "kind": "AgentRun",
+      "title": "Payload: deterministic analysis",
+      "state": "accepted",
+      "owner": "payload",
+      "created_at": "2026-09-09T16:30:29.989399+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "deterministic mock",
+        "input_revision": 5,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+          "51df662e-b690-4341-a880-2abb082f341a",
+          "objective",
+          "req-observe",
+          "req-latency",
+          "req-life",
+          "req-launch",
+          "req-cost",
+          "4ebf2af6-698a-429f-9312-f9cb16ad41d3",
+          "bb3376a8-811d-40ad-8284-26524a0f2571",
+          "wide",
+          "selective",
+          "detect",
+          "deliver",
+          "imager",
+          "bus-component",
+          "interface",
+          "mission-risk",
+          "2704fc03-c8c0-4c06-839b-a2491b7bf903"
+        ],
+        "tool_calls": [
+          "data"
+        ],
+        "result": "completed",
+        "tokens": 0,
+        "cost": 0
+      }
+    },
+    "c3fce35d-88f2-48e8-a55f-00a01deea821": {
+      "id": "c3fce35d-88f2-48e8-a55f-00a01deea821",
+      "kind": "AgentRun",
+      "title": "Spacecraft Bus & Ground: deterministic analysis",
+      "state": "accepted",
+      "owner": "bus",
+      "created_at": "2026-09-09T16:30:29.989423+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "deterministic mock",
+        "input_revision": 5,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+          "51df662e-b690-4341-a880-2abb082f341a",
+          "objective",
+          "req-observe",
+          "req-latency",
+          "req-life",
+          "req-launch",
+          "req-cost",
+          "4ebf2af6-698a-429f-9312-f9cb16ad41d3",
+          "bb3376a8-811d-40ad-8284-26524a0f2571",
+          "wide",
+          "selective",
+          "detect",
+          "deliver",
+          "imager",
+          "bus-component",
+          "interface",
+          "mission-risk",
+          "2704fc03-c8c0-4c06-839b-a2491b7bf903"
+        ],
+        "tool_calls": [
+          "mass",
+          "power",
+          "link"
+        ],
+        "result": "completed",
+        "tokens": 0,
+        "cost": 0
+      }
+    },
+    "concept-trade-analysis": {
+      "id": "concept-trade-analysis",
+      "kind": "AnalysisRun",
+      "title": "concept \u00b7 trade calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.989494+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-link"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-link"
+        }
+      ],
+      "data": {
+        "tool": "trade",
+        "version": "1.0",
+        "inputs": {
+          "weights": {
+            "science": 0.35,
+            "capacity": 0.45,
+            "simplicity": 0.2
+          },
+          "scores": {
+            "wide": {
+              "science": 5,
+              "capacity": 0,
+              "simplicity": 4
+            },
+            "selective": {
+              "science": 3,
+              "capacity": 5,
+              "simplicity": 3
+            }
+          }
+        },
+        "source_revision": 5,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:29.989446+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "scores": {
+            "wide": 2.55,
+            "selective": 3.9
+          },
+          "recommendation": "selective"
+        },
+        "status": "valid",
+        "elapsed_seconds": 3.402899983484531e-05
+      }
+    },
+    "concept-trade-claim": {
+      "id": "concept-trade-claim",
+      "kind": "Claim",
+      "title": "concept: preliminary trade results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:29.989519+00:00",
+      "modified_at": "2026-09-09T16:30:29.989812+00:00",
+      "revision": 6,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "concept-trade-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "scores": {
+            "wide": 2.55,
+            "selective": 3.9
+          },
+          "recommendation": "selective"
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "trade": {
+      "id": "trade",
+      "kind": "TradeStudy",
+      "title": "Resolve the payload\u2013ground capacity conflict",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:29.989538+00:00",
+      "modified_at": "2026-09-09T16:30:30.031486+00:00",
+      "revision": 7,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "concept-trade-analysis"
+        },
+        {
+          "type": "evidenced_by",
+          "target": "selection-trade-analysis"
+        }
+      ],
+      "data": {
+        "criteria": [
+          "science",
+          "capacity",
+          "simplicity"
+        ],
+        "weights": {
+          "science": 0.35,
+          "capacity": 0.45,
+          "simplicity": 0.2
+        },
+        "scores": {
+          "wide": {
+            "science": 5,
+            "capacity": 0,
+            "simplicity": 4
+          },
+          "selective": {
+            "science": 3,
+            "capacity": 5,
+            "simplicity": 3
+          }
+        },
+        "recommendation": "selective",
+        "dissent": "Payload favors complete images; event filtering risks missed weak anomalies.",
+        "sensitivities": "Recommendation depends on assumed science utility scores; weights editable before selection.",
+        "alternatives": [
+          "wide",
+          "selective"
+        ],
+        "score_basis": "Engineering estimate on a 0\u20135 ordinal scale"
+      }
+    },
+    "selection-trade-analysis": {
+      "id": "selection-trade-analysis",
+      "kind": "AnalysisRun",
+      "title": "selection \u00b7 trade calculation",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:30.031372+00:00",
+      "modified_at": "2026-09-09T16:30:30.031486+00:00",
+      "revision": 7,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "wide-link"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-link"
+        }
+      ],
+      "data": {
+        "tool": "trade",
+        "version": "1.0",
+        "inputs": {
+          "weights": {
+            "science": 0.35,
+            "capacity": 0.45,
+            "simplicity": 0.2
+          },
+          "scores": {
+            "wide": {
+              "science": 5,
+              "capacity": 0,
+              "simplicity": 4
+            },
+            "selective": {
+              "science": 3,
+              "capacity": 5,
+              "simplicity": 3
+            }
+          }
+        },
+        "source_revision": 6,
+        "assumptions": [
+          "Concept estimates; approved resources and operations assumptions"
+        ],
+        "timestamp": "2026-09-09T16:30:30.031285+00:00",
+        "warnings": [
+          "Preliminary concept sizing; assumed inputs are not validated hardware performance."
+        ],
+        "errors": [],
+        "outputs": {
+          "scores": {
+            "wide": 2.55,
+            "selective": 3.9
+          },
+          "recommendation": "selective"
+        },
+        "status": "valid",
+        "elapsed_seconds": 5.950600007054163e-05
+      }
+    },
+    "selection-trade-claim": {
+      "id": "selection-trade-claim",
+      "kind": "Claim",
+      "title": "selection: preliminary trade results",
+      "state": "accepted",
+      "owner": "tool",
+      "created_at": "2026-09-09T16:30:30.031404+00:00",
+      "modified_at": "2026-09-09T16:30:30.031486+00:00",
+      "revision": 7,
+      "classification": "Deterministic calculation",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selection-trade-analysis"
+        }
+      ],
+      "data": {
+        "outputs": {
+          "scores": {
+            "wide": 2.55,
+            "selective": 3.9
+          },
+          "recommendation": "selective"
+        },
+        "validity": "Conditional on recorded assumptions"
+      }
+    },
+    "selection": {
+      "id": "selection",
+      "kind": "Decision",
+      "title": "Mission owner selected selective",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:30.031470+00:00",
+      "modified_at": "2026-09-09T16:30:30.031486+00:00",
+      "revision": 7,
+      "classification": "Human decision",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "trade"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-link"
+        }
+      ],
+      "data": {
+        "rationale": "Simulated human selection: positive capacity with acknowledged science dissent",
+        "alternatives": [
+          "wide",
+          "selective"
+        ],
+        "consequences": "Proceed to independent concept review; feasibility remains preliminary"
+      }
+    },
+    "review-latency": {
+      "id": "review-latency",
+      "kind": "ReviewFinding",
+      "title": "Daily downlink capacity does not establish 30-minute delivery",
+      "state": "verified",
+      "owner": "review",
+      "created_at": "2026-09-09T16:30:30.094874+00:00",
+      "modified_at": "2026-09-09T16:30:30.253227+00:00",
+      "revision": 10,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-latency"
+        },
+        {
+          "type": "depends_on",
+          "target": "selective-link"
+        }
+      ],
+      "data": {
+        "severity": "critical",
+        "resolution": "Removed implied latency feasibility; allocated explicit verification task and retained mission risk. This resolves the evidence representation defect, not mission feasibility.",
+        "entry_criteria": "Requirements approved; two concepts analyzed; selection recorded",
+        "checks": [
+          "Latency evidence",
+          "Traceability",
+          "Resource compliance"
+        ],
+        "exit_criteria": "Explicit unverified status, verification allocation and human acknowledgement",
+        "reviewer_verification": "review: verification obligation and residual risk present; conceptual scope only"
+      }
+    },
+    "review-run": {
+      "id": "review-run",
+      "kind": "AgentRun",
+      "title": "Independent Mission Concept Review",
+      "state": "accepted",
+      "owner": "review",
+      "created_at": "2026-09-09T16:30:30.094929+00:00",
+      "modified_at": "2026-09-09T16:30:30.097422+00:00",
+      "revision": 8,
+      "classification": "Explicit assumption",
+      "relations": [],
+      "data": {
+        "agent_version": "1.0",
+        "model": "deterministic mock",
+        "input_revision": 7,
+        "context_references": [
+          "brief",
+          "agent-science",
+          "agent-systems",
+          "agent-analysis",
+          "agent-payload",
+          "agent-bus",
+          "agent-review",
+          "a0edba13-e3f4-4683-8d48-c7b6b6ce65ca",
+          "scope",
+          "observation",
+          "orbit-assumption",
+          "operations",
+          "resources",
+          "567b6fd6-b15a-4f6c-81db-27fe6275cd61",
+          "51df662e-b690-4341-a880-2abb082f341a",
+          "objective",
+          "req-observe",
+          "req-latency",
+          "req-life",
+          "req-launch",
+          "req-cost",
+          "4ebf2af6-698a-429f-9312-f9cb16ad41d3",
+          "bb3376a8-811d-40ad-8284-26524a0f2571",
+          "wide",
+          "selective",
+          "detect",
+          "deliver",
+          "imager",
+          "bus-component",
+          "interface",
+          "mission-risk",
+          "2704fc03-c8c0-4c06-839b-a2491b7bf903",
+          "mission-orbit-analysis",
+          "mission-orbit-claim",
+          "wide-mass-analysis",
+          "wide-mass",
+          "wide-mass-claim",
+          "wide-mass-entry-0",
+          "wide-mass-entry-1",
+          "wide-mass-entry-2",
+          "wide-mass-entry-3",
+          "wide-mass-entry-4",
+          "wide-power-analysis",
+          "wide-power",
+          "wide-power-claim",
+          "wide-data-analysis",
+          "wide-data",
+          "wide-data-claim",
+          "wide-link-analysis",
+          "wide-link",
+          "wide-link-claim",
+          "wide-conflict",
+          "selective-mass-analysis",
+          "selective-mass",
+          "selective-mass-claim",
+          "selective-mass-entry-0",
+          "selective-mass-entry-1",
+          "selective-mass-entry-2",
+          "selective-mass-entry-3",
+          "selective-mass-entry-4",
+          "selective-power-analysis",
+          "selective-power",
+          "selective-power-claim",
+          "selective-data-analysis",
+          "selective-data",
+          "selective-data-claim",
+          "selective-link-analysis",
+          "selective-link",
+          "selective-link-claim",
+          "a90ce4a2-d64e-4e89-ba39-09f5cc0aa146",
+          "51c131da-a0c4-4ba9-8a7c-7a930cc24c80",
+          "c3fce35d-88f2-48e8-a55f-00a01deea821",
+          "concept-trade-analysis",
+          "concept-trade-claim",
+          "trade",
+          "selection-trade-analysis",
+          "selection-trade-claim",
+          "selection"
+        ],
+        "tool_calls": [],
+        "result": "Critical finding raised",
+        "tokens": 0,
+        "cost": 0
+      }
+    },
+    "verify-latency": {
+      "id": "verify-latency",
+      "kind": "VerificationItem",
+      "title": "Demonstrate worst-case acquisition-to-user latency",
+      "state": "accepted",
+      "owner": "systems",
+      "created_at": "2026-09-09T16:30:30.149429+00:00",
+      "modified_at": "2026-09-09T16:30:30.149767+00:00",
+      "revision": 9,
+      "classification": "Explicit assumption",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "req-latency"
+        },
+        {
+          "type": "depends_on",
+          "target": "operations"
+        }
+      ],
+      "data": {
+        "method": "Orbit access and processing simulation",
+        "success_criterion": "All required acquisitions delivered within 30 minutes",
+        "status": "not verified",
+        "evidence": "Unknown: no propagated access evidence",
+        "review_point": "Before preliminary design review"
+      }
+    },
+    "baseline-approval": {
+      "id": "baseline-approval",
+      "kind": "Decision",
+      "title": "Reference conceptual baseline \u2014 test fixture",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:30.346557+00:00",
+      "modified_at": "2026-09-09T16:30:30.346629+00:00",
+      "revision": 11,
+      "classification": "Human decision",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "selection"
+        },
+        {
+          "type": "depends_on",
+          "target": "review-latency"
+        },
+        {
+          "type": "depends_on",
+          "target": "mission-risk"
+        }
+      ],
+      "data": {
+        "rationale": "Approve conceptual study with explicitly unverified latency, coverage, lifetime and programme estimates",
+        "alternatives": [
+          "approve conceptual baseline",
+          "continue engineering"
+        ],
+        "consequences": "Immutable concept snapshot; not flight feasibility approval"
+      }
+    },
+    "5aecbae3-cc26-4dff-8fd5-4df0c5512041": {
+      "id": "5aecbae3-cc26-4dff-8fd5-4df0c5512041",
+      "kind": "Baseline",
+      "title": "Reference conceptual baseline \u2014 test fixture",
+      "state": "accepted",
+      "owner": "human",
+      "created_at": "2026-09-09T16:30:30.346612+00:00",
+      "modified_at": "2026-09-09T16:30:30.346629+00:00",
+      "revision": 11,
+      "classification": "Human decision",
+      "relations": [
+        {
+          "type": "depends_on",
+          "target": "baseline-approval"
+        }
+      ],
+      "data": {
+        "source_revision": 11
+      }
+    }
+  },
+  "proposals": {
+    "e012781b-c8c5-4011-b6a4-adac3b0211bd": {
+      "created_at": "2026-09-09T16:30:29.705070+00:00",
+      "modified_at": "2026-09-09T16:30:29.739409+00:00",
+      "revision": 1,
+      "owner": "science",
+      "id": "e012781b-c8c5-4011-b6a4-adac3b0211bd",
+      "proposal_type": "assumptions",
+      "agent": "science",
+      "agent_version": "1.0",
+      "target_revision": 0,
+      "operations": [
+        {
+          "action": "add",
+          "entity": {
+            "id": "scope",
+            "kind": "Assumption",
+            "title": "Reference scenario applies: 12U, southern Europe, 30 minutes, two years, rideshare, \u20ac12M",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.704953+00:00",
+            "modified_at": "2026-09-09T16:30:29.704956+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [],
+            "data": {
+              "rationale": "Incomplete brief requires a declared sizing basis",
+              "impact": "May invalidate payload, orbit or mission feasibility",
+              "confidence": 0.4,
+              "validation_plan": "Confirm these constraints against the supplied brief; custom missions need edited requirements."
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "observation",
+            "kind": "Assumption",
+            "title": "Thermal anomalies and contextual images; assumed 100 m sampling and 100 km swath",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.704967+00:00",
+            "modified_at": "2026-09-09T16:30:29.704970+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [],
+            "data": {
+              "rationale": "Incomplete brief requires a declared sizing basis",
+              "impact": "May invalidate payload, orbit or mission feasibility",
+              "confidence": 0.4,
+              "validation_plan": "Validate detection sensitivity, geolocation, cloud effects and user needs with a payload study."
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "orbit-assumption",
+            "kind": "Assumption",
+            "title": "Assume circular 550 km LEO; access windows and revisit remain unknown",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.704979+00:00",
+            "modified_at": "2026-09-09T16:30:29.704981+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [],
+            "data": {
+              "rationale": "Incomplete brief requires a declared sizing basis",
+              "impact": "May invalidate payload, orbit or mission feasibility",
+              "confidence": 0.4,
+              "validation_plan": "Propagate actual orbit and ground stations before a preliminary design review."
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "operations",
+            "kind": "Assumption",
+            "title": "Assume 40 minutes of usable ground contact daily; this does not prove 30-minute delivery",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.704993+00:00",
+            "modified_at": "2026-09-09T16:30:29.704996+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [],
+            "data": {
+              "rationale": "Incomplete brief requires a declared sizing basis",
+              "impact": "May invalidate payload, orbit or mission feasibility",
+              "confidence": 0.4,
+              "validation_plan": "Simulate worst-case acquisition-to-user latency with actual station access and processing."
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "resources",
+            "kind": "Assumption",
+            "title": "Resource inputs are concept estimates with 20% mass contingency and 60% battery depth of discharge",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.705004+00:00",
+            "modified_at": "2026-09-09T16:30:29.705006+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [],
+            "data": {
+              "rationale": "Incomplete brief requires a declared sizing basis",
+              "impact": "May invalidate payload, orbit or mission feasibility",
+              "confidence": 0.4,
+              "validation_plan": "Replace with qualified supplier and environmental evidence."
+            }
+          }
+        }
+      ],
+      "rationale": "Mission & Science proposes assumptions from the current engineering model",
+      "evidence_references": [],
+      "assumptions": [],
+      "expected_consequences": "Review engineering assumptions before acceptance",
+      "confidence": 0.6,
+      "requested_reviewers": [
+        "human"
+      ],
+      "status": "accepted"
+    },
+    "50c421ab-aa35-4a4c-838e-860670709b66": {
+      "created_at": "2026-09-09T16:30:29.798203+00:00",
+      "modified_at": "2026-09-09T16:30:29.848201+00:00",
+      "revision": 3,
+      "owner": "science",
+      "id": "50c421ab-aa35-4a4c-838e-860670709b66",
+      "proposal_type": "requirements",
+      "agent": "science",
+      "agent_version": "1.0",
+      "target_revision": 2,
+      "operations": [
+        {
+          "action": "add",
+          "entity": {
+            "id": "objective",
+            "kind": "Objective",
+            "title": "Detect and monitor wildfires over southern Europe",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798014+00:00",
+            "modified_at": "2026-09-09T16:30:29.798028+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "scope"
+              }
+            ],
+            "data": {
+              "stakeholder": "Civil protection and wildfire monitoring teams",
+              "priority": "must",
+              "measure_of_success": "Useful thermal anomalies and contextual imagery"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "req-observe",
+            "kind": "Requirement",
+            "title": "The mission shall acquire wildfire monitoring imagery over southern Europe.",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798051+00:00",
+            "modified_at": "2026-09-09T16:30:29.798054+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "derives_from",
+                "target": "objective"
+              }
+            ],
+            "data": {
+              "rationale": "Derived from the mission owner brief and approved scope",
+              "source": "Mission brief / scope assumption",
+              "level": "stakeholder",
+              "priority": "must",
+              "verification_method": "demonstration"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "req-latency",
+            "kind": "Requirement",
+            "title": "The ground segment shall deliver useful imagery within 30 minutes of acquisition.",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798086+00:00",
+            "modified_at": "2026-09-09T16:30:29.798089+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "derives_from",
+                "target": "objective"
+              }
+            ],
+            "data": {
+              "rationale": "Derived from the mission owner brief and approved scope",
+              "source": "Mission brief / scope assumption",
+              "level": "system",
+              "priority": "must",
+              "verification_method": "analysis"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "req-life",
+            "kind": "Requirement",
+            "title": "The spacecraft shall support operations for at least two years.",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798110+00:00",
+            "modified_at": "2026-09-09T16:30:29.798113+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "derives_from",
+                "target": "objective"
+              }
+            ],
+            "data": {
+              "rationale": "Derived from the mission owner brief and approved scope",
+              "source": "Mission brief / scope assumption",
+              "level": "system",
+              "priority": "must",
+              "verification_method": "analysis"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "req-launch",
+            "kind": "Requirement",
+            "title": "The spacecraft shall fit a 12U rideshare deployer envelope.",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798125+00:00",
+            "modified_at": "2026-09-09T16:30:29.798128+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "derives_from",
+                "target": "objective"
+              }
+            ],
+            "data": {
+              "rationale": "Derived from the mission owner brief and approved scope",
+              "source": "Mission brief / scope assumption",
+              "level": "system",
+              "priority": "must",
+              "verification_method": "inspection"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "req-cost",
+            "kind": "Requirement",
+            "title": "The programme shall remain within \u20ac12 million.",
+            "state": "proposed",
+            "owner": "science",
+            "created_at": "2026-09-09T16:30:29.798142+00:00",
+            "modified_at": "2026-09-09T16:30:29.798145+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "derives_from",
+                "target": "objective"
+              }
+            ],
+            "data": {
+              "rationale": "Derived from the mission owner brief and approved scope",
+              "source": "Mission brief / scope assumption",
+              "level": "stakeholder",
+              "priority": "must",
+              "verification_method": "review"
+            }
+          }
+        }
+      ],
+      "rationale": "Mission & Science proposes requirements from the current engineering model",
+      "evidence_references": [],
+      "assumptions": [],
+      "expected_consequences": "Review engineering assumptions before acceptance",
+      "confidence": 0.6,
+      "requested_reviewers": [
+        "human"
+      ],
+      "status": "accepted"
+    },
+    "9ae97e64-de6e-4952-aa06-5bd4f3eb0cf7": {
+      "created_at": "2026-09-09T16:30:29.881078+00:00",
+      "modified_at": "2026-09-09T16:30:29.924444+00:00",
+      "revision": 5,
+      "owner": "systems",
+      "id": "9ae97e64-de6e-4952-aa06-5bd4f3eb0cf7",
+      "proposal_type": "architectures",
+      "agent": "systems",
+      "agent_version": "1.0",
+      "target_revision": 4,
+      "operations": [
+        {
+          "action": "add",
+          "entity": {
+            "id": "wide",
+            "kind": "ArchitectureAlternative",
+            "title": "A \u00b7 Wide-area continuous imaging",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880877+00:00",
+            "modified_at": "2026-09-09T16:30:29.880894+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "req-observe"
+              },
+              {
+                "type": "depends_on",
+                "target": "resources"
+              }
+            ],
+            "data": {
+              "benefits": [
+                "More contextual imagery"
+              ],
+              "disadvantages": [
+                "Data volume exceeds S-band downlink"
+              ],
+              "risks": [
+                "Contact assumptions",
+                "Payload sensitivity unverified"
+              ],
+              "conops": "Acquire thermal strips and store complete imagery; daily S-band ground delivery.",
+              "payload": "Thermal imager with contextual channel; 5% observation duty cycle",
+              "ground": "Single-network S-band contacts",
+              "cost_estimate_eur": 10500000,
+              "cost_basis": "Explicit programme estimate, not a quotation"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "selective",
+            "kind": "ArchitectureAlternative",
+            "title": "B \u00b7 Event-selective imaging + X-band",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880925+00:00",
+            "modified_at": "2026-09-09T16:30:29.880929+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "req-observe"
+              },
+              {
+                "type": "depends_on",
+                "target": "resources"
+              }
+            ],
+            "data": {
+              "benefits": [
+                "Lower data demand",
+                "Higher downlink capacity"
+              ],
+              "disadvantages": [
+                "Onboard filtering can miss weak anomalies",
+                "Larger ground antenna dependency"
+              ],
+              "risks": [
+                "False negatives",
+                "Unverified latency and revisit"
+              ],
+              "conops": "Observe targeted strips, filter events onboard, retain context, downlink via X-band; S-band for TT&C.",
+              "payload": "Thermal imager with event filtering; 2% observation duty cycle",
+              "ground": "Scheduled X-band network",
+              "cost_estimate_eur": 11500000,
+              "cost_basis": "Explicit programme estimate, not a quotation"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "detect",
+            "kind": "Function",
+            "title": "Detect, locate and prioritize thermal anomalies",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880943+00:00",
+            "modified_at": "2026-09-09T16:30:29.880946+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "req-observe"
+              }
+            ],
+            "data": {
+              "inputs": [
+                "Thermal radiance"
+              ],
+              "outputs": [
+                "Geolocated events"
+              ],
+              "performance": "Sensitivity unknown",
+              "allocated_element": "imager"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "deliver",
+            "kind": "Function",
+            "title": "Store and deliver imagery to mission users",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880959+00:00",
+            "modified_at": "2026-09-09T16:30:29.880961+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "req-latency"
+              }
+            ],
+            "data": {
+              "inputs": [
+                "Image products"
+              ],
+              "outputs": [
+                "Ground products"
+              ],
+              "performance": "30 minutes required; unverified",
+              "allocated_element": "bus-component"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "imager",
+            "kind": "Component",
+            "title": "Thermal payload",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880973+00:00",
+            "modified_at": "2026-09-09T16:30:29.880975+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "detect"
+              }
+            ],
+            "data": {
+              "type": "payload",
+              "parent": "spacecraft",
+              "pointing": "Ground-target tracking; accuracy TBD",
+              "calibration": "Onboard reference and vicarious calibration; validation pending",
+              "maturity": "concept"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "bus-component",
+            "kind": "Component",
+            "title": "12U platform and ground service",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.880992+00:00",
+            "modified_at": "2026-09-09T16:30:29.880995+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "deliver"
+              }
+            ],
+            "data": {
+              "type": "platform",
+              "parent": "spacecraft",
+              "aocs": "Three-axis stabilized; pointing budget TBD",
+              "thermal": "Passive concept; thermal balance unverified",
+              "obc": "Event filtering and solid-state storage",
+              "maturity": "concept"
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "interface",
+            "kind": "Interface",
+            "title": "Payload \u2192 onboard data handling",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.881009+00:00",
+            "modified_at": "2026-09-09T16:30:29.881012+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "imager"
+              },
+              {
+                "type": "depends_on",
+                "target": "bus-component"
+              }
+            ],
+            "data": {
+              "endpoints": [
+                "imager",
+                "bus-component"
+              ],
+              "exchanges": [
+                "Image packets",
+                "Time tags"
+              ],
+              "direction": "payload to bus",
+              "medium": "SpaceWire assumed",
+              "constraints": [
+                "Peak input rate 20 Mbit/s; verify hardware compatibility"
+              ]
+            }
+          }
+        },
+        {
+          "action": "add",
+          "entity": {
+            "id": "mission-risk",
+            "kind": "Risk",
+            "title": "Latency, coverage, lifetime and cost remain unverified",
+            "state": "proposed",
+            "owner": "systems",
+            "created_at": "2026-09-09T16:30:29.881032+00:00",
+            "modified_at": "2026-09-09T16:30:29.881035+00:00",
+            "revision": 0,
+            "classification": "Explicit assumption",
+            "relations": [
+              {
+                "type": "depends_on",
+                "target": "req-latency"
+              },
+              {
+                "type": "depends_on",
+                "target": "req-life"
+              },
+              {
+                "type": "depends_on",
+                "target": "req-cost"
+              }
+            ],
+            "data": {
+              "cause": "Concept inputs lack detailed orbit, environmental and supplier analysis",
+              "event": "Mission cannot satisfy user constraints",
+              "consequence": "Concept redesign",
+              "likelihood": "medium",
+              "severity": "high",
+              "mitigation": "Complete access, radiation, reliability and cost studies",
+              "residual_risk": "open"
+            }
+          }
+        }
+      ],
+      "rationale": "Systems Engineering proposes architectures from the current engineering model",
+      "evidence_references": [],
+      "assumptions": [],
+      "expected_consequences": "Review engineering assumptions before acceptance",
+      "confidence": 0.6,
+      "requested_reviewers": [
+        "human"
+      ],
+      "status": "accepted"
+    }
+  },
+  "selected": "selective",
+  "baseline": "5aecbae3-cc26-4dff-8fd5-4df0c5512041",
+  "paused": false,
+  "steps": 6
+}

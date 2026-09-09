@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: foundry
+      POSTGRES_USER: foundry
+      POSTGRES_PASSWORD: local-development-only
+    volumes:
+      - mission-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foundry"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://foundry:local-development-only@db/foundry
+      DEMO_MODE: ${DEMO_MODE:-true}
+      MISSION_OWNER_TOKEN: ${MISSION_OWNER_TOKEN:-}
+      LLM_PROVIDER: ${LLM_PROVIDER:-mock}
+      MAX_ITERATIONS: ${MAX_ITERATIONS:-30}
+    depends_on:
+      db:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      - backend
+volumes:
+  mission-data:

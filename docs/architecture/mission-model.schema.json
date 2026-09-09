@@ -1,0 +1,381 @@
+{
+  "$defs": {
+    "Classification": {
+      "enum": [
+        "Sourced fact",
+        "Deterministic calculation",
+        "Engineering estimate",
+        "Analogy",
+        "Explicit assumption",
+        "Human decision",
+        "Unknown"
+      ],
+      "title": "Classification",
+      "type": "string"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "Mission",
+            "Objective",
+            "Requirement",
+            "Function",
+            "Component",
+            "Interface",
+            "Parameter",
+            "Budget",
+            "BudgetEntry",
+            "Claim",
+            "Evidence",
+            "Assumption",
+            "AnalysisRun",
+            "ArchitectureAlternative",
+            "TradeStudy",
+            "Proposal",
+            "Decision",
+            "ReviewFinding",
+            "Risk",
+            "VerificationItem",
+            "AgentDefinition",
+            "AgentRun",
+            "ModelRevision",
+            "Baseline",
+            "DomainEvent"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "state": {
+          "default": "accepted",
+          "enum": [
+            "proposed",
+            "accepted",
+            "rejected",
+            "open",
+            "resolved",
+            "verified",
+            "closed",
+            "waived",
+            "stale",
+            "superseded"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "owner": {
+          "title": "Owner",
+          "type": "string"
+        },
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "modified_at": {
+          "title": "Modified At",
+          "type": "string"
+        },
+        "revision": {
+          "default": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "classification": {
+          "$ref": "#/$defs/Classification",
+          "default": "Explicit assumption"
+        },
+        "relations": {
+          "items": {
+            "$ref": "#/$defs/Relation"
+          },
+          "title": "Relations",
+          "type": "array"
+        },
+        "data": {
+          "additionalProperties": true,
+          "title": "Data",
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind",
+        "title",
+        "owner"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "Operation": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "add",
+            "replace"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "entity": {
+          "$ref": "#/$defs/Entity"
+        }
+      },
+      "required": [
+        "action",
+        "entity"
+      ],
+      "title": "Operation",
+      "type": "object"
+    },
+    "Proposal": {
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "title": "Created At",
+          "type": "string"
+        },
+        "modified_at": {
+          "title": "Modified At",
+          "type": "string"
+        },
+        "revision": {
+          "default": 0,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "owner": {
+          "default": "",
+          "title": "Owner",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "proposal_type": {
+          "title": "Proposal Type",
+          "type": "string"
+        },
+        "agent": {
+          "title": "Agent",
+          "type": "string"
+        },
+        "agent_version": {
+          "default": "1.0",
+          "title": "Agent Version",
+          "type": "string"
+        },
+        "target_revision": {
+          "minimum": 0,
+          "title": "Target Revision",
+          "type": "integer"
+        },
+        "operations": {
+          "items": {
+            "$ref": "#/$defs/Operation"
+          },
+          "maxItems": 100,
+          "minItems": 1,
+          "title": "Operations",
+          "type": "array"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "evidence_references": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence References",
+          "type": "array"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "expected_consequences": {
+          "title": "Expected Consequences",
+          "type": "string"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "requested_reviewers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requested Reviewers",
+          "type": "array"
+        },
+        "status": {
+          "default": "submitted",
+          "enum": [
+            "submitted",
+            "challenged",
+            "accepted",
+            "rejected",
+            "superseded"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "proposal_type",
+        "agent",
+        "target_revision",
+        "operations",
+        "rationale",
+        "expected_consequences",
+        "confidence"
+      ],
+      "title": "Proposal",
+      "type": "object"
+    },
+    "Relation": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "derives_from",
+            "allocated_to",
+            "satisfies",
+            "verifies",
+            "depends_on",
+            "evidenced_by",
+            "contains",
+            "connects",
+            "supersedes"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "target"
+      ],
+      "title": "Relation",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "id": {
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "brief": {
+      "title": "Brief",
+      "type": "string"
+    },
+    "owner": {
+      "default": "human",
+      "title": "Owner",
+      "type": "string"
+    },
+    "created_at": {
+      "title": "Created At",
+      "type": "string"
+    },
+    "modified_at": {
+      "title": "Modified At",
+      "type": "string"
+    },
+    "revision": {
+      "default": 0,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "phase": {
+      "default": "Brief",
+      "title": "Phase",
+      "type": "string"
+    },
+    "entities": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Entity"
+      },
+      "title": "Entities",
+      "type": "object"
+    },
+    "proposals": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Proposal"
+      },
+      "title": "Proposals",
+      "type": "object"
+    },
+    "selected": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Selected"
+    },
+    "baseline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline"
+    },
+    "paused": {
+      "default": false,
+      "title": "Paused",
+      "type": "boolean"
+    },
+    "steps": {
+      "default": 0,
+      "title": "Steps",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "name",
+    "brief"
+  ],
+  "title": "Model",
+  "type": "object"
+}
