@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { request } from "./api";
 import type { Entity, Model } from "./types";
 
@@ -94,6 +94,15 @@ export default function DesignEditor({
     [saving, setSaving] = useState(false);
   const [targetRevision] = useState(revision);
   const parameter = entity.kind === "Parameter";
+  const [metrics, setMetrics] = useState<
+    Record<string, { label: string; unit: string }>
+  >({});
+  useEffect(() => {
+    if (editing && entity.kind === "Requirement")
+      request("/requirement-metrics")
+        .then(setMetrics)
+        .catch((e) => setError(e.message));
+  }, [editing, entity.kind]);
   const [changes, setChanges] = useState<Changes>(() =>
     parameter
       ? { inputs: structuredClone(entity.data.inputs) }
@@ -113,6 +122,8 @@ export default function DesignEditor({
               }),
         },
   );
+  const criterion: any =
+    "criterion" in changes ? changes.criterion : entity.data.criterion;
   function update(path: string[], value: string | number) {
     setChanges((previous) => {
       const next = structuredClone(previous);
@@ -162,58 +173,161 @@ export default function DesignEditor({
       {parameter ? (
         <QuantityFields value={changes.inputs} update={update} />
       ) : (
-        Object.entries(changes).map(([key, value]) => (
-          <label key={key} htmlFor={`design-edit-${key}`}>
-            {key.replaceAll("_", " ")}
-            {["priority", "level", "verification_method"].includes(key) ? (
-              <select
-                id={`design-edit-${key}`}
-                value={String(value)}
-                onChange={(e) =>
-                  setChanges({ ...changes, [key]: e.target.value })
-                }
-              >
-                {(key === "priority"
-                  ? ["must", "should", "could"]
-                  : key === "level"
-                    ? ["stakeholder", "system", "subsystem"]
-                    : [
-                        "analysis",
-                        "test",
-                        "inspection",
-                        "demonstration",
-                        "review",
-                      ]
-                ).map((v) => (
-                  <option key={v}>{v}</option>
-                ))}
-              </select>
-            ) : key === "confidence" ? (
-              <input
-                required
-                id={`design-edit-${key}`}
-                type="number"
-                min="0"
-                max="1"
-                step="0.05"
-                value={String(value)}
-                onChange={(e) =>
-                  setChanges({ ...changes, [key]: Number(e.target.value) })
-                }
-              />
-            ) : (
-              <textarea
-                id={`design-edit-${key}`}
-                required
-                rows={2}
-                value={String(value)}
-                onChange={(e) =>
-                  setChanges({ ...changes, [key]: e.target.value })
-                }
-              />
-            )}
+        Object.entries(changes)
+          .filter(([key]) => key !== "criterion")
+          .map(([key, value]) => (
+            <label key={key} htmlFor={`design-edit-${key}`}>
+              {key.replaceAll("_", " ")}
+              {["priority", "level", "verification_method"].includes(key) ? (
+                <select
+                  id={`design-edit-${key}`}
+                  value={String(value)}
+                  onChange={(e) =>
+                    setChanges({ ...changes, [key]: e.target.value })
+                  }
+                >
+                  {(key === "priority"
+                    ? ["must", "should", "could"]
+                    : key === "level"
+                      ? ["stakeholder", "system", "subsystem"]
+                      : [
+                          "analysis",
+                          "test",
+                          "inspection",
+                          "demonstration",
+                          "review",
+                        ]
+                  ).map((v) => (
+                    <option key={v}>{v}</option>
+                  ))}
+                </select>
+              ) : key === "confidence" ? (
+                <input
+                  required
+                  id={`design-edit-${key}`}
+                  type="number"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={String(value)}
+                  onChange={(e) =>
+                    setChanges({ ...changes, [key]: Number(e.target.value) })
+                  }
+                />
+              ) : (
+                <textarea
+                  id={`design-edit-${key}`}
+                  required
+                  rows={2}
+                  value={String(value)}
+                  onChange={(e) =>
+                    setChanges({ ...changes, [key]: e.target.value })
+                  }
+                />
+              )}
+            </label>
+          ))
+      )}
+      {entity.kind === "Requirement" && (
+        <fieldset>
+          <legend>Quantitative verification</legend>
+          <p className="muted">
+            Choose an output that verifies this statement. Units are converted
+            automatically. Passing a concept calculation is conditional on its
+            assumptions.
+          </p>
+          <label>
+            Measured output
+            <select
+              aria-label="Measured output"
+              value={criterion?.metric || ""}
+              onChange={(e) => {
+                const metric = e.target.value;
+                setChanges({
+                  ...changes,
+                  criterion: metric
+                    ? {
+                        metric,
+                        operator: "<=",
+                        threshold: { value: 0, unit: metrics[metric].unit },
+                      }
+                    : null,
+                });
+              }}
+            >
+              <option value="">Unverified — no quantitative check</option>
+              {Object.entries(metrics).map(([key, metric]) => (
+                <option key={key} value={key}>
+                  {metric.label}
+                </option>
+              ))}
+            </select>
           </label>
-        ))
+          {criterion && (
+            <>
+              <label>
+                Comparison
+                <select
+                  aria-label="Comparison"
+                  value={criterion.operator}
+                  onChange={(e) =>
+                    setChanges({
+                      ...changes,
+                      criterion: { ...criterion, operator: e.target.value },
+                    })
+                  }
+                >
+                  <option value="<=">At most (≤)</option>
+                  <option value=">=">At least (≥)</option>
+                </select>
+              </label>
+              <label>
+                Required value
+                <input
+                  required
+                  aria-label="Required value"
+                  type="number"
+                  min="0"
+                  step="any"
+                  value={criterion.threshold.value}
+                  onChange={(e) =>
+                    setChanges({
+                      ...changes,
+                      criterion: {
+                        ...criterion,
+                        threshold: {
+                          ...criterion.threshold,
+                          value:
+                            e.target.value === "" ? "" : Number(e.target.value),
+                        },
+                      },
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Requirement unit
+                <input
+                  required
+                  aria-label="Requirement unit"
+                  value={criterion.threshold.unit}
+                  onChange={(e) =>
+                    setChanges({
+                      ...changes,
+                      criterion: {
+                        ...criterion,
+                        threshold: {
+                          ...criterion.threshold,
+                          unit: e.target.value,
+                        },
+                      },
+                    })
+                  }
+                />
+              </label>
+            </>
+          )}
+        </fieldset>
       )}
       <label>
         Change rationale

@@ -94,7 +94,9 @@ test("validation failure preserves the draft and is visible inside the editor", 
 
 test("requirement text can be revised and submitted for impact review", async () => {
   const done = vi.fn();
-  vi.mocked(request).mockResolvedValue({ id: "mission" });
+  vi.mocked(request).mockImplementation(async (path) =>
+    path === "/requirement-metrics" ? {} : { id: "mission" },
+  );
   const requirement: Entity = {
     ...data,
     id: "req-latency",

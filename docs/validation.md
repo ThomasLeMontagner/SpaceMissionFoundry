@@ -36,3 +36,11 @@ The API test client emits two upstream deprecation warnings about httpx and AnyI
 - Ruff, TypeScript/Vite build and Prettier checks pass. Browser tests use separate app ports 5174/8011.
 - GitHub Actions configuration added for these checks using SQLite, a PostgreSQL service and Playwright. Its commands are exercised locally; no hosted Actions run is claimed until the changes are pushed.
 - Existing sample exports remain the historical v0.1 fixture. The new code reads those schema-compatible snapshots without rewriting their baseline contents.
+
+## Quantitative requirement checks — 2026-09-14
+
+- Existing SQLite regressions: 32 passed, one PostgreSQL-only skip. New requirement regressions: 8 passed. These cover compatible units, invalid criteria, upper/lower bounds, signed calculated margins, missing/failed/stale evidence, input invalidation, required-criterion selection blocking, removal, and preserved baseline exports.
+- Frontend unit tests: 6 passed; production build and formatting checks passed.
+- All three Playwright workflows passed, including criterion editing, conversion from grams to kilograms, per-candidate pass status and navigation to recorded analysis evidence. The evidence detail screenshot was inspected.
+- Backend lint/format checks and patch whitespace checks passed. No SQL schema changes were required. PostgreSQL was not rerun for this milestone; its previous validation is recorded above.
+- Updated the authoritative specification to version 0.2, adding MF-REQ-011 through MF-REQ-015. Semantic statement-to-metric matching remains an explicit owner review responsibility.

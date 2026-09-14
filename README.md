@@ -1,5 +1,11 @@
 # Mission Foundry
 
+## Quantitative requirement checks
+
+Open a requirement and choose **Edit requirement**. Under **Quantitative verification**, select a measured output, an upper/lower comparison, and a threshold with units. Update the statement and rationale to match the criterion, then propose and approve the change. Complete any requested impact review; recalculation refreshes the per-candidate pass/fail/stale/unverified results. Open a result to inspect its recorded calculation evidence.
+
+Supported outputs cover mass, power/energy margins, daily data and downlink capacity, and orbit period/eclipse duration. Compatible units such as grams and kilograms are converted. Missing or failed evidence remains unverified. Failed must-priority criteria block selection and baseline approval; conceptual baselines explicitly retain outstanding obligations. Criteria do not replace resource-budget checks or infer meaning from prose. Existing mission requirements are not automatically assigned quantitative criteria, and earlier baseline exports remain unchanged.
+
 A local, model-centered conceptual mission engineering workbench. Six versioned discipline roles propose a wildfire-monitoring CubeSat concept, deterministic tools size resources, and a human approves an immutable concept baseline.
 
 ## Run with Docker Compose

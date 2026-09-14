@@ -51,6 +51,11 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-008 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-009 | Partial | Existing requirements can be edited through reviewed replacement proposals with history. Manual creation remains deferred. |
 | MF-REQ-010 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
+| MF-REQ-011 | Implemented | Typed criterion, closed metric registry, unit conversion and invalid-input tests. |
+| MF-REQ-012 | Implemented | Per-candidate VerificationItems link requirements and AnalysisRuns with criterion, actual value and revision provenance. |
+| MF-REQ-013 | Implemented | Pass/fail/stale/unverified checks; transitive invalidation and recalculation regression tests. |
+| MF-REQ-014 | Implemented | Must-priority failures/stale checks block selection and baseline; outstanding obligations recorded in approval. |
+| MF-REQ-015 | Implemented | Reviewed criterion editor, per-candidate evidence navigation, immutable export and criterion-removal tests. |
 | MF-ARC-001 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-002 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-003 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |

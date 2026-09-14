@@ -17,6 +17,7 @@ from app.services.design_inputs import (
     parameter_id,
     read_inputs,
 )
+from app.services.requirement_checks import guard_candidate, refresh
 
 
 class Workflow:
@@ -172,6 +173,7 @@ class Workflow:
         )
         if id in m.entities:
             e.created_at = m.entities[id].created_at
+        e.revision = m.revision + 1
         m.entities[id] = e
         outputs = (
             record["outputs"]
@@ -325,6 +327,7 @@ class Workflow:
         self.guard(old, revision)
         if old.phase != "Trade study" or candidate not in ["wide", "selective"]:
             raise ValueError("Selection requires analyzed alternatives and a trade study")
+        guard_candidate(old, candidate)
         if any(
             old.entities[f"{candidate}-{tool}"].state != "accepted"
             or old.entities[f"{candidate}-{tool}"].data.get("compliant") is not True
@@ -390,6 +393,8 @@ class Workflow:
             raise ValueError("A current compliant concept must be selected")
         m = old.model_copy(deep=True)
         m.baseline = str(uuid4())
+        guard_candidate(old, old.selected)
+        refresh(m)
         m.phase = "Baselined"
         d = entity(
             "baseline-approval",
@@ -403,6 +408,13 @@ class Workflow:
             consequences="Immutable concept snapshot; not flight feasibility approval",
         )
         m.entities[d.id] = d
+        d.data["outstanding_requirements"] = [
+            e.data["requirement"]
+            for e in m.entities.values()
+            if e.kind == "VerificationItem"
+            and e.data.get("candidate") == m.selected
+            and e.data.get("status") in ["unverified", "fail"]
+        ]
         b = entity(
             m.baseline,
             "Baseline",
@@ -637,4 +649,5 @@ class Workflow:
             alternatives=list(CANDIDATES),
             score_basis="Engineering estimates on a 0–5 scale; capacity scored by deterministic compliance",
         )
+        refresh(m)
         m.phase = "Trade study"

@@ -801,10 +801,19 @@ export default function App() {
                         model.entities[`${candidate}-${tool}`]?.data
                           .compliant === true,
                     );
+                    const failedRequirements = objects.some(
+                      (e) =>
+                        e.kind === "VerificationItem" &&
+                        e.data.candidate === candidate &&
+                        model.entities[e.data.requirement]?.data.priority ===
+                          "must" &&
+                        (e.state === "stale" ||
+                          ["fail", "stale"].includes(e.data.status)),
+                    );
                     return (
                       <div key={candidate}>
                         <button
-                          disabled={busy || !compliant}
+                          disabled={busy || !compliant || failedRequirements}
                           onClick={() =>
                             act("/select", { candidate, weights, reason })
                           }
@@ -1104,6 +1113,27 @@ export default function App() {
                           <Badge value={e.state} />
                         </div>
                         <h3>{e.title}</h3>
+                        {e.kind === "Requirement" && (
+                          <p>
+                            {e.data.criterion
+                              ? `${e.data.criterion.metric} ${e.data.criterion.operator} ${e.data.criterion.threshold.value} ${e.data.criterion.threshold.unit}`
+                              : "No quantitative criterion · unverified"}
+                            {["wide", "selective"].map((candidate) => {
+                              const check =
+                                model.entities[`check-${e.id}-${candidate}`];
+                              return (
+                                <span key={candidate}>
+                                  {" "}
+                                  · {candidate}:{" "}
+                                  {e.state === "stale" ||
+                                  check?.state === "stale"
+                                    ? "stale"
+                                    : check?.data.status || "unverified"}
+                                </span>
+                              );
+                            })}
+                          </p>
+                        )}
                         <div className="row">
                           <Badge value={e.classification} />
                           <small>
@@ -1179,6 +1209,46 @@ export default function App() {
             <p>
               {detail.state} · Owner {detail.owner} · Revision {detail.revision}
             </p>
+            {detail.kind === "Requirement" && model && (
+              <section aria-label="Requirement verification results">
+                <h3>Verification results</h3>
+                <p>
+                  These checks assess the declared criterion under concept
+                  assumptions. Unverified requirements remain open obligations.
+                </p>
+                {["wide", "selective"].map((candidate) => {
+                  const check =
+                    model.entities[`check-${detail.id}-${candidate}`];
+                  const status =
+                    detail.state === "stale" || check?.state === "stale"
+                      ? "stale"
+                      : check?.data.status || "unverified";
+                  return (
+                    <div key={candidate}>
+                      <h4>
+                        {candidate} · {status}
+                      </h4>
+                      <p>
+                        {status === "stale"
+                          ? "Previous evidence is stale; review and recalculate."
+                          : check?.data.reason ||
+                            "No current calculation check is available."}
+                      </p>
+                      {status !== "stale" && check?.data.actual && (
+                        <p>
+                          Measured: <Value value={check.data.actual} />
+                        </p>
+                      )}
+                      {check && (
+                        <button onClick={() => show(check)}>
+                          Inspect {candidate} check and evidence
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </section>
+            )}
             {detail.state === "stale" && (
               <p className="notice">
                 This object is stale. The values below describe the previous

@@ -8,6 +8,7 @@ from fastapi.responses import Response, StreamingResponse
 from pydantic import Field
 
 from app.domain.models import Proposal, Strict
+from app.domain.requirement_checks import METRICS
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
@@ -89,6 +90,10 @@ def create_app(store=None):
     @app.get("/api/scenario")
     def scenario():
         return {"name": "Pyra · Southern Europe Wildfire Monitor", "brief": BRIEF, "version": "1.0"}
+
+    @app.get("/api/requirement-metrics")
+    def requirement_metrics():
+        return METRICS
 
     @app.get("/api/missions")
     def missions():
