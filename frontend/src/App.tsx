@@ -1,16 +1,18 @@
 import { useEffect, useState, useRef } from "react";
 import { request, download, setToken, subscribe } from "./api";
+import DesignEditor from "./DesignEditor";
 import type { Entity, Model, Proposal } from "./types";
 
 const tabs: Record<string, string[]> = {
   Overview: [],
   "Brief & assumptions": ["Mission", "Assumption"],
+  "Design inputs": ["Parameter"],
   Requirements: ["Objective", "Requirement"],
   Architectures: ["ArchitectureAlternative", "Function", "Component"],
   Interfaces: ["Interface"],
   Budgets: ["Budget", "BudgetEntry", "AnalysisRun"],
   Trades: ["TradeStudy"],
-  "Claims & evidence": ["Claim", "Evidence", "Parameter"],
+  "Claims & evidence": ["Claim", "Evidence"],
   "Conflicts & review": ["ReviewFinding", "Risk", "VerificationItem"],
   "Agent activity": ["AgentRun", "AgentDefinition"],
   Decisions: ["Decision"],
@@ -81,9 +83,32 @@ export default function App() {
       simplicity: 0.2,
     }),
     [confirm, setConfirm] = useState(false),
+    [impactConfirmed, setImpactConfirmed] = useState(false),
+    [baselineName, setBaselineName] = useState("Mission Concept Baseline"),
+    [baselineList, setBaselineList] = useState<
+      { id: string; name: string; revision: number }[]
+    >([]),
     [history, setHistory] = useState<any[]>([]),
     [past, setPast] = useState<Model | null>(null),
     [token, setTokenInput] = useState("");
+  useEffect(() => {
+    setConfirm(false);
+    setImpactConfirmed(false);
+  }, [model?.revision]);
+  useEffect(() => {
+    setBaselineList([]);
+    setHistory([]);
+    setPast(null);
+    setDetail(null);
+    setQuery("");
+  }, [model?.id]);
+  function receiveModel(next: Model) {
+    setModel((current) =>
+      current?.id === next.id && current.revision > next.revision
+        ? current
+        : next,
+    );
+  }
   const detailRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!detail) return;
@@ -103,7 +128,7 @@ export default function App() {
     if (!model?.id) return;
     return subscribe(model.id, () => {
       request("/missions/" + model.id)
-        .then(setModel)
+        .then(receiveModel)
         .catch((e) => setError(e.message));
     });
   }, [model?.id]);
@@ -116,7 +141,7 @@ export default function App() {
     setSuccess("");
     try {
       const result = await fn();
-      if (result?.entities) setModel(result);
+      if (result?.entities) receiveModel(result);
       setSuccess(message);
       await loadList();
     } catch (e) {
@@ -127,7 +152,37 @@ export default function App() {
   }
   const base = model ? "/missions/" + model.id : "";
   const act = (path: string, body: object = {}) =>
-    run(() => request(base + path, { revision: model!.revision, ...body }));
+    run(async () => {
+      const updated: Model = await request(base + path, {
+        revision: model!.revision,
+        ...body,
+      });
+      receiveModel(updated);
+      const approvals =
+        path.endsWith("/decision") ||
+        path === "/review-impact" ||
+        path === "/pause";
+      if (
+        approvals &&
+        updated.phase === "Recalculation required" &&
+        !updated.paused &&
+        !Object.values(updated.proposals).some((p) =>
+          ["submitted", "challenged"].includes(p.status),
+        )
+      ) {
+        try {
+          return await request(base + "/advance", {
+            revision: updated.revision,
+          });
+        } catch (error) {
+          throw Error(
+            "The change is saved, but recalculation needs attention: " +
+              (error as Error).message,
+          );
+        }
+      }
+      return updated;
+    });
   const objects = model ? Object.values(model.entities) : [];
   const pending = model
     ? Object.values(model.proposals).filter((p) =>
@@ -145,6 +200,21 @@ export default function App() {
   function show(e: Entity) {
     setDetail(e);
   }
+  const affectedDesign = objects.filter(
+    (e) =>
+      e.state === "stale" &&
+      [
+        "Objective",
+        "Requirement",
+        "Assumption",
+        "Parameter",
+        "ArchitectureAlternative",
+        "Function",
+        "Component",
+        "Interface",
+        "Risk",
+      ].includes(e.kind),
+  );
   function proposal(p: Proposal) {
     return (
       <article className="proposal" key={p.id}>
@@ -162,6 +232,36 @@ export default function App() {
               {o.entity.title}
             </button>
             <Badge value={o.entity.classification} />
+            {o.action === "replace" && (
+              <details className="change-comparison">
+                <summary>Compare proposed change</summary>
+                <div className="comparison">
+                  <div>
+                    <b>Current accepted content</b>
+                    <pre>
+                      {JSON.stringify(
+                        {
+                          title: model?.entities[o.entity.id]?.title,
+                          data: model?.entities[o.entity.id]?.data,
+                        },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </div>
+                  <div>
+                    <b>Proposed content</b>
+                    <pre>
+                      {JSON.stringify(
+                        { title: o.entity.title, data: o.entity.data },
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </div>
+                </div>
+              </details>
+            )}
           </div>
         ))}
         <p className="muted">
@@ -410,7 +510,7 @@ export default function App() {
                   </div>
                   <div className="orbital">
                     <div className="earth">
-                      EU<span>550 km assumed LEO</span>
+                      EU<span>Conceptual LEO</span>
                     </div>
                     <div className="satellite">▣</div>
                   </div>
@@ -463,11 +563,25 @@ export default function App() {
                         onClick={() => show(e)}
                       >
                         <span>{e.title.split(" · ")[1].toUpperCase()}</span>
-                        <Value value={e.data.margin} />
-                        <small className={e.data.compliant ? "pass" : "fail"}>
-                          {e.data.compliant
-                            ? "Positive preliminary margin"
-                            : "Constraint violation"}
+                        {e.state === "stale" ? (
+                          <strong>Stale — recalculate</strong>
+                        ) : (
+                          <Value value={e.data.margin} />
+                        )}
+                        <small
+                          className={
+                            e.state === "stale"
+                              ? "muted"
+                              : e.data.compliant
+                                ? "pass"
+                                : "fail"
+                          }
+                        >
+                          {e.state === "stale"
+                            ? "Previous results are no longer current"
+                            : e.data.compliant
+                              ? "Positive preliminary margin"
+                              : "Constraint violation"}
                         </small>
                       </button>
                     ))
@@ -499,6 +613,7 @@ export default function App() {
                   {!pending.length &&
                     ![
                       "Trade study",
+                      "Impact review",
                       "Ready for baseline",
                       "Baselined",
                     ].includes(model.phase) && (
@@ -506,13 +621,15 @@ export default function App() {
                         disabled={busy || model.paused}
                         onClick={() => act("/advance")}
                       >
-                        {model.phase === "Review"
-                          ? "Propose finding resolution"
-                          : model.phase === "Resolution proposed"
-                            ? "Verify resolution independently"
-                            : model.phase === "Selected concept"
-                              ? "Run independent review"
-                              : "Advance workflow →"}
+                        {model.phase === "Recalculation required"
+                          ? "Recalculate engineering budgets"
+                          : model.phase === "Review"
+                            ? "Propose finding resolution"
+                            : model.phase === "Resolution proposed"
+                              ? "Verify resolution independently"
+                              : model.phase === "Selected concept"
+                                ? "Run independent review"
+                                : "Advance workflow →"}
                       </button>
                     )}
                   {model.phase === "Trade study" && (
@@ -530,24 +647,106 @@ export default function App() {
                 </section>
               </>
             )}
-            {pending.length > 0 &&
-              [
-                "Overview",
-                "Brief & assumptions",
-                "Requirements",
-                "Architectures",
-              ].includes(tab) && (
-                <section>
-                  <label>
-                    Decision rationale
-                    <input
-                      value={reason}
-                      onChange={(e) => setReason(e.target.value)}
-                    />
-                  </label>
-                  {pending.map(proposal)}
-                </section>
-              )}
+            {pending.length > 0 && (
+              <section>
+                <label>
+                  Decision rationale
+                  <input
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </label>
+                {pending.map(proposal)}
+              </section>
+            )}
+            {model.phase === "Recalculation required" && tab !== "Overview" && (
+              <section className="panel">
+                <h3>Engineering results need recalculation</h3>
+                <p>
+                  Accepted input changes invalidate the previous analyses,
+                  trade, selection and review.
+                </p>
+                <button
+                  disabled={busy || model.paused || pending.length > 0}
+                  onClick={() => act("/advance")}
+                >
+                  Recalculate engineering budgets
+                </button>
+              </section>
+            )}
+            {model.phase === "Impact review" && (
+              <section className="panel">
+                <h2>Review affected design content</h2>
+                <p>
+                  Inspect or edit these objects before reaffirming them.
+                  Reaffirmation does not validate numerical results.
+                </p>
+                {affectedDesign.map((e) => (
+                  <button
+                    className="mission-link"
+                    key={e.id}
+                    onClick={() => show(e)}
+                  >
+                    {e.kind}: {e.title}
+                  </button>
+                ))}
+                <label>
+                  Impact review rationale
+                  <input
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </label>
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    checked={impactConfirmed}
+                    onChange={(e) => setImpactConfirmed(e.target.checked)}
+                  />
+                  I reviewed the affected assumptions, requirements and design
+                  inputs and reaffirm this content.
+                </label>
+                <button
+                  disabled={busy || !impactConfirmed || pending.length > 0}
+                  onClick={() =>
+                    act("/review-impact", { reason, confirm: impactConfirmed })
+                  }
+                >
+                  Confirm impact review
+                </button>
+              </section>
+            )}
+            {tab === "Design inputs" && (
+              <section className="panel">
+                <h2>Accepted calculation inputs</h2>
+                <p>
+                  Select an input group to edit quantities and units.
+                  Calculators read these accepted values; changing a requirement
+                  statement requires human impact review and does not
+                  automatically infer new numbers.
+                </p>
+                {model.baseline ? (
+                  <p className="notice">
+                    Open Baselines & replay and reopen the baseline before
+                    editing.
+                  </p>
+                ) : !model.entities["mission-orbit-inputs"] &&
+                  model.entities.selective ? (
+                  <button
+                    disabled={busy || pending.length > 0}
+                    onClick={() => act("/initialize-inputs")}
+                  >
+                    Initialize editable inputs
+                  </button>
+                ) : (
+                  <p className="muted">
+                    Period and eclipse come from the orbit tool. Downlink demand
+                    comes from the data tool. These derived inputs cannot be
+                    overridden.
+                  </p>
+                )}
+              </section>
+            )}
             {tab === "Brief & assumptions" && (
               <section className="panel">
                 <h2>Mission brief</h2>
@@ -562,9 +761,9 @@ export default function App() {
               <section className="panel">
                 <h2>Select an integrated concept</h2>
                 <p>
-                  Criterion scores are engineering estimates. Weighted totals
-                  are calculated deterministically. Candidate A fails downlink
-                  capacity; candidate B preserves an explicit science dissent.
+                  Science and simplicity scores are estimates. Capacity scores
+                  and weighted totals follow current calculations. Select a
+                  candidate only when all four budgets comply.
                 </p>
                 <div className="weights">
                   {Object.entries(weights).map(([k, v]) => (
@@ -593,14 +792,38 @@ export default function App() {
                     onChange={(e) => setReason(e.target.value)}
                   />
                 </label>
-                <button
-                  disabled={busy}
-                  onClick={() =>
-                    act("/select", { candidate: "selective", weights, reason })
-                  }
-                >
-                  Select B · Event-selective imaging + X-band
-                </button>
+                <div className="actions">
+                  {["wide", "selective"].map((candidate) => {
+                    const compliant = ["mass", "power", "data", "link"].every(
+                      (tool) =>
+                        model.entities[`${candidate}-${tool}`]?.state ===
+                          "accepted" &&
+                        model.entities[`${candidate}-${tool}`]?.data
+                          .compliant === true,
+                    );
+                    return (
+                      <div key={candidate}>
+                        <button
+                          disabled={busy || !compliant}
+                          onClick={() =>
+                            act("/select", { candidate, weights, reason })
+                          }
+                        >
+                          Select{" "}
+                          {candidate === "wide"
+                            ? "A · Wide-area continuous imaging"
+                            : "B · Event-selective imaging + X-band"}
+                        </button>
+                        {!compliant && (
+                          <p className="fail">
+                            Resolve failing or stale budgets before selecting
+                            this concept.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </section>
             )}
             {tab === "Baselines & replay" && (
@@ -616,6 +839,20 @@ export default function App() {
                       <p>
                         Baseline {model.baseline} · revision {model.revision}
                       </p>
+                      <label>
+                        Revision rationale
+                        <input
+                          value={reason}
+                          onChange={(e) => setReason(e.target.value)}
+                        />
+                      </label>
+                      <button
+                        className="secondary"
+                        disabled={busy}
+                        onClick={() => act("/reopen", { reason })}
+                      >
+                        Reopen baseline for design changes
+                      </button>
                       <div className="actions">
                         {["md", "json", "csv"].map((f) => (
                           <button
@@ -639,6 +876,13 @@ export default function App() {
                         Delivery latency, coverage, detection sensitivity,
                         lifetime and cost remain unverified.
                       </p>
+                      <label>
+                        Baseline name
+                        <input
+                          value={baselineName}
+                          onChange={(e) => setBaselineName(e.target.value)}
+                        />
+                      </label>
                       <label className="check">
                         <input
                           type="checkbox"
@@ -652,7 +896,7 @@ export default function App() {
                         disabled={!confirm || busy}
                         onClick={() =>
                           act("/baseline", {
-                            name: "Mission Concept Baseline 1",
+                            name: baselineName,
                             confirm,
                           })
                         }
@@ -666,6 +910,48 @@ export default function App() {
                       finding resolution before approving a baseline.
                     </p>
                   )}
+                </section>
+                <section className="panel">
+                  <div className="row">
+                    <h2>Saved immutable baselines</h2>
+                    <button
+                      className="secondary"
+                      onClick={() =>
+                        run(async () => {
+                          setBaselineList(await request(base + "/baselines"));
+                        }, "Baselines loaded")
+                      }
+                    >
+                      Load baseline history
+                    </button>
+                  </div>
+                  {baselineList.map((b) => (
+                    <div className="timeline" key={b.id}>
+                      <div>
+                        <b>{b.name}</b> · revision {b.revision}
+                        <div className="actions">
+                          {["json", "md", "csv"].map((f) => (
+                            <button
+                              className="secondary"
+                              key={f}
+                              onClick={() =>
+                                run(
+                                  () =>
+                                    download(
+                                      `${base}/export/${f}?baseline_id=${b.id}`,
+                                      f,
+                                    ),
+                                  "Historical baseline downloaded",
+                                )
+                              }
+                            >
+                              Export {b.name} {f.toUpperCase()}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </section>
                 <section className="panel">
                   <div className="row">
@@ -893,6 +1179,34 @@ export default function App() {
             <p>
               {detail.state} · Owner {detail.owner} · Revision {detail.revision}
             </p>
+            {detail.state === "stale" && (
+              <p className="notice">
+                This object is stale. The values below describe the previous
+                design and must not be treated as current results.
+              </p>
+            )}
+            {model &&
+              !model.baseline &&
+              !pending.length &&
+              ["accepted", "stale"].includes(detail.state) &&
+              ["Assumption", "Requirement", "Parameter"].includes(
+                detail.kind,
+              ) &&
+              model.entities[detail.id] && (
+                <DesignEditor
+                  key={`${model.id}:${detail.id}:${detail.revision}`}
+                  entity={detail}
+                  missionId={model.id}
+                  revision={model.revision}
+                  onProposed={(m) => {
+                    receiveModel(m);
+                    setDetail(null);
+                    setSuccess(
+                      "Change proposed. Review and approve it before recalculating.",
+                    );
+                  }}
+                />
+              )}
             <dl>
               {Object.entries(detail.data).map(([k, v]) => (
                 <div key={k}>

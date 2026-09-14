@@ -1,4 +1,5 @@
 from app.agents.definitions import AGENTS
+from app.domain.engineering_inputs import validate_inputs
 from app.domain.models import Classification, Proposal, now
 from app.engineering_tools.calculations import q
 
@@ -6,7 +7,8 @@ from app.engineering_tools.calculations import q
 def validate(model, proposal: Proposal):
     if proposal.target_revision != model.revision:
         raise ValueError("Stale target revision")
-    if (
+    human = proposal.agent == "human"
+    if not human and (
         proposal.agent not in AGENTS
         or proposal.agent_version != AGENTS[proposal.agent].prompt_version
     ):
@@ -22,8 +24,15 @@ def validate(model, proposal: Proposal):
             raise ValueError("Missing evidence or assumption reference")
     for op in proposal.operations:
         e = op.entity
-        if e.kind not in AGENTS[proposal.agent].authority or e.owner != proposal.agent:
+        allowed = (
+            ["Assumption", "Requirement", "Parameter"]
+            if human
+            else AGENTS[proposal.agent].authority
+        )
+        if e.kind not in allowed or e.owner != proposal.agent:
             raise ValueError("Agent lacks authority for object or owner")
+        if human and (op.action != "replace" or proposal.proposal_type != "design change"):
+            raise ValueError("Human proposals may only edit existing design inputs")
         if op.action == "add" and e.id in model.entities:
             raise ValueError("Object already exists")
         if op.action == "replace" and e.id not in model.entities:
@@ -48,7 +57,14 @@ def validate(model, proposal: Proposal):
         ):
             raise ValueError("Sourced facts require existing evidence")
         if e.kind == "Parameter":
-            q(e.data["quantity"], e.data["dimension"])
+            if "inputs" in e.data:
+                validate_inputs(e.data["tool"], e.data["inputs"])
+                if op.action == "replace":
+                    prior = model.entities[e.id]
+                    if any(e.data.get(k) != prior.data.get(k) for k in ["tool", "candidate"]):
+                        raise ValueError("Parameter tool and candidate are immutable")
+            else:
+                q(e.data["quantity"], e.data["dimension"])
 
 
 def accept(model, proposal):
@@ -62,13 +78,21 @@ def accept(model, proposal):
         if e.id in model.entities:
             e.created_at = model.entities[e.id].created_at
         model.entities[e.id] = e
+    invalidate_dependents(model, changed)
+    proposal.status = "accepted"
+
+
+def invalidate_dependents(model, changed):
     # Transitive dependency invalidation; historical snapshots retain the previous states.
     visited = set(changed)
     while changed:
         downstream = {
             e.id
             for e in model.entities.values()
-            if e.id not in visited and any(r.target in changed for r in e.relations)
+            if e.id not in visited
+            and e.kind not in ["Baseline", "AgentRun", "AgentDefinition"]
+            and e.state != "superseded"
+            and any(r.target in changed for r in e.relations)
         }
         for key in downstream:
             model.entities[key].state = "stale"
@@ -76,4 +100,3 @@ def accept(model, proposal):
             model.entities[key].modified_at = now()
         visited |= downstream
         changed = downstream
-    proposal.status = "accepted"

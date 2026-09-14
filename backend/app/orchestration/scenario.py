@@ -29,17 +29,17 @@ def assumptions():
         ),
         (
             "orbit-assumption",
-            "Assume circular 550 km LEO; access windows and revisit remain unknown",
+            "Circular LEO sizing uses accepted orbit inputs; access windows and revisit remain unknown",
             "Propagate actual orbit and ground stations before a preliminary design review.",
         ),
         (
             "operations",
-            "Assume 40 minutes of usable ground contact daily; this does not prove 30-minute delivery",
+            "Usable daily ground contact follows accepted link inputs; capacity does not prove delivery latency",
             "Simulate worst-case acquisition-to-user latency with actual station access and processing.",
         ),
         (
             "resources",
-            "Resource inputs are concept estimates with 20% mass contingency and 60% battery depth of discharge",
+            "Mass contingency and battery depth of discharge are explicit estimates in accepted resource inputs",
             "Replace with qualified supplier and environmental evidence.",
         ),
     ]
@@ -125,7 +125,7 @@ def architectures():
             disadvantages=["Data volume exceeds S-band downlink"],
             risks=["Contact assumptions", "Payload sensitivity unverified"],
             conops="Acquire thermal strips and store complete imagery; daily S-band ground delivery.",
-            payload="Thermal imager with contextual channel; 5% observation duty cycle",
+            payload="Thermal imager with contextual channel; duty cycle in accepted data inputs",
             ground="Single-network S-band contacts",
             cost_estimate_eur=10500000,
             cost_basis="Explicit programme estimate, not a quotation",
@@ -142,7 +142,7 @@ def architectures():
             ],
             risks=["False negatives", "Unverified latency and revisit"],
             conops="Observe targeted strips, filter events onboard, retain context, downlink via X-band; S-band for TT&C.",
-            payload="Thermal imager with event filtering; 2% observation duty cycle",
+            payload="Thermal imager with event filtering; duty cycle in accepted data inputs",
             ground="Scheduled X-band network",
             cost_estimate_eur=11500000,
             cost_basis="Explicit programme estimate, not a quotation",
@@ -164,7 +164,7 @@ def architectures():
             refs=["req-latency"],
             inputs=["Image products"],
             outputs=["Ground products"],
-            performance="30 minutes required; unverified",
+            performance="Delivery latency follows the linked requirement; unverified",
             allocated_element="bus-component",
         ),
         entity(
@@ -221,7 +221,7 @@ def Q(v, u):
     return {"value": v, "unit": u}
 
 
-def inputs(candidate, orbital):
+def inputs(candidate, orbital=None):
     selective = candidate == "selective"
     return {
         "mass": {
@@ -247,8 +247,7 @@ def inputs(candidate, orbital):
                 },
                 {"name": "standby", "fraction": Q(0.8, ""), "loads": {"bus": Q(10, "W")}},
             ],
-            "period": orbital["period"],
-            "eclipse": orbital["eclipse"],
+            **({"period": orbital["period"], "eclipse": orbital["eclipse"]} if orbital else {}),
             "solar": Q(45, "W"),
             "battery": Q(40, "Wh"),
             "depth_of_discharge": Q(0.6, ""),

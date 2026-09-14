@@ -3,11 +3,20 @@ from uuid import uuid4
 
 from app.agents.definitions import AGENTS
 from app.agents.providers import provider
-from app.domain.models import Model, Operation, Proposal, now
+from app.domain.models import Model, Operation, Proposal, Relation, now
 from app.domain.protocol import accept, validate
 from app.engineering_tools.calculations import execute
-from app.orchestration.scenario import Q, architectures, assumptions, entity, inputs, requirements
+from app.orchestration.scenario import architectures, assumptions, entity, requirements
 from app.services.brief import extract
+from app.services.design_inputs import (
+    BUDGET_TOOLS,
+    CANDIDATES,
+    IMPACT_KINDS,
+    edited_entity,
+    input_entities,
+    parameter_id,
+    read_inputs,
+)
 
 
 class Workflow:
@@ -85,12 +94,22 @@ class Workflow:
             raise ValueError("Proposal is not pending")
         if action == "accept":
             accept(m, p)
-            if p.proposal_type == "assumptions":
+            if any(
+                op.action == "replace"
+                and op.entity.kind in ["Assumption", "Requirement", "Parameter"]
+                for op in p.operations
+            ):
+                self.after_change(m)
+            elif p.proposal_type == "assumptions":
                 m.phase = "Needs defined"
             elif p.proposal_type == "requirements":
                 m.phase = "Requirements approved"
             elif p.proposal_type == "architectures":
                 m.phase = "Candidate concepts"
+            elif p.proposal_type == "calculation inputs":
+                self.require_recalculation(m)
+            elif p.proposal_type == "design change":
+                self.after_change(m)
         elif action in ["reject", "challenge"]:
             p.status = "rejected" if action == "reject" else "challenged"
             if action == "challenge":
@@ -114,6 +133,10 @@ class Workflow:
     def submit(self, id, p):
         old = self.store.get(id)
         self.guard(old, p.target_revision)
+        if p.id in old.proposals or p.status != "submitted":
+            raise ValueError("Proposal must be a new submitted proposal")
+        if p.agent == "human":
+            raise ValueError("Use the mission owner edit endpoint for human changes")
         validate(old, p)
         m = old.model_copy(deep=True)
         p.target_revision += 1
@@ -133,6 +156,8 @@ class Workflow:
             m.revision,
             ["Concept estimates; approved resources and operations assumptions"],
         )
+        if tool == "trade" and record["status"] != "valid":
+            raise ValueError("Invalid trade inputs: " + "; ".join(record["errors"]))
         id = f"{prefix}-{tool}-analysis"
         e = entity(
             id,
@@ -140,12 +165,25 @@ class Workflow:
             f"{prefix} · {tool} calculation",
             "tool",
             refs=refs,
-            classification="Deterministic calculation",
+            classification="Deterministic calculation"
+            if record["status"] == "valid"
+            else "Unknown",
             **record,
         )
+        if id in m.entities:
+            e.created_at = m.entities[id].created_at
         m.entities[id] = e
-        if record["status"] != "valid":
-            raise ValueError(f"{tool} calculation invalid: {record['errors']}")
+        outputs = (
+            record["outputs"]
+            if record["status"] == "valid"
+            else {
+                "status": "invalid",
+                "compliant": None,
+                "margin": None,
+                "errors": record["errors"],
+            }
+        )
+
         if tool in ["mass", "power", "data", "link"]:
             b = entity(
                 f"{prefix}-{tool}",
@@ -153,9 +191,11 @@ class Workflow:
                 f"{prefix} · {tool}",
                 "tool",
                 refs=[id],
-                classification="Deterministic calculation",
+                classification="Deterministic calculation"
+                if record["status"] == "valid"
+                else "Unknown",
                 candidate=prefix,
-                **record["outputs"],
+                **outputs,
             )
             m.entities[b.id] = b
         claim = entity(
@@ -164,13 +204,20 @@ class Workflow:
             f"{prefix}: preliminary {tool} results",
             "tool",
             refs=[id],
-            classification="Deterministic calculation",
-            outputs=record["outputs"],
+            classification="Deterministic calculation"
+            if record["status"] == "valid"
+            else "Unknown",
+            outputs=outputs,
             validity="Conditional on recorded assumptions",
         )
         m.entities[claim.id] = claim
         if tool == "mass":
-            for index, entry in enumerate(record["outputs"]["entries"]):
+            for previous in m.entities.values():
+                if previous.kind == "BudgetEntry" and previous.id.startswith(
+                    f"{prefix}-mass-entry-"
+                ):
+                    previous.state = "superseded"
+            for index, entry in enumerate(record["outputs"].get("entries", [])):
                 item = entity(
                     f"{prefix}-mass-entry-{index}",
                     "BudgetEntry",
@@ -181,7 +228,7 @@ class Workflow:
                     **entry,
                 )
                 m.entities[item.id] = item
-        return record["outputs"]
+        return outputs
 
     def advance(self, id, revision):
         old = self.store.get(id)
@@ -200,95 +247,16 @@ class Workflow:
         elif phase == "Needs defined":
             self.propose(m, "science", requirements(), "requirements")
         elif phase == "Requirements approved":
-            self.propose(m, "systems", architectures(), "architectures")
+            self.propose(m, "systems", architectures() + input_entities(), "architectures")
         elif phase == "Candidate concepts":
-            orbital = self.analysis(
-                m, "orbit", {"altitude": Q(550, "km")}, ["orbit-assumption"], "mission"
-            )
-            for candidate in ["wide", "selective"]:
-                values = inputs(candidate, orbital)
-                for tool in ["mass", "power", "data"]:
-                    result = self.analysis(
-                        m, tool, values[tool], [candidate, "resources", "operations"], candidate
-                    )
-                    if tool == "data":
-                        values["link"]["demand"] = result["daily"]
-                result = self.analysis(
-                    m,
-                    "link",
-                    values["link"],
-                    [candidate, f"{candidate}-data", "operations"],
-                    candidate,
-                )
-                if not result["compliant"]:
-                    finding = entity(
-                        f"{candidate}-conflict",
-                        "ReviewFinding",
-                        "Payload production exceeds daily downlink capacity",
-                        "systems",
-                        refs=[f"{candidate}-link", f"{candidate}-data"],
-                        severity="critical",
-                        resolution="",
-                        disciplines=[
-                            "Payload: preserve contextual imagery",
-                            "Bus & Ground: finite contact capacity",
-                        ],
-                    )
-                    finding.state = "open"
-                    m.entities[finding.id] = finding
-            for role, tools in [
-                ("analysis", ["orbit"]),
-                ("payload", ["data"]),
-                ("bus", ["mass", "power", "link"]),
-            ]:
-                r = entity(
-                    str(uuid4()),
-                    "AgentRun",
-                    AGENTS[role].role + ": deterministic analysis",
-                    role,
-                    agent_version="1.0",
-                    model="deterministic mock",
-                    input_revision=old.revision,
-                    context_references=list(old.entities),
-                    tool_calls=tools,
-                    result="completed",
-                    tokens=0,
-                    cost=0,
-                )
-                m.entities[r.id] = r
-            weights = {"science": 0.35, "capacity": 0.45, "simplicity": 0.20}
-            scores = {
-                "wide": {"science": 5, "capacity": 0, "simplicity": 4},
-                "selective": {"science": 3, "capacity": 5, "simplicity": 3},
-            }
-            calculated = self.analysis(
-                m,
-                "trade",
-                {"weights": weights, "scores": scores},
-                ["wide-link", "selective-link"],
-                "concept",
-            )
-            t = entity(
-                "trade",
-                "TradeStudy",
-                "Resolve the payload–ground capacity conflict",
-                refs=["concept-trade-analysis"],
-                criteria=list(weights),
-                weights=weights,
-                scores=scores,
-                recommendation=calculated["recommendation"],
-                dissent="Payload favors complete images; event filtering risks missed weak anomalies.",
-                sensitivities="Recommendation depends on assumed science utility scores; weights editable before selection.",
-                alternatives=["wide", "selective"],
-                score_basis="Engineering estimate on a 0–5 ordinal scale",
-            )
-            m.entities[t.id] = t
-            m.phase = "Trade study"
+            self.calculate_design(m)
+        elif phase == "Recalculation required":
+            self.calculate_design(m)
         elif phase == "Selected concept":
             f = entity(
                 "review-latency",
                 "ReviewFinding",
-                "Daily downlink capacity does not establish 30-minute delivery",
+                "Daily downlink capacity does not establish delivery latency",
                 "review",
                 refs=["req-latency", f"{m.selected}-link"],
                 severity="critical",
@@ -322,7 +290,7 @@ class Workflow:
                 "Demonstrate worst-case acquisition-to-user latency",
                 refs=["req-latency", "operations"],
                 method="Orbit access and processing simulation",
-                success_criterion="All required acquisitions delivered within 30 minutes",
+                success_criterion=m.entities["req-latency"].title,
                 status="not verified",
                 evidence="Unknown: no propagated access evidence",
                 review_point="Before preliminary design review",
@@ -358,7 +326,8 @@ class Workflow:
         if old.phase != "Trade study" or candidate not in ["wide", "selective"]:
             raise ValueError("Selection requires analyzed alternatives and a trade study")
         if any(
-            not old.entities[f"{candidate}-{tool}"].data["compliant"]
+            old.entities[f"{candidate}-{tool}"].state != "accepted"
+            or old.entities[f"{candidate}-{tool}"].data.get("compliant") is not True
             for tool in ["mass", "power", "data", "link"]
         ):
             raise ValueError("Candidate has a failing budget; revise it before selection")
@@ -372,11 +341,8 @@ class Workflow:
             "selection",
         )
         t.data.update(weights=weights, recommendation=result["recommendation"])
-        t.relations.append(
-            __import__("app.domain.models", fromlist=["Relation"]).Relation(
-                type="evidenced_by", target="selection-trade-analysis"
-            )
-        )
+        t.relations = [r for r in t.relations if r.target != "selection-trade-analysis"]
+        t.relations.append(Relation(type="evidenced_by", target="selection-trade-analysis"))
         m.selected = candidate
         m.phase = "Selected concept"
         for e in m.entities.values():
@@ -409,13 +375,19 @@ class Workflow:
             or (
                 e.kind == "ReviewFinding"
                 and e.data["severity"] == "critical"
-                and e.state not in ["verified", "resolved", "closed", "waived"]
+                and e.state not in ["verified", "resolved", "closed", "waived", "superseded"]
             )
             for e in old.entities.values()
         ):
             raise ValueError("Stale objects or unresolved critical findings block baseline")
         if any(p.status in ["submitted", "challenged"] for p in old.proposals.values()):
             raise ValueError("Pending proposals block baseline")
+        if not old.selected or any(
+            old.entities[f"{old.selected}-{tool}"].state != "accepted"
+            or old.entities[f"{old.selected}-{tool}"].data.get("compliant") is not True
+            for tool in BUDGET_TOOLS
+        ):
+            raise ValueError("A current compliant concept must be selected")
         m = old.model_copy(deep=True)
         m.baseline = str(uuid4())
         m.phase = "Baselined"
@@ -442,3 +414,227 @@ class Workflow:
         )
         m.entities[b.id] = b
         return self.store.save(m, "human", d.data["rationale"], old, baseline=True)
+
+    def edit(self, id, object_id, revision, changes, reason):
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        prior = old.entities.get(object_id)
+        if not prior or prior.state not in ["accepted", "stale"]:
+            raise ValueError("Only accepted or stale design objects can be edited")
+        if (
+            any(e.kind == "AnalysisRun" for e in old.entities.values())
+            and "mission-orbit-inputs" not in old.entities
+        ):
+            raise ValueError("Initialize editable inputs from recorded analyses first")
+        e = edited_entity(prior, changes)
+        p = Proposal(
+            proposal_type="design change",
+            agent="human",
+            target_revision=old.revision,
+            operations=[Operation(action="replace", entity=e)],
+            rationale=reason,
+            expected_consequences="Dependent results and decisions become stale; review and recalculation are required.",
+            confidence=1,
+        )
+        validate(old, p)
+        m = old.model_copy(deep=True)
+        p.target_revision += 1
+        m.proposals[p.id] = p
+        return self.store.save(m, "human", f"Proposed edit to {object_id}: {reason}", old)
+
+    @staticmethod
+    def no_pending(m):
+        if any(p.status in ["submitted", "challenged"] for p in m.proposals.values()):
+            raise ValueError("Resolve pending proposals before changing the design")
+
+    def require_recalculation(self, m):
+        if any(e.kind == "AnalysisRun" for e in m.entities.values()):
+            m.phase = "Recalculation required"
+        else:
+            m.phase = m.resume_phase or m.phase
+        m.resume_phase = None
+
+    def after_change(self, m):
+        if m.phase not in ["Impact review", "Recalculation required"]:
+            m.resume_phase = m.phase
+        if any(e.state == "stale" and e.kind in IMPACT_KINDS for e in m.entities.values()):
+            m.phase = "Impact review"
+        else:
+            self.require_recalculation(m)
+
+    def review_impact(self, id, revision, reason, confirm):
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        if old.phase != "Impact review" or not confirm:
+            raise ValueError("Explicit confirmation of affected design content is required")
+        m = old.model_copy(deep=True)
+        reviewed = []
+        for e in m.entities.values():
+            if e.state == "stale" and e.kind in IMPACT_KINDS:
+                if e.kind == "Parameter":
+                    from app.domain.engineering_inputs import validate_inputs
+
+                    validate_inputs(e.data["tool"], e.data["inputs"])
+                e.state = "accepted"
+                reviewed.append(e.id)
+        self.require_recalculation(m)
+        decision = entity(
+            str(uuid4()),
+            "Decision",
+            "Mission owner reviewed change impact",
+            "human",
+            refs=reviewed,
+            classification="Human decision",
+            rationale=reason,
+            alternatives=["revise affected content", "reaffirm affected content"],
+            consequences="Reaffirmed design content; numerical results still require recalculation",
+        )
+        m.entities[decision.id] = decision
+        return self.store.save(m, "human", reason, old)
+
+    def initialize_inputs(self, id, revision):
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        if "selective" not in old.entities or "mission-orbit-inputs" in old.entities:
+            raise ValueError(
+                "Input initialization is only for existing concepts without input objects"
+            )
+        m = old.model_copy(deep=True)
+        self.propose(m, "systems", input_entities(old), "calculation inputs")
+        return self.store.save(
+            m, "systems", "Proposed explicit input objects from recorded sizing basis", old
+        )
+
+    def reopen(self, id, revision, reason):
+        old = self.store.get(id)
+        if old.revision != revision or not old.baseline:
+            raise ValueError("Reopening requires the current approved baseline revision")
+        m = old.model_copy(deep=True)
+        m.derived_from_baseline = old.baseline
+        m.baseline = None
+        m.entities = {
+            k: v for k, v in m.entities.items() if v.kind != "Baseline" and k != "baseline-approval"
+        }
+        m.phase = "Ready for baseline"
+        return self.store.save(
+            m, "human", f"Reopened baseline {old.baseline} as a new revision: {reason}", old
+        )
+
+    def calculate_design(self, m):
+        if any(e.state == "stale" and e.kind in IMPACT_KINDS for e in m.entities.values()):
+            raise ValueError("Review affected assumptions, requirements and design inputs first")
+        # A recalculation never reuses a stale selection or independent review.
+        for e in m.entities.values():
+            if e.state == "stale" and e.kind in ["Decision", "VerificationItem", "ReviewFinding"]:
+                e.state = "superseded"
+            if e.id.startswith("selection-trade-"):
+                e.state = "superseded"
+        m.selected = None
+        reqs = [
+            e.id for e in m.entities.values() if e.kind == "Requirement" and e.state == "accepted"
+        ]
+        orbit = self.analysis(
+            m,
+            "orbit",
+            read_inputs(m, "mission", "orbit"),
+            [parameter_id("mission", "orbit"), "orbit-assumption"],
+            "mission",
+        )
+        for candidate in CANDIDATES:
+            for tool in BUDGET_TOOLS:
+                values = read_inputs(m, candidate, tool)
+                refs = [parameter_id(candidate, tool), candidate, *reqs]
+                if tool == "power":
+                    values.update(period=orbit.get("period"), eclipse=orbit.get("eclipse"))
+                    refs.append("mission-orbit-analysis")
+                if tool == "link":
+                    values["demand"] = m.entities[f"{candidate}-data"].data.get("daily")
+                    refs.append(f"{candidate}-data")
+                result = self.analysis(m, tool, values, refs, candidate)
+                key = f"{candidate}-conflict" if tool == "link" else f"{candidate}-{tool}-conflict"
+                if result.get("compliant") is not True or key in m.entities:
+                    finding = entity(
+                        key,
+                        "ReviewFinding",
+                        "Payload production exceeds downlink capacity or RF link fails"
+                        if tool == "link"
+                        else f"{candidate}: {tool} constraint violation",
+                        refs=[f"{candidate}-{tool}"],
+                        severity="critical",
+                        resolution="",
+                        candidate=candidate,
+                        tool=tool,
+                        disciplines=[
+                            "Payload: observation demand",
+                            "Bus & Ground: resource availability",
+                        ],
+                    )
+                    if result.get("compliant") is True:
+                        finding.state = "verified"
+                        finding.data["resolution"] = (
+                            "Deterministic recalculation verifies compliance under the revised inputs"
+                        )
+                    else:
+                        finding.state = "open"
+                        if result.get("status") == "invalid":
+                            finding.title = f"{candidate}: {tool} calculation is invalid"
+                    m.entities[key] = finding
+        for role, tools in [
+            ("analysis", ["orbit"]),
+            ("payload", ["data"]),
+            ("bus", ["mass", "power", "link"]),
+        ]:
+            run = entity(
+                str(uuid4()),
+                "AgentRun",
+                AGENTS[role].role + ": deterministic analysis",
+                role,
+                agent_version="1.0",
+                model="deterministic mock",
+                input_revision=m.revision,
+                context_references=list(m.entities),
+                tool_calls=tools,
+                result="completed",
+                tokens=0,
+                cost=0,
+            )
+            m.entities[run.id] = run
+        previous_trade = m.entities.get("trade")
+        weights = (
+            previous_trade.data["weights"]
+            if previous_trade
+            else {"science": 0.35, "capacity": 0.45, "simplicity": 0.2}
+        )
+        scores = {
+            "wide": {"science": 5, "capacity": 0, "simplicity": 4},
+            "selective": {"science": 3, "capacity": 0, "simplicity": 3},
+        }
+        for candidate in CANDIDATES:
+            scores[candidate]["capacity"] = (
+                5 if m.entities[f"{candidate}-link"].data.get("compliant") is True else 0
+            )
+        calculated = self.analysis(
+            m,
+            "trade",
+            {"weights": weights, "scores": scores},
+            ["wide-link", "selective-link"],
+            "concept",
+        )
+        m.entities["trade"] = entity(
+            "trade",
+            "TradeStudy",
+            "Compare the revised engineering concepts",
+            refs=["concept-trade-analysis"],
+            criteria=list(weights),
+            weights=weights,
+            scores=scores,
+            recommendation=calculated["recommendation"],
+            dissent="Payload favors complete images; event filtering risks missed weak anomalies.",
+            sensitivities="Science and simplicity are estimates; capacity scores follow current tool results.",
+            alternatives=list(CANDIDATES),
+            score_basis="Engineering estimates on a 0–5 scale; capacity scored by deterministic compliance",
+        )
+        m.phase = "Trade study"

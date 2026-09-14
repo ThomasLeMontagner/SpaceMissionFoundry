@@ -80,6 +80,8 @@ class Store:
         model.modified_at = now()
         for key, e in model.entities.items():
             if previous and e != previous.entities.get(key):
+                if key in previous.entities:
+                    e.created_at = previous.entities[key].created_at
                 e.revision = model.revision
                 e.modified_at = model.modified_at
         for key, proposal in model.proposals.items():
@@ -158,10 +160,28 @@ class Store:
                 raise KeyError("Revision does not exist")
             return Model.model_validate(row.snapshot)
 
-    def baseline(self, mission_id):
+    def baselines(self, mission_id):
+        self.get(mission_id)
+        with Session(self.engine) as s:
+            return sorted(
+                [
+                    {
+                        "id": row.id,
+                        "revision": row.snapshot["revision"],
+                        "name": row.snapshot["entities"][row.id]["title"],
+                    }
+                    for row in s.scalars(
+                        select(BaselineRow).where(BaselineRow.mission_id == mission_id)
+                    )
+                ],
+                key=lambda item: item["revision"],
+            )
+
+    def baseline(self, mission_id, baseline_id=None):
         model = self.get(mission_id)
         with Session(self.engine) as s:
-            row = s.get(BaselineRow, model.baseline) if model.baseline else None
-            if not row:
-                raise ValueError("An approved baseline is required")
+            key = baseline_id or model.baseline
+            row = s.get(BaselineRow, key) if key else None
+            if not row or row.mission_id != mission_id:
+                raise ValueError("An approved baseline belonging to this mission is required")
             return row.snapshot

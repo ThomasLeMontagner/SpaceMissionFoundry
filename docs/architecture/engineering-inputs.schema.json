@@ -1,0 +1,320 @@
+{
+  "mass": {
+    "$defs": {
+      "MassEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "mass": {
+            "$ref": "#/$defs/Quantity"
+          }
+        },
+        "required": [
+          "name",
+          "mass"
+        ],
+        "title": "MassEntry",
+        "type": "object"
+      },
+      "Quantity": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "number"
+          },
+          "unit": {
+            "maxLength": 40,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Quantity",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "entries": {
+        "items": {
+          "$ref": "#/$defs/MassEntry"
+        },
+        "maxItems": 40,
+        "minItems": 1,
+        "title": "Entries",
+        "type": "array"
+      },
+      "margin": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "limit": {
+        "$ref": "#/$defs/Quantity"
+      }
+    },
+    "required": [
+      "entries",
+      "margin",
+      "limit"
+    ],
+    "title": "MassInputs",
+    "type": "object"
+  },
+  "power": {
+    "$defs": {
+      "Mode": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "fraction": {
+            "$ref": "#/$defs/Quantity"
+          },
+          "loads": {
+            "additionalProperties": {
+              "$ref": "#/$defs/Quantity"
+            },
+            "maxProperties": 30,
+            "minProperties": 1,
+            "title": "Loads",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "fraction",
+          "loads"
+        ],
+        "title": "Mode",
+        "type": "object"
+      },
+      "Quantity": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "number"
+          },
+          "unit": {
+            "maxLength": 40,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Quantity",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "modes": {
+        "items": {
+          "$ref": "#/$defs/Mode"
+        },
+        "maxItems": 20,
+        "minItems": 1,
+        "title": "Modes",
+        "type": "array"
+      },
+      "solar": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "battery": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "depth_of_discharge": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "eclipse_load": {
+        "$ref": "#/$defs/Quantity"
+      }
+    },
+    "required": [
+      "modes",
+      "solar",
+      "battery",
+      "depth_of_discharge",
+      "eclipse_load"
+    ],
+    "title": "PowerInputs",
+    "type": "object"
+  },
+  "data": {
+    "$defs": {
+      "Quantity": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "number"
+          },
+          "unit": {
+            "maxLength": 40,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Quantity",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "rate": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "duty": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "compression": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "storage": {
+        "$ref": "#/$defs/Quantity"
+      }
+    },
+    "required": [
+      "rate",
+      "duty",
+      "compression",
+      "storage"
+    ],
+    "title": "DataInputs",
+    "type": "object"
+  },
+  "link": {
+    "$defs": {
+      "Quantity": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "number"
+          },
+          "unit": {
+            "maxLength": 40,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Quantity",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "frequency": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "range": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "rate": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "tx_power": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "tx_gain_db": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "rx_gain_db": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "loss_db": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "required_ebn0_db": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "noise_temperature": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "contact": {
+        "$ref": "#/$defs/Quantity"
+      },
+      "efficiency": {
+        "$ref": "#/$defs/Quantity"
+      }
+    },
+    "required": [
+      "frequency",
+      "range",
+      "rate",
+      "tx_power",
+      "tx_gain_db",
+      "rx_gain_db",
+      "loss_db",
+      "required_ebn0_db",
+      "noise_temperature",
+      "contact",
+      "efficiency"
+    ],
+    "title": "LinkInputs",
+    "type": "object"
+  },
+  "orbit": {
+    "$defs": {
+      "Quantity": {
+        "additionalProperties": false,
+        "properties": {
+          "value": {
+            "minimum": 0,
+            "title": "Value",
+            "type": "number"
+          },
+          "unit": {
+            "maxLength": 40,
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "unit"
+        ],
+        "title": "Quantity",
+        "type": "object"
+      }
+    },
+    "additionalProperties": false,
+    "properties": {
+      "altitude": {
+        "$ref": "#/$defs/Quantity"
+      }
+    },
+    "required": [
+      "altitude"
+    ],
+    "title": "OrbitInputs",
+    "type": "object"
+  }
+}

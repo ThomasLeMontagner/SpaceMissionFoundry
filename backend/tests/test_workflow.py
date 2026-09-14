@@ -1,21 +1,12 @@
 import os
 
 import pytest
-from fastapi.testclient import TestClient
 from sqlalchemy.orm import Session
 
-from app.api.main import create_app
 from app.domain.models import Operation, Proposal
 from app.domain.protocol import validate
 from app.orchestration.scenario import BRIEF, Q, entity
-from app.persistence.store import BaselineRow, RevisionRow, Store
-
-
-@pytest.fixture
-def client(tmp_path):
-    store = Store(os.getenv("TEST_DATABASE_URL", "sqlite:///" + str(tmp_path / "test.db")))
-    store.initialize()
-    return TestClient(create_app(store))
+from app.persistence.store import BaselineRow, RevisionRow
 
 
 def create(client):

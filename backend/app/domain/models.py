@@ -154,3 +154,5 @@ class Model(Strict):
     baseline: str | None = None
     paused: bool = False
     steps: int = 0
+    resume_phase: str | None = None
+    derived_from_baseline: str | None = None

@@ -26,3 +26,13 @@ No paid LLM call was made. The optional adapter's rationale-only contract and co
 No high-fidelity engineering verification is claimed. Positive resource margins are conditional on declared concept assumptions. End-to-end 30-minute delivery, coverage/revisit, detection sensitivity, lifetime, cost confidence, pointing and thermal feasibility remain unverified.
 
 The API test client emits two upstream deprecation warnings about httpx and AnyIO compatibility; all assertions pass. File-watcher polling is enabled because this host exhausted its inotify watcher limit. Browser tests use a separate temporary SQLite database.
+
+## Design iteration milestone — 2026-09-13
+
+- SQLite regression: 32 passed, one PostgreSQL-only skip.
+- PostgreSQL 16 regression: 33 passed, including the database immutability trigger and two-baseline change workflow. The isolated test database uses port 55440.
+- Vitest / React Testing Library: 6 passed, including quantity and requirement edit submission and draft preservation on validation failure.
+- Playwright: original workflow plus design iteration. The latter changes duty cycle, exercises stale state while paused, recalculates on resume, blocks noncompliant selection, corrects contact duration, creates a second baseline, exports the original unchanged, and reviews the impact of an edited requirement.
+- Ruff, TypeScript/Vite build and Prettier checks pass. Browser tests use separate app ports 5174/8011.
+- GitHub Actions configuration added for these checks using SQLite, a PostgreSQL service and Playwright. Its commands are exercised locally; no hosted Actions run is claimed until the changes are pushed.
+- Existing sample exports remain the historical v0.1 fixture. The new code reads those schema-compatible snapshots without rewriting their baseline contents.

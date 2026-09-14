@@ -32,4 +32,6 @@ export type Model = {
   baseline: string | null;
   paused: boolean;
   steps: number;
+  resume_phase?: string | null;
+  derived_from_baseline?: string | null;
 };

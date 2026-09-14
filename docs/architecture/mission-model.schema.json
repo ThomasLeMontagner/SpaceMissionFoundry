@@ -370,6 +370,30 @@
       "default": 0,
       "title": "Steps",
       "type": "integer"
+    },
+    "resume_phase": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Resume Phase"
+    },
+    "derived_from_baseline": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Derived From Baseline"
     }
   },
   "required": [

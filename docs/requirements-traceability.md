@@ -12,7 +12,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MIS-004 | Partial | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-MIS-005 | Partial | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-MIS-006 | Implemented | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
-| MF-MIS-007 | Partial | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
+| MF-MIS-007 | Implemented | Unit-bearing editable calculator inputs preserve original values and compatible units; test_iteration.py tests percent and seconds. |
 | MF-MIS-008 | Partial | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-MIS-009 | Deferred | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-AGT-001 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
@@ -25,7 +25,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-AGT-008 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-009 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-010 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-011 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
+| MF-AGT-011 | Partial | Human edit proposals, before/after inspection, acceptance/rejection/challenge; general agent counter-proposals deferred. |
 | MF-AGT-012 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-013 | Deferred | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-014 | Deferred | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
@@ -38,7 +38,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MDL-006 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-007 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-008 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
-| MF-MDL-009 | Partial | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
+| MF-MDL-009 | Implemented | Transitive invalidation, human impact review and recalculation of the reference model; test_iteration.py. |
 | MF-MDL-010 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-011 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-REQ-001 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
@@ -49,7 +49,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-006 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-007 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-008 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
-| MF-REQ-009 | Deferred | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
+| MF-REQ-009 | Partial | Existing requirements can be edited through reviewed replacement proposals with history. Manual creation remains deferred. |
 | MF-REQ-010 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-ARC-001 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-002 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
@@ -61,7 +61,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ARC-008 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-009 | Deferred | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ANL-001 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-002 | Partial | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
+| MF-ANL-002 | Implemented | Versioned executions record accepted inputs/units, source revision, elapsed time, outputs and failures; test_iteration.py. |
 | MF-ANL-003 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
 | MF-ANL-004 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
 | MF-ANL-005 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
@@ -86,7 +86,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-TRD-004 | Implemented | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-TRD-005 | Partial | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-TRD-006 | Implemented | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
-| MF-TRD-007 | Partial | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
+| MF-TRD-007 | Implemented | Input changes stale dependent selection decisions and force recalculation and reselection; test_iteration.py. |
 | MF-TRD-008 | Deferred | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-REV-001 | Implemented | One concept review with seeded defect and verified evidence correction; no broad finding lifecycle editor. |
 | MF-REV-002 | Partial | One concept review with seeded defect and verified evidence correction; no broad finding lifecycle editor. |
@@ -99,7 +99,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-CFG-001 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-002 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-003 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
-| MF-CFG-004 | Partial | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
+| MF-CFG-004 | Partial | Revision comparison plus immutable baseline history and per-baseline export; dedicated baseline diff UI deferred. |
 | MF-CFG-005 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-006 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-UI-001 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |

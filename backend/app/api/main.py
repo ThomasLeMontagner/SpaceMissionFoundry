@@ -11,6 +11,7 @@ from app.domain.models import Proposal, Strict
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
+from app.services.design_inputs import EditChanges
 from app.services.workflow import Workflow
 
 
@@ -47,6 +48,20 @@ class Select(Command):
 class Approve(Command):
     name: str = Field(min_length=1, max_length=120)
     confirm: bool
+
+
+class Edit(Command):
+    changes: EditChanges
+    reason: str = Field(min_length=3, max_length=2000)
+
+
+class Impact(Command):
+    reason: str = Field(min_length=3, max_length=2000)
+    confirm: bool
+
+
+class Reopen(Command):
+    reason: str = Field(min_length=3, max_length=2000)
 
 
 class Restore(Command):
@@ -86,6 +101,26 @@ def create_app(store=None):
     @app.get("/api/missions/{id}")
     def get(id: str):
         return store.get(id)
+
+    @app.post("/api/missions/{id}/objects/{object_id}/edit")
+    def edit(id: str, object_id: str, body: Edit):
+        return service.edit(id, object_id, body.revision, body.changes, body.reason)
+
+    @app.post("/api/missions/{id}/review-impact")
+    def review_impact(id: str, body: Impact):
+        return service.review_impact(id, **body.model_dump())
+
+    @app.post("/api/missions/{id}/initialize-inputs")
+    def initialize_inputs(id: str, body: Command):
+        return service.initialize_inputs(id, body.revision)
+
+    @app.post("/api/missions/{id}/reopen")
+    def reopen(id: str, body: Reopen):
+        return service.reopen(id, **body.model_dump())
+
+    @app.get("/api/missions/{id}/baselines")
+    def baselines(id: str):
+        return store.baselines(id)
 
     @app.post("/api/missions/{id}/advance")
     def advance(id: str, body: Command):
@@ -165,8 +200,8 @@ def create_app(store=None):
         }
 
     @app.get("/api/missions/{id}/export/{format}")
-    def export(id: str, format: str):
-        m = store.baseline(id)
+    def export(id: str, format: str, baseline_id: str | None = None):
+        m = store.baseline(id, baseline_id)
         if format == "json":
             data, media = json.dumps(m, indent=2), "application/json"
         elif format == "md":

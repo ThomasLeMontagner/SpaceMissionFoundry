@@ -28,6 +28,7 @@ AGENTS = {
         objective="Integrate a consistent concept",
         responsibilities=["Allocations", "interfaces", "trade studies", "preserve dissent"],
         authority=[
+            "Parameter",
             "Requirement",
             "Function",
             "Component",

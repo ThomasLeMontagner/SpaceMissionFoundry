@@ -768,3 +768,42 @@ footer span {
     flex-direction: column;
   }
 }
+
+.quantity-fields {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 14px;
+}
+.quantity-fields label {
+  margin: 8px 0;
+}
+.design-editor {
+  border-top: 1px solid #bdccd3;
+  padding-top: 16px;
+  margin-top: 18px;
+}
+.change-comparison {
+  width: 100%;
+  flex-basis: 100%;
+}
+.proposed-object {
+  flex-wrap: wrap;
+}
+.change-comparison .comparison {
+  align-items: start;
+}
+.change-comparison pre {
+  margin-top: 12px;
+  max-height: 220px;
+}
+.badge.stale {
+  background: #fff1d4;
+  color: #705000;
+}
+.design-editor textarea {
+  max-width: 100%;
+}
+
+.panel > .actions {
+  margin-top: 12px;
+}
