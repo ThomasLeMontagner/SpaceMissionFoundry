@@ -35,6 +35,10 @@ class Command(Strict):
     revision: int = Field(ge=0)
 
 
+class Archive(Command):
+    archived: bool
+
+
 class Decide(Command):
     action: str
     reason: str = Field(min_length=3, max_length=2000)
@@ -96,8 +100,12 @@ def create_app(store=None):
         return METRICS
 
     @app.get("/api/missions")
-    def missions():
-        return store.list()
+    def missions(archived: bool = False):
+        return store.list(archived=archived)
+
+    @app.post("/api/missions/{id}/archive")
+    def archive(id: str, body: Archive):
+        return service.archive(id, body.revision, body.archived)
 
     @app.post("/api/missions", status_code=201)
     def create(body: Create):
@@ -118,6 +126,10 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/initialize-inputs")
     def initialize_inputs(id: str, body: Command):
         return service.initialize_inputs(id, body.revision)
+
+    @app.post("/api/missions/{id}/initialize-access")
+    def initialize_access(id: str, body: Command):
+        return service.initialize_access(id, body.revision)
 
     @app.post("/api/missions/{id}/reopen")
     def reopen(id: str, body: Reopen):
@@ -173,9 +185,12 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/restore")
     def restore(id: str, body: Restore):
         old = store.get(id)
+        if old.archived:
+            raise ValueError("Restore the archived mission to the active list first")
         if body.revision != old.revision:
             raise ValueError("Stale revision")
         m = store.revision(id, body.source_revision)
+        m.archived = False
         m.baseline = None
         m.entities = {
             k: v for k, v in m.entities.items() if v.kind != "Baseline" and k != "baseline-approval"

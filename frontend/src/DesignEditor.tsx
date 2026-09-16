@@ -14,6 +14,14 @@ const names: Record<string, string> = {
   battery: "Battery capacity",
   depth_of_discharge: "Battery depth of discharge",
   altitude: "Orbit altitude",
+  inclination: "Orbit inclination",
+  raan: "Ascending node angle",
+  argument_of_latitude: "Initial orbital position angle",
+  earth_rotation_angle: "Initial Earth rotation angle",
+  duration: "Analysis duration",
+  step: "Sampling step",
+  footprint_width: "Ground footprint diameter",
+  minimum_elevation: "Minimum station elevation",
 };
 
 function QuantityFields({
@@ -23,8 +31,71 @@ function QuantityFields({
 }: {
   value: any;
   path?: string[];
-  update: (path: string[], value: string | number) => void;
+  update: (path: string[], value: unknown) => void;
 }) {
+  if (Array.isArray(value) && ["targets", "stations"].includes(path[0])) {
+    const label = path[0] === "targets" ? "Target" : "Station";
+    return (
+      <fieldset>
+        <legend>
+          {path[0] === "targets" ? "Point targets" : "Ground stations"}
+        </legend>
+        {value.map((site, index) => (
+          <fieldset key={index}>
+            <legend>
+              {label} {index + 1}
+            </legend>
+            <label>
+              {label} {index + 1} name
+              <input
+                required
+                maxLength={80}
+                value={site.name}
+                onChange={(e) =>
+                  update([...path, String(index), "name"], e.target.value)
+                }
+              />
+            </label>
+            <QuantityFields
+              value={site}
+              path={[...path, String(index)]}
+              update={update}
+            />
+            <button
+              type="button"
+              className="secondary"
+              disabled={value.length === 1}
+              onClick={() =>
+                update(
+                  path,
+                  value.filter((_, i) => i !== index),
+                )
+              }
+            >
+              Remove {label.toLowerCase()} {index + 1}
+            </button>
+          </fieldset>
+        ))}
+        <button
+          type="button"
+          className="secondary"
+          disabled={value.length >= (path[0] === "targets" ? 12 : 8)}
+          onClick={() =>
+            update(path, [
+              ...value,
+              {
+                name: `${label} ${value.length + 1}`,
+                latitude: { value: 0, unit: "deg" },
+                longitude: { value: 0, unit: "deg" },
+              },
+            ])
+          }
+        >
+          Add {label.toLowerCase()}
+        </button>
+      </fieldset>
+    );
+  }
   if (
     value &&
     typeof value === "object" &&
@@ -39,7 +110,11 @@ function QuantityFields({
           <input
             required
             type="number"
-            min="0"
+            min={
+              path.at(-1) === "latitude" || path.at(-1) === "longitude"
+                ? undefined
+                : 0
+            }
             step="any"
             value={value.value}
             onChange={(e) =>
@@ -124,7 +199,7 @@ export default function DesignEditor({
   );
   const criterion: any =
     "criterion" in changes ? changes.criterion : entity.data.criterion;
-  function update(path: string[], value: string | number) {
+  function update(path: string[], value: unknown) {
     setChanges((previous) => {
       const next = structuredClone(previous);
       let node: any = next.inputs;

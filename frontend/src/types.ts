@@ -31,6 +31,7 @@ export type Model = {
   selected: string | null;
   baseline: string | null;
   paused: boolean;
+  archived?: boolean;
   steps: number;
   resume_phase?: string | null;
   derived_from_baseline?: string | null;

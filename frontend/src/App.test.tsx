@@ -1,10 +1,16 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { vi, test, expect, beforeEach } from "vitest";
 import App, { Badge } from "./App";
-import { request } from "./api";
+import { request, subscribe } from "./api";
 vi.mock("./api", () => ({
   request: vi.fn(),
-  subscribe: () => () => {},
+  subscribe: vi.fn(() => () => {}),
   download: vi.fn(),
   setToken: vi.fn(),
 }));
@@ -53,4 +59,56 @@ test("server errors are actionable and dismissible", async () => {
   );
   fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
   expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
+
+test("a delayed mission refresh cannot reopen a mission after switching away", async () => {
+  const mission = {
+    id: "m",
+    name: "Saved test",
+    brief: "Mission brief",
+    revision: 1,
+    phase: "Brief",
+    entities: {},
+    proposals: {},
+    selected: null,
+    baseline: null,
+    paused: false,
+    steps: 0,
+  };
+  let refresh!: () => void;
+  vi.mocked(subscribe).mockImplementation((_id, callback) => {
+    refresh = callback;
+    return () => {};
+  });
+  vi.mocked(request).mockImplementation(async (path) =>
+    path === "/missions"
+      ? [{ id: "m", name: "Saved test" }]
+      : path === "/missions/m"
+        ? mission
+        : { name: "New mission", brief: "A sufficiently long mission brief." },
+  );
+  render(<App />);
+  fireEvent.click(await screen.findByRole("button", { name: "Saved test →" }));
+  const switchButton = await screen.findByRole("button", {
+    name: "Switch mission",
+  });
+  await waitFor(() => expect(switchButton).toBeEnabled());
+  let resolve!: (value: unknown) => void;
+  vi.mocked(request).mockImplementationOnce(
+    () =>
+      new Promise((r) => {
+        resolve = r;
+      }),
+  );
+  act(() => refresh());
+  fireEvent.click(switchButton);
+  await act(async () => {
+    resolve({ ...mission, revision: 2 });
+  });
+  expect(
+    screen.getByRole("heading", { name: "Saved missions" }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: "Switch mission" }),
+  ).not.toBeInTheDocument();
 });

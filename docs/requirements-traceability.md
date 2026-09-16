@@ -15,6 +15,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MIS-007 | Implemented | Unit-bearing editable calculator inputs preserve original values and compatible units; test_iteration.py tests percent and seconds. |
 | MF-MIS-008 | Partial | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-MIS-009 | Deferred | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
+| MF-MIS-010 | Implemented | Archive actions in saved-mission list and workspace, archived list and restore action; browser regression. Permanent deletion is not provided. |
+| MF-MIS-011 | Implemented | Revision-checked audit events, archived edit guards, preserved baseline/revision exports and resumable pending approvals; test_archive.py. |
 | MF-AGT-001 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-002 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-003 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
@@ -65,18 +67,22 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ARC-007 | Implemented | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-008 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-009 | Deferred | Reference functional/physical records and interface drilldown; no general compatibility engine. |
-| MF-ANL-001 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
+| MF-ANL-001 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-002 | Implemented | Versioned executions record accepted inputs/units, source revision, elapsed time, outputs and failures; test_iteration.py. |
-| MF-ANL-003 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-004 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-005 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-006 | Partial | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-007 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-008 | Implemented | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-009 | Deferred | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-010 | Deferred | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-011 | Partial | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
-| MF-ANL-012 | Partial | Tested mass, mode-power/eclipses, data, RF and circular orbit; coverage and access remain unknown. |
+| MF-ANL-003 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-004 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-005 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-006 | Partial | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-007 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-008 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-009 | Deferred | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-010 | Deferred | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-011 | Partial | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-012 | Partial | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-013 | Implemented | Validated geometry and named point/station inputs, bounded circular propagation and analytic reference tests. |
+| MF-ANL-014 | Implemented | Sampled observation/visibility windows, finite-horizon gaps, repeated-window revisit and union network contact; test_access.py. |
+| MF-ANL-015 | Implemented | Explicit sampling/censoring/model limits; latency remains unverified and approved link-contact assumptions remain unchanged. |
+| MF-ANL-016 | Implemented | Ground-track/window view, approved legacy initialization, stale/failure hiding, evidence and immutable-baseline tests. |
 | MF-EVD-001 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-002 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-003 | Implemented | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
@@ -104,9 +110,11 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-CFG-001 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-002 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-003 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
-| MF-CFG-004 | Partial | Revision comparison plus immutable baseline history and per-baseline export; dedicated baseline diff UI deferred. |
+| MF-CFG-004 | Implemented | Revision replay comparison plus dedicated comparison of two immutable baselines, including directional field changes. |
 | MF-CFG-005 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
 | MF-CFG-006 | Implemented | Immutable snapshots, new-revision restore and object comparison; no branch merging. |
+| MF-CFG-007 | Implemented | Baseline selectors, directional object/field comparison, type and text filters; browser and unit regressions. |
+| MF-CFG-008 | Implemented | Read-only snapshot exports, explicit audit metadata toggle, missing/null and identity tests, stale-request isolation, immutable-export browser checks. |
 | MF-UI-001 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-002 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-003 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |

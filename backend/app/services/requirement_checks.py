@@ -24,7 +24,7 @@ def evaluate(model, requirement, candidate):
     if criterion:
         rule = Criterion.model_validate(criterion)
         tool, output = rule.metric.split(".")
-        source_id = f"{'mission' if tool == 'orbit' else candidate}-{tool}-analysis"
+        source_id = f"{'mission' if tool in ['orbit', 'access'] else candidate}-{tool}-analysis"
         source = model.entities.get(source_id)
         if source:
             refs.append(Relation(type="evidenced_by", target=source_id))

@@ -1,5 +1,23 @@
 # Mission Foundry
 
+## Archive and restore saved missions
+
+Use **Archive** beside a saved mission, or **Archive mission** inside its workspace, and confirm the action. It disappears from the active list. Select **Show archived missions** and **Restore** to bring it back. Archiving keeps the mission's workflow, pending proposals, history and immutable baseline exports; it does not permanently delete any data. Archived missions cannot be edited until restored. Both actions are recorded in history.
+
+## Preliminary coverage and ground access
+
+Open **Coverage & access** to view a sampled ground track, target observation windows, revisit observations, and ground-station visibility. New missions propose explicit coverage assumptions with their architectures. For an existing mission, reopen its baseline if necessary and select **Propose coverage inputs**, review the illustrative point targets and hypothetical station, and approve the proposal. The calculation uses altitude from the accepted orbit input group.
+
+Use **Inspect or edit coverage inputs** to change inclination, orbit/relative-epoch angles, analysis horizon, sample step, footprint diameter, station elevation mask, or add/remove named targets and stations. Latitude and longitude accept negative values and degrees/radians. Approval invalidates dependent results; stale ground tracks stay hidden until recalculation. Three finite-horizon metrics are available in quantitative requirement checks: network contact, observed target fraction, and largest target gap.
+
+This is a bounded circular-orbit, spherical-Earth geometry model. It assesses configured points, not full regional area coverage. Sampling can miss short passes; run a finer step to assess sensitivity. Daily contact is a horizon-average; it does not replace approved link-budget contact assumptions. End-to-end delivery latency remains unverified. The [method and limitations](docs/architecture/access-analysis.md) explain the assumptions and reference equations.
+
+## Compare saved baselines
+
+Open **Baselines & replay → Compare saved baselines**, choose the **From** and **To** snapshots, then select **Compare baselines**. Expand a changed object to see stored field values side by side. Filter by object type or search for a requirement, input, result or decision. Added and removed objects are included; comparison direction follows your selections.
+
+Audit timestamps and revision provenance are hidden by default and can be included with the checkbox. Values retain their recorded units: comparison reports stored differences, not recalculated margins or physical equivalence. Comparing a baseline with itself shows no differences. This view reads immutable exports and does not restore or modify the working design.
+
 ## Quantitative requirement checks
 
 Open a requirement and choose **Edit requirement**. Under **Quantitative verification**, select a measured output, an upper/lower comparison, and a threshold with units. Update the statement and rationale to match the criterion, then propose and approve the change. Complete any requested impact review; recalculation refreshes the per-candidate pass/fail/stale/unverified results. Open a result to inspect its recorded calculation evidence.

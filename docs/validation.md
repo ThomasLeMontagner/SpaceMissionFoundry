@@ -44,3 +44,27 @@ The API test client emits two upstream deprecation warnings about httpx and AnyI
 - All three Playwright workflows passed, including criterion editing, conversion from grams to kilograms, per-candidate pass status and navigation to recorded analysis evidence. The evidence detail screenshot was inspected.
 - Backend lint/format checks and patch whitespace checks passed. No SQL schema changes were required. PostgreSQL was not rerun for this milestone; its previous validation is recorded above.
 - Updated the authoritative specification to version 0.2, adding MF-REQ-011 through MF-REQ-015. Semantic statement-to-metric matching remains an explicit owner review responsibility.
+
+## Baseline comparison — 2026-09-14
+
+- Frontend unit regressions: 12 passed. Coverage includes directional added/removed/changed objects, quantities, missing versus null values, key and relationship ordering, metadata filtering, mission/proposal changes, same-baseline identity, failed requests, and delayed responses after switching missions.
+- All three browser workflows passed. The design-iteration flow now compares two actual baselines, inspects changed duty-cycle values, checks the same-baseline empty state, and verifies both exports remain identical after comparison. The comparison screenshot was visually inspected.
+- TypeScript/Vite production build, Prettier and patch whitespace validation passed. Vitest now discovers both `.test.ts` and `.test.tsx` files.
+- Fixed a navigation race discovered by the broader browser regression: a delayed mission refresh cannot reopen a mission after switching away. A focused unit regression covers it.
+- No backend or database schema changes in this milestone; the existing mission-scoped immutable export API is reused. Updated specification version 0.3 and MF-CFG-004/007/008 traceability. Detailed comparison of two arbitrary revisions remains outside this milestone.
+
+## Preliminary coverage and ground access — 2026-09-15
+
+- SQLite backend regression: 53 passed, one PostgreSQL-only skip. The 13 new access tests include analytic overhead/horizon geometry, Earth rotation, polar position, equatorial repeat timing, sampling refinement, station-union accounting, no-access/unknown cases, signed coordinates, unit and resource validation, stale criterion propagation, controlled tool failure, explicit legacy initialization and immutable baseline preservation.
+- Frontend unit regression: 14 passed. Stale/failed access hides the ground track, legacy input initialization requires an explicit action, and approved baselines require reopening before new inputs.
+- All four Playwright workflows passed. The new flow edits inclination, adds a southern target with negative latitude, verifies stale-state hiding while paused, resumes recalculation, and checks that delivery latency and existing link-contact assumptions remain unchanged. The ground-track screenshot was visually inspected.
+- TypeScript/Vite production build, Ruff lint/format, Prettier and whitespace checks passed. Fixed an editor timing race exposed by larger snapshot responses: input inspectors cannot open while a model action is pending.
+- No external orbital library, paid model call or SQL migration was introduced. PostgreSQL was not rerun in this milestone; prior database validation is recorded above. No operational or high-fidelity accuracy is claimed; the analytic and sampling tests validate the stated simplified model.
+- Specification version 0.4 adds MF-ANL-013 through MF-ANL-016, and traceability retains MF-ANL-011 as partial because full regional coverage, lifetime and operational access verification remain incomplete. Method references and limits are in `docs/architecture/access-analysis.md`.
+
+## Reversible mission archiving — 2026-09-16
+
+- SQLite regression: 56 passed, one PostgreSQL-only skip. New archive tests cover active/archived listing, restoration of pending approvals, archived mutation guards, stale revisions, idempotent state requests, audit events and unchanged baseline exports/historical snapshots.
+- Frontend unit regression: 14 passed. All five Playwright workflows passed, including archive cancellation, persistence after reload, restoration, continued approval and archiving from an open workspace.
+- TypeScript/Vite production build, Ruff lint/format, Prettier and whitespace checks passed. The backward-compatible model schema includes the archive flag; no SQL migration was needed. PostgreSQL was not rerun for this milestone.
+- Updated specification version 0.5 and traceability for MF-MIS-010/011. No permanent deletion endpoint was added and no user mission was archived during implementation.

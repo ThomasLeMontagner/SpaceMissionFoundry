@@ -1,7 +1,16 @@
 import { useEffect, useState, useRef } from "react";
 import { request, download, setToken, subscribe } from "./api";
 import DesignEditor from "./DesignEditor";
+import BaselineComparison from "./BaselineComparison";
+import CoverageView from "./CoverageView";
 import type { Entity, Model, Proposal } from "./types";
+
+type MissionSummary = {
+  id: string;
+  name: string;
+  revision: number;
+  archived?: boolean;
+};
 
 const tabs: Record<string, string[]> = {
   Overview: [],
@@ -11,6 +20,7 @@ const tabs: Record<string, string[]> = {
   Architectures: ["ArchitectureAlternative", "Function", "Component"],
   Interfaces: ["Interface"],
   Budgets: ["Budget", "BudgetEntry", "AnalysisRun"],
+  "Coverage & access": [],
   Trades: ["TradeStudy"],
   "Claims & evidence": ["Claim", "Evidence"],
   "Conflicts & review": ["ReviewFinding", "Risk", "VerificationItem"],
@@ -65,7 +75,9 @@ function Value({ value }: { value: any }) {
 }
 export default function App() {
   const [model, setModel] = useState<Model | null>(null),
-    [list, setList] = useState<{ id: string; name: string }[]>([]),
+    [list, setList] = useState<MissionSummary[]>([]),
+    [archivedList, setArchivedList] = useState<MissionSummary[]>([]),
+    [showArchived, setShowArchived] = useState(false),
     [tab, setTab] = useState("Overview"),
     [name, setName] = useState(""),
     [brief, setBrief] = useState(""),
@@ -106,7 +118,9 @@ export default function App() {
     setModel((current) =>
       current?.id === next.id && current.revision > next.revision
         ? current
-        : next,
+        : next.archived
+          ? null
+          : next,
     );
   }
   const detailRef = useRef<HTMLElement>(null);
@@ -115,7 +129,14 @@ export default function App() {
     const previous = document.activeElement as HTMLElement | null;
     return () => previous?.focus();
   }, [!!detail]);
-  const loadList = () => request("/missions").then(setList);
+  const loadList = async () => {
+    const [active, archived] = await Promise.all([
+      request("/missions"),
+      request("/missions?archived=true"),
+    ]);
+    setList(active);
+    setArchivedList(archived);
+  };
   useEffect(() => {
     Promise.all([request("/scenario"), loadList()])
       .then(([s]) => {
@@ -126,11 +147,27 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (!model?.id) return;
-    return subscribe(model.id, () => {
+    let active = true;
+    const stop = subscribe(model.id, () => {
       request("/missions/" + model.id)
-        .then(receiveModel)
-        .catch((e) => setError(e.message));
+        .then((next: Model) => {
+          if (active)
+            setModel((current) =>
+              current?.id === next.id && current.revision <= next.revision
+                ? next.archived
+                  ? null
+                  : next
+                : current,
+            );
+        })
+        .catch((e) => {
+          if (active) setError(e.message);
+        });
     });
+    return () => {
+      active = false;
+      stop();
+    };
   }, [model?.id]);
   async function run(
     fn: () => Promise<any>,
@@ -151,6 +188,30 @@ export default function App() {
     }
   }
   const base = model ? "/missions/" + model.id : "";
+  function archiveMission(mission: MissionSummary, archived: boolean) {
+    if (
+      archived &&
+      !window.confirm(
+        `Archive “${mission.name}”? Its history and baselines will be kept, and you can restore it later.`,
+      )
+    )
+      return;
+    void run(
+      async () => {
+        await request(`/missions/${mission.id}/archive`, {
+          revision: mission.revision,
+          archived,
+        });
+        if (model?.id === mission.id) {
+          setModel(null);
+          setDetail(null);
+        }
+      },
+      archived
+        ? "Mission archived. Find it under Show archived missions to restore it."
+        : "Mission restored to the active list.",
+    );
+  }
   const act = (path: string, body: object = {}) =>
     run(async () => {
       const updated: Model = await request(base + path, {
@@ -414,25 +475,69 @@ export default function App() {
             <div>
               <div className="panel">
                 <h3>Saved missions</h3>
-                {list.length ? (
-                  list.map((m) => (
-                    <button
-                      className="mission-link"
-                      key={m.id}
-                      onClick={() =>
-                        run(
-                          () => request("/missions/" + m.id),
-                          "Mission loaded",
-                        )
-                      }
-                    >
-                      {m.name} →
-                    </button>
-                  ))
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    checked={showArchived}
+                    onChange={(e) => setShowArchived(e.target.checked)}
+                  />{" "}
+                  Show archived missions
+                </label>
+                {showArchived ? (
+                  <section aria-label="Archived missions">
+                    <p className="muted">
+                      Archived missions retain their history and baselines.
+                      Restore a mission before continuing work.
+                    </p>
+                    {archivedList.length ? (
+                      archivedList.map((m) => (
+                        <div key={m.id} className="timeline">
+                          <span>{m.name}</span>
+                          <button
+                            disabled={busy}
+                            onClick={() => archiveMission(m, false)}
+                          >
+                            Restore {m.name}
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p>No archived missions.</p>
+                    )}
+                  </section>
                 ) : (
-                  <p className="muted">
-                    No missions yet. Your first design starts here.
-                  </p>
+                  <>
+                    {list.length ? (
+                      list.map((m) => (
+                        <div key={m.id}>
+                          <button
+                            className="mission-link"
+                            disabled={busy}
+                            key={m.id}
+                            onClick={() =>
+                              run(
+                                () => request("/missions/" + m.id),
+                                "Mission loaded",
+                              )
+                            }
+                          >
+                            {m.name} →
+                          </button>
+                          <button
+                            className="secondary"
+                            disabled={busy}
+                            onClick={() => archiveMission(m, true)}
+                          >
+                            Archive {m.name}
+                          </button>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="muted">
+                        No missions yet. Your first design starts here.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
               <div className="panel">
@@ -478,12 +583,20 @@ export default function App() {
               <div className="actions">
                 <button
                   className="secondary"
+                  disabled={busy}
                   onClick={() => {
                     setModel(null);
                     setDetail(null);
                   }}
                 >
                   Switch mission
+                </button>
+                <button
+                  className="secondary"
+                  disabled={busy}
+                  onClick={() => archiveMission(model, true)}
+                >
+                  Archive mission
                 </button>
                 {!model.baseline && (
                   <button
@@ -716,6 +829,14 @@ export default function App() {
                 </button>
               </section>
             )}
+            {tab === "Coverage & access" && (
+              <CoverageView
+                model={model}
+                busy={busy || pending.length > 0}
+                onInitialize={() => void act("/initialize-access")}
+                onInspect={(id) => show(model.entities[id])}
+              />
+            )}
             {tab === "Design inputs" && (
               <section className="panel">
                 <h2>Accepted calculation inputs</h2>
@@ -920,6 +1041,11 @@ export default function App() {
                     </p>
                   )}
                 </section>
+                <BaselineComparison
+                  key={model.id}
+                  missionId={model.id}
+                  revision={model.revision}
+                />
                 <section className="panel">
                   <div className="row">
                     <h2>Saved immutable baselines</h2>
@@ -1072,7 +1198,7 @@ export default function App() {
                 </section>
               </>
             )}
-            {tab !== "Overview" && (
+            {tab !== "Overview" && tab !== "Coverage & access" && (
               <section>
                 <div className="section-title">
                   <h2>{tab}</h2>
@@ -1103,6 +1229,7 @@ export default function App() {
                     .map((e) => (
                       <button
                         className="object-card"
+                        disabled={busy}
                         key={e.id}
                         onClick={() => show(e)}
                       >
@@ -1151,11 +1278,12 @@ export default function App() {
                       </button>
                     ))}
                 </div>
-                {!objects.some((e) => tabs[tab].includes(e.kind)) && (
-                  <p className="empty">
-                    No {tab.toLowerCase()} objects at this revision.
-                  </p>
-                )}
+                {tab !== "Coverage & access" &&
+                  !objects.some((e) => tabs[tab].includes(e.kind)) && (
+                    <p className="empty">
+                      No {tab.toLowerCase()} objects at this revision.
+                    </p>
+                  )}
               </section>
             )}
           </>

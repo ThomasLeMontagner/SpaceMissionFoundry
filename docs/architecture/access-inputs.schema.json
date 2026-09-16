@@ -1,0 +1,133 @@
+{
+  "$defs": {
+    "Angle": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "deg",
+            "degree",
+            "rad",
+            "radian"
+          ],
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Angle",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "maxLength": 40,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "Site": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "latitude": {
+          "$ref": "#/$defs/Angle"
+        },
+        "longitude": {
+          "$ref": "#/$defs/Angle"
+        }
+      },
+      "required": [
+        "name",
+        "latitude",
+        "longitude"
+      ],
+      "title": "Site",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "inclination": {
+      "$ref": "#/$defs/Angle"
+    },
+    "raan": {
+      "$ref": "#/$defs/Angle"
+    },
+    "argument_of_latitude": {
+      "$ref": "#/$defs/Angle"
+    },
+    "earth_rotation_angle": {
+      "$ref": "#/$defs/Angle"
+    },
+    "duration": {
+      "$ref": "#/$defs/Quantity"
+    },
+    "step": {
+      "$ref": "#/$defs/Quantity"
+    },
+    "footprint_width": {
+      "$ref": "#/$defs/Quantity"
+    },
+    "minimum_elevation": {
+      "$ref": "#/$defs/Angle"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/Site"
+      },
+      "maxItems": 12,
+      "minItems": 1,
+      "title": "Targets",
+      "type": "array"
+    },
+    "stations": {
+      "items": {
+        "$ref": "#/$defs/Site"
+      },
+      "maxItems": 8,
+      "minItems": 1,
+      "title": "Stations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "inclination",
+    "raan",
+    "argument_of_latitude",
+    "earth_rotation_angle",
+    "duration",
+    "step",
+    "footprint_width",
+    "minimum_elevation",
+    "targets",
+    "stations"
+  ],
+  "title": "AccessInputs",
+  "type": "object"
+}

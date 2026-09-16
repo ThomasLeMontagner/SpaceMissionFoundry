@@ -361,6 +361,11 @@
       "default": null,
       "title": "Baseline"
     },
+    "archived": {
+      "default": false,
+      "title": "Archived",
+      "type": "boolean"
+    },
     "paused": {
       "default": false,
       "title": "Paused",

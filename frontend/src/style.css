@@ -807,3 +807,73 @@ footer span {
 .panel > .actions {
   margin-top: 12px;
 }
+.baseline-comparison > button {
+  margin-top: 12px;
+}
+.baseline-change {
+  margin-top: 12px;
+  border: 1px solid var(--line, #ccd5dd);
+  border-radius: 6px;
+  padding: 12px;
+}
+.baseline-change summary {
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.baseline-change small {
+  color: #526778;
+}
+.diff-table-wrap {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+.diff-table-wrap table {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+}
+.diff-table-wrap th,
+.diff-table-wrap td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px;
+  border: 1px solid #ccd5dd;
+  overflow-wrap: anywhere;
+}
+.diff-table-wrap th:first-child {
+  width: 26%;
+}
+.diff-table-wrap pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 320px;
+  overflow: auto;
+  margin: 0;
+}
+.diff-table-wrap caption {
+  text-align: left;
+  padding-bottom: 8px;
+}
+.coverage-view > svg {
+  width: 100%;
+  max-height: 430px;
+}
+.coverage-view > button {
+  margin: 8px 12px 8px 0;
+}
+.coverage-view details {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #ccd5dd;
+  border-radius: 6px;
+}
+.coverage-view summary {
+  cursor: pointer;
+}
+.design-editor fieldset {
+  min-width: 0;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #ccd5dd;
+  border-radius: 6px;
+}

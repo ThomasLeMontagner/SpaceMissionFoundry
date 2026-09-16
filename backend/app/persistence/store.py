@@ -67,11 +67,17 @@ class Store:
                 raise KeyError("Mission does not exist")
             return Model.model_validate(row.model)
 
-    def list(self):
+    def list(self, archived=False):
         with Session(self.engine) as s:
             return [
-                {"id": r.id, "name": r.model["name"], "revision": r.revision}
+                {
+                    "id": r.id,
+                    "name": r.model["name"],
+                    "revision": r.revision,
+                    "archived": r.model.get("archived", False),
+                }
                 for r in s.scalars(select(MissionRow))
+                if r.model.get("archived", False) == archived
             ]
 
     def save(self, model, actor, reason, previous=None, baseline=False):

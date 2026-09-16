@@ -9,6 +9,15 @@ from app.domain.models import Strict
 from app.engineering_tools.calculations import q
 
 METRICS = {
+    "access.contact": {"label": "Network geometric contact within analysis horizon", "unit": "s"},
+    "access.observed_fraction": {
+        "label": "Fraction of configured target points observed within horizon",
+        "unit": "dimensionless",
+    },
+    "access.largest_target_gap": {
+        "label": "Largest target gap within sampled horizon (edge-censored)",
+        "unit": "s",
+    },
     "mass.total": {"label": "Allocated spacecraft mass", "unit": "kg"},
     "power.average_load": {"label": "Average electrical load", "unit": "W"},
     "power.margin": {"label": "Orbit energy margin", "unit": "Wh"},

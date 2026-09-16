@@ -154,6 +154,56 @@ test("edit duty cycle, correct downlink conflict, approve a second immutable bas
     path: "test-results/design-iteration.png",
     fullPage: true,
   });
+  const comparison = page.getByRole("region", {
+    name: "Baseline comparison",
+    exact: true,
+  });
+  await comparison
+    .getByLabel("From baseline", { exact: true })
+    .selectOption(firstId);
+  await comparison
+    .getByLabel("To baseline", { exact: true })
+    .selectOption(latest.baseline);
+  await comparison
+    .getByRole("button", { name: "Compare baselines", exact: true })
+    .click();
+  await expect(comparison.getByRole("status")).toBeVisible();
+  await comparison
+    .getByLabel("Comparison object type", { exact: true })
+    .selectOption("Parameter");
+  await comparison
+    .getByText(/Changed · Parameter · selective · data inputs/)
+    .click();
+  const dutyRow = comparison
+    .getByRole("row")
+    .filter({ hasText: "data › inputs › duty" });
+  await expect(dutyRow).toContainText("0.02 dimensionless");
+  await expect(dutyRow).toContainText("0.1 dimensionless");
+  await comparison.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: "test-results/baseline-comparison.png" });
+  await comparison
+    .getByLabel("From baseline", { exact: true })
+    .selectOption(latest.baseline);
+  await comparison
+    .getByRole("button", { name: "Compare baselines", exact: true })
+    .click();
+  await expect(
+    comparison.getByText(/No differences between these snapshots/),
+  ).toBeVisible();
+  expect(
+    await (
+      await request.get(
+        `/api/missions/${m.id}/export/json?baseline_id=${firstId}`,
+      )
+    ).json(),
+  ).toEqual(original);
+  expect(
+    await (
+      await request.get(
+        `/api/missions/${m.id}/export/json?baseline_id=${latest.baseline}`,
+      )
+    ).json(),
+  ).toEqual(latest);
   await page
     .getByRole("button", { name: "Reopen baseline for design changes" })
     .click();

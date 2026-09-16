@@ -152,7 +152,13 @@ def trade(i):
     return {"scores": scores, "recommendation": max(scores, key=scores.get)}
 
 
-TOOLS = dict(mass=mass, power=power, data=data, link=link, orbit=orbit, trade=trade)
+def access(inputs):
+    from app.engineering_tools.access import calculate
+
+    return calculate(inputs)
+
+
+TOOLS = dict(mass=mass, power=power, data=data, link=link, orbit=orbit, trade=trade, access=access)
 
 
 def execute(name, inputs, revision, assumptions=None):
@@ -173,6 +179,8 @@ def execute(name, inputs, revision, assumptions=None):
     )
     try:
         record["outputs"] = TOOLS[name](inputs)
+        if name == "access":
+            record["warnings"].extend(record["outputs"].get("limitations", []))
     except Exception as exc:
         record.update(status="invalid", errors=[str(exc)])
     record["elapsed_seconds"] = perf_counter() - started

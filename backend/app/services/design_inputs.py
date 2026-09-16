@@ -51,11 +51,56 @@ def parameter_id(candidate, tool):
     return f"{candidate}-{tool}-inputs"
 
 
+def access_values():
+    def site(name, latitude, longitude):
+        return dict(name=name, latitude=Q(latitude, "deg"), longitude=Q(longitude, "deg"))
+
+    return dict(
+        inclination=Q(97.6, "deg"),
+        raan=Q(0, "deg"),
+        argument_of_latitude=Q(0, "deg"),
+        earth_rotation_angle=Q(0, "deg"),
+        duration=Q(24, "hour"),
+        step=Q(10, "s"),
+        footprint_width=Q(200, "km"),
+        minimum_elevation=Q(10, "deg"),
+        targets=[
+            site("Portugal sample", 38.7, -9.1),
+            site("Italy sample", 41.9, 12.5),
+            site("Greece sample", 38, 23.7),
+        ],
+        stations=[site("Illustrative Madrid station", 40.4, -3.7)],
+    )
+
+
+def access_parameter():
+    return entity(
+        parameter_id("mission", "access"),
+        "Parameter",
+        "mission · access inputs",
+        refs=["orbit-assumption", "operations", "observation"],
+        tool="access",
+        candidate="mission",
+        inputs=validate_inputs("access", access_values()),
+        input_schema="1.0",
+        rationale="Illustrative point targets and hypothetical station; shared circular geometry and relative epoch require owner approval. Not operational station availability.",
+    )
+
+
 def input_entities(model=None):
     """Seed only at proposal time, or explicitly lift a legacy run's recorded inputs."""
     records = []
     historical = model is not None and any(e.kind == "AnalysisRun" for e in model.entities.values())
     groups = [("mission", "orbit", {"altitude": Q(550, "km")}, ["orbit-assumption"])]
+    if model is None or "mission-access-analysis" in model.entities:
+        groups.append(
+            (
+                "mission",
+                "access",
+                access_values(),
+                ["orbit-assumption", "operations", "observation"],
+            )
+        )
     for candidate in CANDIDATES:
         for tool, values in inputs(candidate).items():
             groups.append((candidate, tool, values, ["resources", "operations", "observation"]))
@@ -69,6 +114,8 @@ def input_entities(model=None):
             values = deepcopy(analysis.data["inputs"])
             for derived in ("period", "eclipse", "demand"):
                 values.pop(derived, None)
+            if tool == "access":
+                values.pop("altitude", None)
         records.append(
             entity(
                 parameter_id(candidate, tool),
@@ -79,7 +126,9 @@ def input_entities(model=None):
                 candidate=candidate,
                 inputs=validate_inputs(tool, values),
                 input_schema="1.0",
-                rationale="Explicit sizing assumptions; reviewed before deterministic calculation",
+                rationale="Illustrative point targets and hypothetical station, circular geometry and relative epoch; review before use"
+                if tool == "access"
+                else "Explicit sizing assumptions; reviewed before deterministic calculation",
             )
         )
     return records

@@ -6,7 +6,7 @@ from pint.errors import PintError
 from pydantic import Field
 
 from app.domain.models import Strict
-from app.engineering_tools.calculations import fraction, q
+from app.engineering_tools.calculations import U, fraction, q
 
 
 class Quantity(Strict):
@@ -64,13 +64,38 @@ class OrbitInputs(Strict):
     altitude: Quantity
 
 
-Tool = Literal["mass", "power", "data", "link", "orbit"]
+class Angle(Strict):
+    value: float = Field(strict=True)
+    unit: Literal["deg", "degree", "rad", "radian"]
+
+
+class Site(Strict):
+    name: str = Field(min_length=1, max_length=80)
+    latitude: Angle
+    longitude: Angle
+
+
+class AccessInputs(Strict):
+    inclination: Angle
+    raan: Angle
+    argument_of_latitude: Angle
+    earth_rotation_angle: Angle
+    duration: Quantity
+    step: Quantity
+    footprint_width: Quantity
+    minimum_elevation: Angle
+    targets: list[Site] = Field(min_length=1, max_length=12)
+    stations: list[Site] = Field(min_length=1, max_length=8)
+
+
+Tool = Literal["mass", "power", "data", "link", "orbit", "access"]
 INPUT_SCHEMAS = {
     "mass": MassInputs,
     "power": PowerInputs,
     "data": DataInputs,
     "link": LinkInputs,
     "orbit": OrbitInputs,
+    "access": AccessInputs,
 }
 
 
@@ -96,6 +121,7 @@ def validate_inputs(tool: str, inputs: dict) -> dict:
             "efficiency": "",
         },
         "orbit": {"altitude": "m"},
+        "access": {"duration": "s", "step": "s", "footprint_width": "km"},
     }
     try:
         converted = {key: q(values[key], unit) for key, unit in units[tool].items()}
@@ -125,6 +151,35 @@ def validate_inputs(tool: str, inputs: dict) -> dict:
                 raise ValueError("Daily ground contact cannot exceed 24 hours")
         if tool == "orbit" and converted["altitude"] <= 0:
             raise ValueError("Orbit altitude must be positive")
+        if tool == "access":
+
+            def angle(value, lower, upper):
+                number = U.Quantity(value["value"], value["unit"]).to("degree").magnitude
+                if not lower <= number <= upper:
+                    raise ValueError(f"Angle must be between {lower} and {upper} degrees")
+
+            angle(values["inclination"], 0, 180)
+            for key in ["raan", "argument_of_latitude", "earth_rotation_angle"]:
+                angle(values[key], 0, 360)
+            angle(values["minimum_elevation"], 0, 90)
+            if not 60 <= converted["duration"] <= 604800:
+                raise ValueError("Analysis duration must be between 1 minute and 7 days")
+            if not 1 <= converted["step"] <= 60:
+                raise ValueError("Sampling step must be between 1 and 60 seconds")
+            if converted["duration"] / converted["step"] > 100000:
+                raise ValueError(
+                    "Analysis exceeds the 100,000 sample limit; reduce duration or increase step"
+                )
+            if not 1 <= converted["footprint_width"] <= 2000:
+                raise ValueError("Footprint width must be between 1 and 2000 km")
+            for group in ["targets", "stations"]:
+                if len({s["name"].strip() for s in values[group]}) != len(values[group]):
+                    raise ValueError("Site names must be unique within each group")
+                for site in values[group]:
+                    if not site["name"].strip():
+                        raise ValueError("Site names cannot be blank")
+                    angle(site["latitude"], -90, 90)
+                    angle(site["longitude"], -180, 180)
     except PintError as exc:
         raise ValueError(f"Incompatible or unknown input units: {exc}") from None
     return values

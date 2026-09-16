@@ -12,6 +12,7 @@ from app.services.design_inputs import (
     BUDGET_TOOLS,
     CANDIDATES,
     IMPACT_KINDS,
+    access_parameter,
     edited_entity,
     input_entities,
     parameter_id,
@@ -145,10 +146,30 @@ class Workflow:
         return self.store.save(m, p.agent, p.rationale, old)
 
     def guard(self, m, revision):
+        if m.archived:
+            raise ValueError("Mission is archived; restore it to the active list before editing")
         if m.revision != revision:
             raise ValueError("Stale revision; reload and retry")
         if m.baseline:
             raise ValueError("Baseline is immutable; restore a revision to continue")
+
+    def archive(self, id, revision, archived):
+        old = self.store.get(id)
+        if old.revision != revision:
+            raise ValueError("Stale revision; reload before changing archive status")
+        if old.archived == archived:
+            return old
+        m = old.model_copy(deep=True)
+        m.archived = archived
+        for p in m.proposals.values():
+            if p.status in ["submitted", "challenged"]:
+                p.target_revision = old.revision + 1
+        return self.store.save(
+            m,
+            "human",
+            "Archived mission; history retained" if archived else "Restored mission to active list",
+            old,
+        )
 
     def analysis(self, m, tool, values, refs, prefix):
         record = execute(
@@ -260,7 +281,8 @@ class Workflow:
                 "ReviewFinding",
                 "Daily downlink capacity does not establish delivery latency",
                 "review",
-                refs=["req-latency", f"{m.selected}-link"],
+                refs=["req-latency", f"{m.selected}-link"]
+                + (["mission-access-analysis"] if "mission-access-analysis" in m.entities else []),
                 severity="critical",
                 resolution="",
                 entry_criteria="Requirements approved; two concepts analyzed; selection recorded",
@@ -290,11 +312,14 @@ class Workflow:
                 "verify-latency",
                 "VerificationItem",
                 "Demonstrate worst-case acquisition-to-user latency",
-                refs=["req-latency", "operations"],
+                refs=["req-latency", "operations"]
+                + (["mission-access-analysis"] if "mission-access-analysis" in m.entities else []),
                 method="Orbit access and processing simulation",
                 success_criterion=m.entities["req-latency"].title,
                 status="not verified",
-                evidence="Unknown: no propagated access evidence",
+                evidence="Unverified: geometric access does not include transmission, queues, processing or dissemination"
+                if "mission-access-analysis" in m.entities
+                else "Unknown: no propagated access evidence",
                 review_point="Before preliminary design review",
             )
             m.entities[verification.id] = verification
@@ -359,7 +384,8 @@ class Workflow:
             "Decision",
             f"Mission owner selected {candidate}",
             "human",
-            refs=["trade", f"{candidate}-link"],
+            refs=["trade", f"{candidate}-link"]
+            + (["mission-access-analysis"] if "mission-access-analysis" in m.entities else []),
             classification="Human decision",
             rationale=reason,
             alternatives=["wide", "selective"],
@@ -520,8 +546,27 @@ class Workflow:
             m, "systems", "Proposed explicit input objects from recorded sizing basis", old
         )
 
+    def initialize_access(self, id, revision):
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        if "mission-access-inputs" in old.entities or "mission-orbit-inputs" not in old.entities:
+            raise ValueError(
+                "Access initialization requires editable orbit inputs and no existing access inputs"
+            )
+        m = old.model_copy(deep=True)
+        self.propose(m, "systems", [access_parameter()], "calculation inputs")
+        return self.store.save(
+            m,
+            "systems",
+            "Proposed illustrative coverage and station assumptions for explicit approval",
+            old,
+        )
+
     def reopen(self, id, revision, reason):
         old = self.store.get(id)
+        if old.archived:
+            raise ValueError("Restore the archived mission to the active list before reopening")
         if old.revision != revision or not old.baseline:
             raise ValueError("Reopening requires the current approved baseline revision")
         m = old.model_copy(deep=True)
@@ -555,6 +600,17 @@ class Workflow:
             [parameter_id("mission", "orbit"), "orbit-assumption"],
             "mission",
         )
+        if "mission-access-inputs" in m.entities:
+            self.analysis(
+                m,
+                "access",
+                {
+                    **read_inputs(m, "mission", "access"),
+                    "altitude": read_inputs(m, "mission", "orbit")["altitude"],
+                },
+                ["mission-access-inputs", "mission-orbit-inputs", *reqs],
+                "mission",
+            )
         for candidate in CANDIDATES:
             for tool in BUDGET_TOOLS:
                 values = read_inputs(m, candidate, tool)
@@ -595,7 +651,10 @@ class Workflow:
                             finding.title = f"{candidate}: {tool} calculation is invalid"
                     m.entities[key] = finding
         for role, tools in [
-            ("analysis", ["orbit"]),
+            (
+                "analysis",
+                ["orbit", "access"] if "mission-access-inputs" in m.entities else ["orbit"],
+            ),
             ("payload", ["data"]),
             ("bus", ["mass", "power", "link"]),
         ]:

@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.2
+**Version:** 0.5
 
-**Status:** Requirements revision — quantitative verification criteria
+**Status:** Requirements revision — reversible mission archiving
 
-**Date:** 2026-09-14
+**Date:** 2026-09-16
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -130,6 +130,8 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-MIS-007 | The system shall represent quantities using explicit units and preserve their original input values. | Must | Test |
 | MF-MIS-008 | The system should support reusable mission templates, initially including an Earth-observation CubeSat mission. | Should | Demonstration |
 | MF-MIS-009 | The system could support planetary, lunar, communications, navigation, science, and in-orbit demonstration mission templates. | Could | Demonstration |
+| MF-MIS-010 | The user shall be able to archive a saved mission, remove it from the active list, list archived missions and restore one to the active list. Archiving shall require an explicit user action and shall preserve its model history and baseline exports without permanent deletion. | Must | Demonstration |
+| MF-MIS-011 | Archive and restore actions shall be revision-checked and audited. Archived missions shall reject engineering mutations until restored, while history and approved exports remain readable. Restoration shall preserve workflow phase, pause state and pending proposal usability. | Must | Test |
 
 ### 7.2 Agent definition and orchestration
 
@@ -219,6 +221,12 @@ Quantitative verification scope for version 0.2: the initial metric registry cov
 | MF-ANL-010 | The system should perform sensitivity analysis for user-selected design parameters. | Should | Demonstration |
 | MF-ANL-011 | The system should support preliminary orbit, coverage, access-window, eclipse, and mission-lifetime calculations. | Should | Demonstration |
 | MF-ANL-012 | The system could later integrate high-fidelity domain tools without changing the core model schema. | Could | Inspection |
+| MF-ANL-013 | The system shall support preliminary circular-orbit propagation over a rotating spherical Earth using accepted altitude, inclination, ascending node, orbital phase, relative-epoch Earth angle, bounded horizon and sampling resolution. Target point coordinates, ground-station coordinates, ground-footprint diameter and station elevation mask shall be explicitly editable and validated. | Must | Test |
+| MF-ANL-014 | The analysis shall record sampled target observation windows, observed target fraction, within-horizon gaps, observed start-to-start revisits, station visibility windows and network contact duration without double-counting simultaneous station visibility. Missing repeated observations shall leave revisit unknown. | Must | Test |
+| MF-ANL-015 | Coverage and access results shall disclose finite-horizon censoring, sampling uncertainty, missed-short-pass risk and model assumptions. Geometric contact opportunities shall not verify end-to-end delivery latency, regional coverage or usable communications capacity. Link-budget contact assumptions shall remain separately approved. | Must | Inspection |
+| MF-ANL-016 | The workbench shall display a sampled ground track and per-site windows with calculation evidence. Approved geometry/input changes shall stale dependent access results, checks and decisions; recalculation shall refresh them. Historical baselines shall remain immutable, and legacy missions shall explicitly approve any newly introduced coverage inputs. | Must | Demonstration |
+
+Preliminary access scope for version 0.4: one shared circular orbit and nadir-centred circular surface footprint for the two reference candidates; up to 12 target points and 8 hypothetical sea-level stations. Latitude/longitude use signed angles. Supported altitude is 100–2000 km; duration is 1 minute–7 days, step 1–60 seconds, and runs are capped at 100,000 midpoint samples. The relative epoch is set by an explicit initial Earth rotation angle and is not a calendar-date ephemeris. Network daily contact is a horizon-normalized average, not a guaranteed daily minimum. A target with no sampled windows has a gap equal to the horizon; this is a censored observation, not an infinite revisit or proof of permanent inaccessibility. The optimistic wait from observed-window starts to later network visibility remains unknown if any such observation has no following contact in the horizon. It omits transmission duration, contention, queues, processing and delivery. Perturbations, eccentricity, terrain, weather, illumination, pointing/scheduling, RF acquisition and booked station availability remain outside this preliminary model. Full regional coverage, mission lifetime and operational delivery-latency verification remain deferred.
 
 ### 7.7 Evidence, assumptions, and claims
 
@@ -269,6 +277,10 @@ Quantitative verification scope for version 0.2: the initial metric registry cov
 | MF-CFG-004 | The system shall display the differences between two model revisions or baselines. | Must | Demonstration |
 | MF-CFG-005 | The system shall allow a user to return to an earlier revision by creating a new revision based on it; immutable history shall remain intact. | Must | Test |
 | MF-CFG-006 | Generated artifacts shall identify the source baseline and generation time. | Must | Inspection |
+| MF-CFG-007 | The user shall be able to choose two saved baselines from the same mission, inspect directional added/removed/changed objects and field-level before/after values, and filter by object type or text. Requirements, inputs, calculation results, decisions, proposals and mission summary changes shall be included. | Must | Demonstration |
+| MF-CFG-008 | Baseline comparison shall preserve stored values and units without recalculation or mutation. It shall offer an explicit option to include audit timestamps and revision provenance, distinguish missing fields from null values, and display a no-differences state. Results from an earlier selection or another mission shall not be displayed as the current comparison. | Must | Test |
+
+Baseline comparison scope for version 0.3: comparisons use immutable, mission-scoped snapshot exports. The default view omits entity/model revision and creation/modification timestamps, plus calculation timestamps, elapsed time and recorded source/evaluation revision fields. All other stored content remains eligible for display, including additions and removals. Typed relationship sets ignore ordering; other arrays retain their recorded order. A change of numerical representation or unit is displayed as stored, even if physically equivalent. Revision replay continues to compare a historical revision with the current working model; the detailed field comparison added here is for two saved baselines.
 
 ### 7.11 User interface
 

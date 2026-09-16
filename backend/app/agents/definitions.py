@@ -47,9 +47,13 @@ AGENTS = {
         id="analysis",
         role="Mission Analysis",
         objective="Calculate orbital geometry",
-        responsibilities=["Orbit and eclipse", "expose coverage uncertainty"],
+        responsibilities=[
+            "Orbit and eclipse",
+            "sampled target and station access",
+            "expose coverage uncertainty",
+        ],
         authority=["Parameter", "Assumption", "Claim"],
-        permitted_tools=["orbit"],
+        permitted_tools=["orbit", "access"],
     ),
     "payload": AgentDefinition(
         id="payload",
