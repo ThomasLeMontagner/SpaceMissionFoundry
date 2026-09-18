@@ -93,8 +93,9 @@ export default function CoverageView({
       {current && (
         <>
           <p className="notice">
-            Delivery latency remains unverified. Geometric visibility does not
-            establish successful transmission, processing, or delivery.
+            Geometric visibility alone does not verify delivery latency. See
+            Data delivery for conditional simulation results. Visibility does
+            not establish successful transmission, processing, or delivery.
           </p>
           <div className="comparison">
             <div>

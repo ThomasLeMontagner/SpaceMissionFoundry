@@ -1,0 +1,13 @@
+# Conditional delivery analysis
+
+Each candidate receives approved, unit-bearing onboard, ground-processing and dissemination delays (initial illustrative values: 60, 120 and 30 seconds). Existing missions use `initialize-delivery`; baseline missions must first reopen. The workflow records a versioned delivery AnalysisRun referencing access, payload/link inputs, RF evidence and delay inputs. Changes invalidate downstream evidence and selection through the existing dependency graph.
+
+One product is generated for each sampled target observation window. Acquisition time is its start; the whole product enters storage at its end. Size is payload rate × duty fraction × window duration / compression. Overlapping target windows create separate products. This is a declared synthetic workload, distinct from the continuous daily payload budget.
+
+Storage admits whole products in window-end order, with product ID breaking ties. Overflow drops the newly arriving product. One FIFO radio transmits after the onboard delay, only during the union of station windows, at link rate × efficiency if the recorded RF margin is nonnegative. Partial transmission resumes at later contacts; transmitted bits immediately free storage. The invariant is produced = transmitted + dropped + remaining onboard bits. A negative RF margin yields zero transfer; missing or invalid evidence yields an invalid run.
+
+Fixed ground and dissemination delays follow complete downlink, with unlimited parallel ground processing. Delivery is counted only when complete within the access horizon. Times are elapsed seconds from the access model's relative epoch. Queue traces are display-downsampled to approximately 2,000 points; summary peaks use the full event sequence. Work is bounded to 10,000 products, seven-day horizons and seven-day individual delays.
+
+`delivery.maximum_latency <= threshold` must be explicitly approved on a requirement. Every product is checked: drops, late deliveries and pending products already older than the deadline fail; otherwise pending or truncated products are unresolved. Only a nonempty set of complete, nontruncated on-time deliveries passes. The complete-workload maximum is null when evidence is incomplete; the separately labeled delivered-only maximum cannot verify a deadline. No products means unverified. Existing requirement prose does not silently become a numerical criterion.
+
+Limitations: sampled access boundaries; assumed booked/usable ground stations; constant RF conditions; no retries, contention, background traffic, shared ground CPU queue, dynamic scheduling or operational guarantee. Independent operational review remains outstanding even if the conditional calculation passes.

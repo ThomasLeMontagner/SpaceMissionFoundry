@@ -353,7 +353,9 @@ export default function DesignEditor({
                   }
                 >
                   <option value="<=">At most (≤)</option>
-                  <option value=">=">At least (≥)</option>
+                  {criterion.metric !== "delivery.maximum_latency" && (
+                    <option value=">=">At least (≥)</option>
+                  )}
                 </select>
               </label>
               <label>

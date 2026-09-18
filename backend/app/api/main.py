@@ -127,6 +127,10 @@ def create_app(store=None):
     def initialize_inputs(id: str, body: Command):
         return service.initialize_inputs(id, body.revision)
 
+    @app.post("/api/missions/{id}/initialize-delivery")
+    def initialize_delivery(id: str, body: Command):
+        return service.initialize_delivery(id, body.revision)
+
     @app.post("/api/missions/{id}/initialize-access")
     def initialize_access(id: str, body: Command):
         return service.initialize_access(id, body.revision)

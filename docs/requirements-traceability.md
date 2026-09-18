@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-The authoritative specification is unchanged. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.6. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -83,6 +83,10 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ANL-014 | Implemented | Sampled observation/visibility windows, finite-horizon gaps, repeated-window revisit and union network contact; test_access.py. |
 | MF-ANL-015 | Implemented | Explicit sampling/censoring/model limits; latency remains unverified and approved link-contact assumptions remain unchanged. |
 | MF-ANL-016 | Implemented | Ground-track/window view, approved legacy initialization, stale/failure hiding, evidence and immutable-baseline tests. |
+| MF-ANL-017 | Implemented | engineering_tools/delivery.py; analytical fragmented-contact, FIFO, storage overflow, RF gate and delay tests in test_delivery.py. |
+| MF-ANL-018 | Implemented | Recorded per-product events, pending/dropped totals, queue trace, conservation tests and explicit model limits; docs/architecture/delivery-analysis.md. |
+| MF-ANL-019 | Implemented | Explicit delivery.maximum_latency criterion; per-product deadline evaluation and selection/baseline guards. Missing or censored evidence never produces a full-workload pass. Operational validation remains outstanding. |
+| MF-ANL-020 | Implemented | DeliveryView.tsx, legacy initialization approval, transitive evidence invalidation and regression tests; immutable baseline storage retained. |
 | MF-EVD-001 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-002 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-003 | Implemented | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |

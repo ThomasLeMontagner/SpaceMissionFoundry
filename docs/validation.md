@@ -68,3 +68,12 @@ The API test client emits two upstream deprecation warnings about httpx and AnyI
 - Frontend unit regression: 14 passed. All five Playwright workflows passed, including archive cancellation, persistence after reload, restoration, continued approval and archiving from an open workspace.
 - TypeScript/Vite production build, Ruff lint/format, Prettier and whitespace checks passed. The backward-compatible model schema includes the archive flag; no SQL migration was needed. PostgreSQL was not rerun for this milestone.
 - Updated specification version 0.5 and traceability for MF-MIS-010/011. No permanent deletion endpoint was added and no user mission was archived during implementation.
+
+## Conditional delivery simulation — 2026-09-18
+
+- Full SQLite backend regression: 62 passed, one PostgreSQL-only skip.
+- Six delivery regressions pass: analytic interrupted-contact completion times, FIFO conservation, overlapping station union, overflow drops, negative RF margin, processing beyond the horizon, unit validation, no observations, truncated observations, missed/unresolved deadlines, failed calculation evidence, legacy approval, stale checks/selection and immutable baseline exports.
+- Frontend unit regression: 15 passed. Delivery tests hide stale/invalid results and enforce explicit setup for legacy missions and reopening for baselines.
+- All five Playwright workflows pass, including delivery tables and queue charts in the coverage workflow. The delivery screenshot was visually inspected.
+- TypeScript/Vite production build, Ruff lint/format, Prettier and patch whitespace checks pass. No SQL migration or external dependency was introduced; PostgreSQL was not rerun for this milestone.
+- Specification version 0.6 adds MF-ANL-017 through MF-ANL-020 with traceability. Results validate the stated synthetic workload and scheduler, not operational delivery or ground-station availability. Existing user missions were not modified by verification.

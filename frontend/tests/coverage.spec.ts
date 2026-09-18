@@ -40,10 +40,26 @@ test("coverage assumptions can change while stale geometry stays hidden until re
   });
   await expect(coverage.getByRole("img")).toBeVisible();
   await expect(
-    coverage.getByText(/Delivery latency remains unverified/),
+    coverage.getByText(
+      /Geometric visibility alone does not verify delivery latency/,
+    ),
   ).toBeVisible();
   await coverage.scrollIntoViewIfNeeded();
   await page.screenshot({ path: "test-results/coverage-access.png" });
+  await page
+    .getByRole("button", { name: "Data delivery", exact: true })
+    .click();
+  const delivery = page.getByRole("region", {
+    name: "Data delivery simulation",
+    exact: true,
+  });
+  await expect(delivery.getByRole("table")).toHaveCount(2);
+  await expect(delivery.getByRole("img")).toHaveCount(2);
+  await expect(delivery.getByText(/No numeric deadline/).first()).toBeVisible();
+  await page.screenshot({ path: "test-results/data-delivery.png" });
+  await page
+    .getByRole("button", { name: "Coverage & access", exact: true })
+    .click();
   await page.getByRole("button", { name: "Pause", exact: true }).click();
   await coverage
     .getByRole("button", { name: "Inspect or edit coverage inputs" })

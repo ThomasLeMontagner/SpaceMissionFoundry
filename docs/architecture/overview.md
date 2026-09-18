@@ -74,6 +74,8 @@ The new `access` tool uses accepted mission geometry plus altitude from the exis
 
 This does not substitute geometric contact for usable link-budget contact or verify delivery latency. Both reference candidates share the same declared orbit and footprint. See [access method, limits and analytic validation](access-analysis.md) and the [input schema](access-inputs.schema.json). No external orbital library or database migration is required.
 
+The delivery calculator consumes recorded access windows, accepted payload/link inputs, RF results and approved delay parameters. It records a finite-horizon FIFO product simulation per candidate; explicit latency criteria evaluate all products rather than only successful deliveries. The Data delivery view hides stale/invalid results and links to input/evidence inspection. Legacy setup uses a reviewed proposal, and baseline history remains immutable. See [delivery assumptions and deadline semantics](delivery-analysis.md).
+
 ### Reversible mission archiving
 
 The model has a backward-compatible `archived` flag, defaulting to false for older snapshots. `GET /missions` lists active missions; `?archived=true` lists archived missions. `POST /missions/{id}/archive` accepts the expected revision and desired boolean state. A change appends an audited model revision without modifying baseline rows or prior snapshots. Pending proposal target revisions advance with this organizational change so restoring a mission does not make its approvals unusable.

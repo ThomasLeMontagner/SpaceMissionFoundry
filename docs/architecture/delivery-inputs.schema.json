@@ -1,0 +1,44 @@
+{
+  "$defs": {
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "maxLength": 40,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "onboard_delay": {
+      "$ref": "#/$defs/Quantity"
+    },
+    "ground_delay": {
+      "$ref": "#/$defs/Quantity"
+    },
+    "dissemination_delay": {
+      "$ref": "#/$defs/Quantity"
+    }
+  },
+  "required": [
+    "onboard_delay",
+    "ground_delay",
+    "dissemination_delay"
+  ],
+  "title": "DeliveryInputs",
+  "type": "object"
+}

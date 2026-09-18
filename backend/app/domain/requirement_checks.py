@@ -9,6 +9,10 @@ from app.domain.models import Strict
 from app.engineering_tools.calculations import q
 
 METRICS = {
+    "delivery.maximum_latency": {
+        "label": "Maximum acquisition-to-delivery latency (all modeled products)",
+        "unit": "s",
+    },
     "access.contact": {"label": "Network geometric contact within analysis horizon", "unit": "s"},
     "access.observed_fraction": {
         "label": "Fraction of configured target points observed within horizon",
@@ -38,6 +42,8 @@ class Criterion(Strict):
     def compatible(self):
         if self.metric not in METRICS:
             raise ValueError("Unsupported requirement metric")
+        if self.metric == "delivery.maximum_latency" and self.operator != "<=":
+            raise ValueError("Delivery deadline must use <=")
         try:
             q(self.threshold.model_dump(), METRICS[self.metric]["unit"])
         except Exception as exc:

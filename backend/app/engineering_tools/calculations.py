@@ -158,7 +158,22 @@ def access(inputs):
     return calculate(inputs)
 
 
-TOOLS = dict(mass=mass, power=power, data=data, link=link, orbit=orbit, trade=trade, access=access)
+def delivery(inputs):
+    from app.engineering_tools.delivery import simulate
+
+    return simulate(inputs)
+
+
+TOOLS = dict(
+    mass=mass,
+    power=power,
+    data=data,
+    link=link,
+    orbit=orbit,
+    trade=trade,
+    access=access,
+    delivery=delivery,
+)
 
 
 def execute(name, inputs, revision, assumptions=None):
@@ -179,7 +194,7 @@ def execute(name, inputs, revision, assumptions=None):
     )
     try:
         record["outputs"] = TOOLS[name](inputs)
-        if name == "access":
+        if name in ["access", "delivery"]:
             record["warnings"].extend(record["outputs"].get("limitations", []))
     except Exception as exc:
         record.update(status="invalid", errors=[str(exc)])

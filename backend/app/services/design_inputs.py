@@ -131,7 +131,33 @@ def input_entities(model=None):
                 else "Explicit sizing assumptions; reviewed before deterministic calculation",
             )
         )
+    if model is None:
+        records.extend(delivery_parameters())
     return records
+
+
+def delivery_parameters():
+    return [
+        entity(
+            parameter_id(candidate, "delivery"),
+            "Parameter",
+            f"{candidate} · delivery inputs",
+            refs=["operations", "observation"],
+            tool="delivery",
+            candidate=candidate,
+            input_schema="1.0",
+            inputs=validate_inputs(
+                "delivery",
+                dict(
+                    onboard_delay=Q(60, "s"),
+                    ground_delay=Q(120, "s"),
+                    dissemination_delay=Q(30, "s"),
+                ),
+            ),
+            rationale="Illustrative fixed delays; one FIFO radio and independent target-window products. Review before use.",
+        )
+        for candidate in CANDIDATES
+    ]
 
 
 def read_inputs(model, candidate, tool):

@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.5
+**Version:** 0.6
 
-**Status:** Requirements revision — reversible mission archiving
+**Status:** Requirements revision — conditional end-to-end delivery simulation
 
-**Date:** 2026-09-16
+**Date:** 2026-09-18
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -225,6 +225,10 @@ Quantitative verification scope for version 0.2: the initial metric registry cov
 | MF-ANL-014 | The analysis shall record sampled target observation windows, observed target fraction, within-horizon gaps, observed start-to-start revisits, station visibility windows and network contact duration without double-counting simultaneous station visibility. Missing repeated observations shall leave revisit unknown. | Must | Test |
 | MF-ANL-015 | Coverage and access results shall disclose finite-horizon censoring, sampling uncertainty, missed-short-pass risk and model assumptions. Geometric contact opportunities shall not verify end-to-end delivery latency, regional coverage or usable communications capacity. Link-budget contact assumptions shall remain separately approved. | Must | Inspection |
 | MF-ANL-016 | The workbench shall display a sampled ground track and per-site windows with calculation evidence. Approved geometry/input changes shall stale dependent access results, checks and decisions; recalculation shall refresh them. Historical baselines shall remain immutable, and legacy missions shall explicitly approve any newly introduced coverage inputs. | Must | Demonstration |
+| MF-ANL-017 | The system shall simulate a declared target-window product workload through bounded onboard storage, FIFO transmission over unioned station windows, and explicitly approved onboard, ground-processing and dissemination delays. Product size shall use the approved payload rate, duty fraction and compression. Transmission shall use link rate times efficiency only with nonnegative recorded RF margin. Overflow shall explicitly record dropped products. | Must | Test |
+| MF-ANL-018 | Delivery evidence shall record per-product acquisition, completed downlink and delivery times, latency, pending/dropped state, queue history and data conservation totals. It shall disclose finite-horizon censoring, access sampling, assumed station availability, fixed-delay parallel ground processing and the distinction from continuous daily data budgets. | Must | Test |
+| MF-ANL-019 | Explicitly approved maximum-delivery-latency criteria shall evaluate every modeled product: dropped, late or overdue pending products fail; absent, truncated or otherwise incomplete evidence cannot pass. Results shall remain conditional on recorded workload assumptions and shall not certify operational performance. Failed required criteria shall block selection and baseline approval. | Must | Test |
+| MF-ANL-020 | The workbench shall display delivery outcomes and evidence for each candidate. Relevant edits shall stale delivery evidence and dependent checks/decisions. Legacy missions shall explicitly approve new delivery assumptions; historical baselines shall remain immutable. | Must | Demonstration |
 
 Preliminary access scope for version 0.4: one shared circular orbit and nadir-centred circular surface footprint for the two reference candidates; up to 12 target points and 8 hypothetical sea-level stations. Latitude/longitude use signed angles. Supported altitude is 100–2000 km; duration is 1 minute–7 days, step 1–60 seconds, and runs are capped at 100,000 midpoint samples. The relative epoch is set by an explicit initial Earth rotation angle and is not a calendar-date ephemeris. Network daily contact is a horizon-normalized average, not a guaranteed daily minimum. A target with no sampled windows has a gap equal to the horizon; this is a censored observation, not an infinite revisit or proof of permanent inaccessibility. The optimistic wait from observed-window starts to later network visibility remains unknown if any such observation has no following contact in the horizon. It omits transmission duration, contention, queues, processing and delivery. Perturbations, eccentricity, terrain, weather, illumination, pointing/scheduling, RF acquisition and booked station availability remain outside this preliminary model. Full regional coverage, mission lifetime and operational delivery-latency verification remain deferred.
 

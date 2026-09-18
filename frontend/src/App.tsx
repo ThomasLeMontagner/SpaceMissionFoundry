@@ -3,6 +3,7 @@ import { request, download, setToken, subscribe } from "./api";
 import DesignEditor from "./DesignEditor";
 import BaselineComparison from "./BaselineComparison";
 import CoverageView from "./CoverageView";
+import DeliveryView from "./DeliveryView";
 import type { Entity, Model, Proposal } from "./types";
 
 type MissionSummary = {
@@ -21,6 +22,7 @@ const tabs: Record<string, string[]> = {
   Interfaces: ["Interface"],
   Budgets: ["Budget", "BudgetEntry", "AnalysisRun"],
   "Coverage & access": [],
+  "Data delivery": [],
   Trades: ["TradeStudy"],
   "Claims & evidence": ["Claim", "Evidence"],
   "Conflicts & review": ["ReviewFinding", "Risk", "VerificationItem"],
@@ -837,6 +839,14 @@ export default function App() {
                 onInspect={(id) => show(model.entities[id])}
               />
             )}
+            {tab === "Data delivery" && (
+              <DeliveryView
+                model={model}
+                busy={busy || pending.length > 0}
+                onInitialize={() => void act("/initialize-delivery")}
+                onInspect={(id) => show(model.entities[id])}
+              />
+            )}
             {tab === "Design inputs" && (
               <section className="panel">
                 <h2>Accepted calculation inputs</h2>
@@ -1198,94 +1208,96 @@ export default function App() {
                 </section>
               </>
             )}
-            {tab !== "Overview" && tab !== "Coverage & access" && (
-              <section>
-                <div className="section-title">
-                  <h2>{tab}</h2>
-                  <label className="search">
-                    Search model objects
-                    <input
-                      placeholder="ID, text, owner, state…"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                  </label>
-                </div>
-                <div
-                  className={
-                    tab === "Architectures"
-                      ? "architecture-grid"
-                      : "object-list"
-                  }
-                >
-                  {objects
-                    .filter(
-                      (e) =>
-                        tabs[tab].includes(e.kind) &&
-                        JSON.stringify(e)
-                          .toLowerCase()
-                          .includes(query.toLowerCase()),
-                    )
-                    .map((e) => (
-                      <button
-                        className="object-card"
-                        disabled={busy}
-                        key={e.id}
-                        onClick={() => show(e)}
-                      >
-                        <div className="row">
-                          <span className="eyebrow">
-                            {e.kind} / {e.id.slice(0, 24)}
-                          </span>
-                          <Badge value={e.state} />
-                        </div>
-                        <h3>{e.title}</h3>
-                        {e.kind === "Requirement" && (
-                          <p>
-                            {e.data.criterion
-                              ? `${e.data.criterion.metric} ${e.data.criterion.operator} ${e.data.criterion.threshold.value} ${e.data.criterion.threshold.unit}`
-                              : "No quantitative criterion · unverified"}
-                            {["wide", "selective"].map((candidate) => {
-                              const check =
-                                model.entities[`check-${e.id}-${candidate}`];
-                              return (
-                                <span key={candidate}>
-                                  {" "}
-                                  · {candidate}:{" "}
-                                  {e.state === "stale" ||
-                                  check?.state === "stale"
-                                    ? "stale"
-                                    : check?.data.status || "unverified"}
-                                </span>
-                              );
-                            })}
-                          </p>
-                        )}
-                        <div className="row">
-                          <Badge value={e.classification} />
-                          <small>
-                            {e.owner} · r{e.revision}
-                          </small>
-                        </div>
-                        {e.kind === "Budget" && (
-                          <p>
-                            <Value value={e.data.margin} /> margin
-                          </p>
-                        )}
-                        {e.kind === "ArchitectureAlternative" && (
-                          <p>{e.data.conops}</p>
-                        )}
-                      </button>
-                    ))}
-                </div>
-                {tab !== "Coverage & access" &&
-                  !objects.some((e) => tabs[tab].includes(e.kind)) && (
-                    <p className="empty">
-                      No {tab.toLowerCase()} objects at this revision.
-                    </p>
-                  )}
-              </section>
-            )}
+            {tab !== "Overview" &&
+              tab !== "Coverage & access" &&
+              tab !== "Data delivery" && (
+                <section>
+                  <div className="section-title">
+                    <h2>{tab}</h2>
+                    <label className="search">
+                      Search model objects
+                      <input
+                        placeholder="ID, text, owner, state…"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                      />
+                    </label>
+                  </div>
+                  <div
+                    className={
+                      tab === "Architectures"
+                        ? "architecture-grid"
+                        : "object-list"
+                    }
+                  >
+                    {objects
+                      .filter(
+                        (e) =>
+                          tabs[tab].includes(e.kind) &&
+                          JSON.stringify(e)
+                            .toLowerCase()
+                            .includes(query.toLowerCase()),
+                      )
+                      .map((e) => (
+                        <button
+                          className="object-card"
+                          disabled={busy}
+                          key={e.id}
+                          onClick={() => show(e)}
+                        >
+                          <div className="row">
+                            <span className="eyebrow">
+                              {e.kind} / {e.id.slice(0, 24)}
+                            </span>
+                            <Badge value={e.state} />
+                          </div>
+                          <h3>{e.title}</h3>
+                          {e.kind === "Requirement" && (
+                            <p>
+                              {e.data.criterion
+                                ? `${e.data.criterion.metric} ${e.data.criterion.operator} ${e.data.criterion.threshold.value} ${e.data.criterion.threshold.unit}`
+                                : "No quantitative criterion · unverified"}
+                              {["wide", "selective"].map((candidate) => {
+                                const check =
+                                  model.entities[`check-${e.id}-${candidate}`];
+                                return (
+                                  <span key={candidate}>
+                                    {" "}
+                                    · {candidate}:{" "}
+                                    {e.state === "stale" ||
+                                    check?.state === "stale"
+                                      ? "stale"
+                                      : check?.data.status || "unverified"}
+                                  </span>
+                                );
+                              })}
+                            </p>
+                          )}
+                          <div className="row">
+                            <Badge value={e.classification} />
+                            <small>
+                              {e.owner} · r{e.revision}
+                            </small>
+                          </div>
+                          {e.kind === "Budget" && (
+                            <p>
+                              <Value value={e.data.margin} /> margin
+                            </p>
+                          )}
+                          {e.kind === "ArchitectureAlternative" && (
+                            <p>{e.data.conops}</p>
+                          )}
+                        </button>
+                      ))}
+                  </div>
+                  {tab !== "Coverage & access" &&
+                    !objects.some((e) => tabs[tab].includes(e.kind)) && (
+                      <p className="empty">
+                        No {tab.toLowerCase()} objects at this revision.
+                      </p>
+                    )}
+                </section>
+              )}
           </>
         )}
         <footer>

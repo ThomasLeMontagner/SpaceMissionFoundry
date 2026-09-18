@@ -38,6 +38,13 @@ def evaluate(model, requirement, candidate):
             data["reason"] = "Calculation failed; no valid evidence is available."
         else:
             try:
+                if rule.metric == "delivery.maximum_latency":
+                    from app.engineering_tools.delivery import assess_deadline
+
+                    outputs = source.data["outputs"]
+                    data.update(assess_deadline(outputs, q(rule.threshold.model_dump(), "s")))
+                    data["actual"] = outputs["maximum_latency"]
+                    return make_check(requirement, candidate, data, refs)
                 raw = source.data["outputs"][output]
                 unit = METRICS[rule.metric]["unit"]
                 value = U.Quantity(raw["value"], raw["unit"]).to(unit).magnitude
@@ -56,6 +63,10 @@ def evaluate(model, requirement, candidate):
                 )
     elif requirement.state == "stale":
         data.update(status="stale", reason="Requirement has changed and needs review.")
+    return make_check(requirement, candidate, data, refs)
+
+
+def make_check(requirement, candidate, data, refs):
     check = entity(
         f"check-{requirement.id}-{candidate}",
         "VerificationItem",

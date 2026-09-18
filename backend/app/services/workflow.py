@@ -13,6 +13,7 @@ from app.services.design_inputs import (
     CANDIDATES,
     IMPACT_KINDS,
     access_parameter,
+    delivery_parameters,
     edited_entity,
     input_entities,
     parameter_id,
@@ -317,7 +318,7 @@ class Workflow:
                 method="Orbit access and processing simulation",
                 success_criterion=m.entities["req-latency"].title,
                 status="not verified",
-                evidence="Unverified: geometric access does not include transmission, queues, processing or dissemination"
+                evidence="Operational delivery remains unverified: modeled delivery is conditional on sampled access and assumed processing and station availability"
                 if "mission-access-analysis" in m.entities
                 else "Unknown: no propagated access evidence",
                 review_point="Before preliminary design review",
@@ -385,6 +386,11 @@ class Workflow:
             f"Mission owner selected {candidate}",
             "human",
             refs=["trade", f"{candidate}-link"]
+            + (
+                [f"{candidate}-delivery-analysis"]
+                if f"{candidate}-delivery-analysis" in m.entities
+                else []
+            )
             + (["mission-access-analysis"] if "mission-access-analysis" in m.entities else []),
             classification="Human decision",
             rationale=reason,
@@ -546,6 +552,20 @@ class Workflow:
             m, "systems", "Proposed explicit input objects from recorded sizing basis", old
         )
 
+    def initialize_delivery(self, id, revision):
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        if "mission-access-inputs" not in old.entities or any(
+            parameter_id(c, "delivery") in old.entities for c in CANDIDATES
+        ):
+            raise ValueError(
+                "Delivery initialization requires access inputs and no existing delivery inputs"
+            )
+        m = old.model_copy(deep=True)
+        self.propose(m, "systems", delivery_parameters(), "calculation inputs")
+        return self.store.save(m, "systems", "Proposed delivery delays for explicit approval", old)
+
     def initialize_access(self, id, revision):
         old = self.store.get(id)
         self.guard(old, revision)
@@ -650,6 +670,41 @@ class Workflow:
                         if result.get("status") == "invalid":
                             finding.title = f"{candidate}: {tool} calculation is invalid"
                     m.entities[key] = finding
+            if parameter_id(candidate, "delivery") in m.entities:
+                access_run = m.entities.get("mission-access-analysis")
+                access_output = (
+                    access_run.data.get("outputs", {})
+                    if access_run
+                    and access_run.state == "accepted"
+                    and access_run.data.get("status") == "valid"
+                    else {}
+                )
+                self.analysis(
+                    m,
+                    "delivery",
+                    dict(
+                        delays=read_inputs(m, candidate, "delivery"),
+                        payload=read_inputs(m, candidate, "data"),
+                        link=read_inputs(m, candidate, "link"),
+                        link_result=m.entities[f"{candidate}-link-analysis"].data.get(
+                            "outputs", {}
+                        ),
+                        access={
+                            k: access_output[k]
+                            for k in ("horizon", "targets", "network_windows", "sample_step")
+                            if k in access_output
+                        },
+                    ),
+                    [
+                        parameter_id(candidate, "delivery"),
+                        parameter_id(candidate, "data"),
+                        parameter_id(candidate, "link"),
+                        f"{candidate}-link-analysis",
+                        "mission-access-analysis",
+                        *reqs,
+                    ],
+                    candidate,
+                )
         for role, tools in [
             (
                 "analysis",

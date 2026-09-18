@@ -64,6 +64,12 @@ class OrbitInputs(Strict):
     altitude: Quantity
 
 
+class DeliveryInputs(Strict):
+    onboard_delay: Quantity
+    ground_delay: Quantity
+    dissemination_delay: Quantity
+
+
 class Angle(Strict):
     value: float = Field(strict=True)
     unit: Literal["deg", "degree", "rad", "radian"]
@@ -88,7 +94,7 @@ class AccessInputs(Strict):
     stations: list[Site] = Field(min_length=1, max_length=8)
 
 
-Tool = Literal["mass", "power", "data", "link", "orbit", "access"]
+Tool = Literal["mass", "power", "data", "link", "orbit", "access", "delivery"]
 INPUT_SCHEMAS = {
     "mass": MassInputs,
     "power": PowerInputs,
@@ -96,6 +102,7 @@ INPUT_SCHEMAS = {
     "link": LinkInputs,
     "orbit": OrbitInputs,
     "access": AccessInputs,
+    "delivery": DeliveryInputs,
 }
 
 
@@ -122,6 +129,7 @@ def validate_inputs(tool: str, inputs: dict) -> dict:
         },
         "orbit": {"altitude": "m"},
         "access": {"duration": "s", "step": "s", "footprint_width": "km"},
+        "delivery": {"onboard_delay": "s", "ground_delay": "s", "dissemination_delay": "s"},
     }
     try:
         converted = {key: q(values[key], unit) for key, unit in units[tool].items()}
@@ -151,6 +159,8 @@ def validate_inputs(tool: str, inputs: dict) -> dict:
                 raise ValueError("Daily ground contact cannot exceed 24 hours")
         if tool == "orbit" and converted["altitude"] <= 0:
             raise ValueError("Orbit altitude must be positive")
+        if tool == "delivery" and any(value > 604800 for value in converted.values()):
+            raise ValueError("Each delivery delay must be at most 7 days")
         if tool == "access":
 
             def angle(value, lower, upper):
