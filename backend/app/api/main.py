@@ -13,6 +13,7 @@ from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
 from app.services.design_inputs import EditChanges
+from app.services.sensitivity import Study, study
 from app.services.workflow import Workflow
 
 
@@ -114,6 +115,10 @@ def create_app(store=None):
     @app.get("/api/missions/{id}")
     def get(id: str):
         return store.get(id)
+
+    @app.post("/api/missions/{id}/sensitivity")
+    def sensitivity(id: str, body: Study):
+        return study(store.get(id), body)
 
     @app.post("/api/missions/{id}/objects/{object_id}/edit")
     def edit(id: str, object_id: str, body: Edit):

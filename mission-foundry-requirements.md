@@ -2,9 +2,9 @@
 
 ## System Requirements Specification
 
-**Version:** 0.6
+**Version:** 0.7
 
-**Status:** Requirements revision — conditional end-to-end delivery simulation
+**Status:** Requirements revision — delivery sensitivity studies
 
 **Date:** 2026-09-18
 
@@ -229,6 +229,10 @@ Quantitative verification scope for version 0.2: the initial metric registry cov
 | MF-ANL-018 | Delivery evidence shall record per-product acquisition, completed downlink and delivery times, latency, pending/dropped state, queue history and data conservation totals. It shall disclose finite-horizon censoring, access sampling, assumed station availability, fixed-delay parallel ground processing and the distinction from continuous daily data budgets. | Must | Test |
 | MF-ANL-019 | Explicitly approved maximum-delivery-latency criteria shall evaluate every modeled product: dropped, late or overdue pending products fail; absent, truncated or otherwise incomplete evidence cannot pass. Results shall remain conditional on recorded workload assumptions and shall not certify operational performance. Failed required criteria shall block selection and baseline approval. | Must | Test |
 | MF-ANL-020 | The workbench shall display delivery outcomes and evidence for each candidate. Relevant edits shall stale delivery evidence and dependent checks/decisions. Legacy missions shall explicitly approve new delivery assumptions; historical baselines shall remain immutable. | Must | Demonstration |
+| MF-ANL-021 | The system shall support bounded, one-parameter delivery sensitivity studies for onboard storage, downlink rate, onboard delay, ground-processing delay and dissemination delay. Each study shall compare 2–15 distinct unit-bearing trial values with a reference calculation anchored to current valid delivery evidence and a specified mission revision. | Must | Test |
+| MF-ANL-022 | Each trial shall recalculate affected data and RF evidence before delivery simulation. Downlink-rate changes shall affect RF margin as well as transmission rate. Trials shall preserve finite-horizon unknowns, drops and overdue products in deadline conclusions; invalid trials shall not be presented as successes. | Must | Test |
+| MF-ANL-023 | Sensitivity studies shall be read-only, including when run on a saved baseline. Optional exploratory deadlines and comparisons with accepted delivery criteria shall not alter approved inputs, verification conclusions, mission revisions or baseline contents. Applying a trial value shall use the normal design-edit review workflow. | Must | Test |
+| MF-ANL-024 | The workbench shall show reference/trial outcomes, source revision and limitations and allow JSON export containing trial inputs and calculation evidence. Results shall clear on changed settings, mission or revision; stale responses shall not appear as current studies. The UI shall disclose that studies are temporary until exported. | Must | Demonstration |
 
 Preliminary access scope for version 0.4: one shared circular orbit and nadir-centred circular surface footprint for the two reference candidates; up to 12 target points and 8 hypothetical sea-level stations. Latitude/longitude use signed angles. Supported altitude is 100–2000 km; duration is 1 minute–7 days, step 1–60 seconds, and runs are capped at 100,000 midpoint samples. The relative epoch is set by an explicit initial Earth rotation angle and is not a calendar-date ephemeris. Network daily contact is a horizon-normalized average, not a guaranteed daily minimum. A target with no sampled windows has a gap equal to the horizon; this is a censored observation, not an infinite revisit or proof of permanent inaccessibility. The optimistic wait from observed-window starts to later network visibility remains unknown if any such observation has no following contact in the horizon. It omits transmission duration, contention, queues, processing and delivery. Perturbations, eccentricity, terrain, weather, illumination, pointing/scheduling, RF acquisition and booked station availability remain outside this preliminary model. Full regional coverage, mission lifetime and operational delivery-latency verification remain deferred.
 

@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.6. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.7. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -76,7 +76,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ANL-007 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-008 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-009 | Deferred | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
-| MF-ANL-010 | Deferred | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
+| MF-ANL-010 | Partial | One-parameter delivery sensitivity for storage, link rate and processing delays; other parameters, coupled sweeps and uncertainty analysis remain deferred. test_sensitivity.py and sensitivity.spec.ts. |
 | MF-ANL-011 | Partial | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-012 | Partial | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-013 | Implemented | Validated geometry and named point/station inputs, bounded circular propagation and analytic reference tests. |
@@ -87,6 +87,10 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ANL-018 | Implemented | Recorded per-product events, pending/dropped totals, queue trace, conservation tests and explicit model limits; docs/architecture/delivery-analysis.md. |
 | MF-ANL-019 | Implemented | Explicit delivery.maximum_latency criterion; per-product deadline evaluation and selection/baseline guards. Missing or censored evidence never produces a full-workload pass. Operational validation remains outstanding. |
 | MF-ANL-020 | Implemented | DeliveryView.tsx, legacy initialization approval, transitive evidence invalidation and regression tests; immutable baseline storage retained. |
+| MF-ANL-021 | Implemented | services/sensitivity.py validates units, distinct values and 2–15 trials; stale source/revision guards and bounded product cases. |
+| MF-ANL-022 | Implemented | Each reference/trial reruns data, RF and delivery tools; tests demonstrate storage overflow, incomplete delivery and higher-rate RF failure. |
+| MF-ANL-023 | Implemented | Read-only study API; baseline export and mission remain identical after studies. Approved criteria are compared without writing verification objects. |
+| MF-ANL-024 | Implemented | SensitivityView comparison table and JSON export; keyed mission/revision view, setting invalidation, error handling, unit and browser regressions. |
 | MF-EVD-001 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-002 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-003 | Implemented | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |

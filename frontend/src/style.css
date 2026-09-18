@@ -854,6 +854,26 @@ footer span {
   text-align: left;
   padding-bottom: 8px;
 }
+.sensitivity-view .diff-table-wrap table {
+  min-width: 1300px;
+  table-layout: auto;
+}
+.sensitivity-view .diff-table-wrap th,
+.sensitivity-view .diff-table-wrap td {
+  min-width: 90px;
+  overflow-wrap: normal;
+}
+.sensitivity-view .diff-table-wrap th:first-child {
+  width: auto;
+  min-width: 170px;
+}
+.sensitivity-view fieldset {
+  border: 1px solid #ccd5dd;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 24px;
+  min-width: 0;
+}
 .coverage-view > svg {
   width: 100%;
   max-height: 430px;

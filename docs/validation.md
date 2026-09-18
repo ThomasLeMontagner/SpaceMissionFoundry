@@ -77,3 +77,11 @@ The API test client emits two upstream deprecation warnings about httpx and AnyI
 - All five Playwright workflows pass, including delivery tables and queue charts in the coverage workflow. The delivery screenshot was visually inspected.
 - TypeScript/Vite production build, Ruff lint/format, Prettier and patch whitespace checks pass. No SQL migration or external dependency was introduced; PostgreSQL was not rerun for this milestone.
 - Specification version 0.6 adds MF-ANL-017 through MF-ANL-020 with traceability. Results validate the stated synthetic workload and scheduler, not operational delivery or ground-station availability. Existing user missions were not modified by verification.
+
+## Delivery sensitivity studies — 2026-09-18
+
+- Full SQLite regression: 71 passed, one PostgreSQL-only skip. The sensitivity suite subsequently expanded from 9 to 11 passing tests with controlled tool-failure and product-case-bound checks. Coverage includes unit conversion, duplicate/invalid trial rejection, stale evidence/revisions, storage overflow, RF recalculation, incomplete delivery, accepted-criterion comparisons, and unchanged mission/baseline exports.
+- Frontend unit tests: 18 passed, including input validation, disabled stale evidence, request failures, result invalidation and delayed-response isolation across mission/revision keys.
+- All six Playwright workflows passed. The new baseline sensitivity test compares on-time and late trials, downloads JSON and verifies unchanged source data. Its browser test was rerun after improving table column widths, and the updated screenshot was visually inspected.
+- Ruff, TypeScript/Vite production build, Prettier and patch whitespace checks passed. No schema migration or new dependency was needed. The local backend was restarted and its sensitivity route verified. PostgreSQL was not rerun.
+- Specification version 0.7 adds MF-ANL-021–024; MF-ANL-010 is partial because only five delivery parameters support one-at-a-time sweeps. Studies are temporary and exportable, not persisted or automatically adopted.

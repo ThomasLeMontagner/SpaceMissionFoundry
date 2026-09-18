@@ -1,5 +1,7 @@
 # Mission Foundry
 
+Open **Sensitivity analysis** after calculating delivery results to compare storage, downlink rate or processing-delay choices. Choose a candidate, vary one input, enter 2–15 comma-separated values with compatible units, and run the study. An optional exploratory deadline highlights missed or unresolved deliveries without changing requirements. Studies work directly on saved baselines. Export the JSON to retain inputs and evidence; use **Design inputs** and its normal approval workflow to adopt a chosen value. See [sensitivity scope and limits](docs/architecture/sensitivity-analysis.md).
+
 ## Archive and restore saved missions
 
 Use **Archive** beside a saved mission, or **Archive mission** inside its workspace, and confirm the action. It disappears from the active list. Select **Show archived missions** and **Restore** to bring it back. Archiving keeps the mission's workflow, pending proposals, history and immutable baseline exports; it does not permanently delete any data. Archived missions cannot be edited until restored. Both actions are recorded in history.

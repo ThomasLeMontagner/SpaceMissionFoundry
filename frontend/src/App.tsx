@@ -4,6 +4,7 @@ import DesignEditor from "./DesignEditor";
 import BaselineComparison from "./BaselineComparison";
 import CoverageView from "./CoverageView";
 import DeliveryView from "./DeliveryView";
+import SensitivityView from "./SensitivityView";
 import type { Entity, Model, Proposal } from "./types";
 
 type MissionSummary = {
@@ -23,6 +24,7 @@ const tabs: Record<string, string[]> = {
   Budgets: ["Budget", "BudgetEntry", "AnalysisRun"],
   "Coverage & access": [],
   "Data delivery": [],
+  "Sensitivity analysis": [],
   Trades: ["TradeStudy"],
   "Claims & evidence": ["Claim", "Evidence"],
   "Conflicts & review": ["ReviewFinding", "Risk", "VerificationItem"],
@@ -847,6 +849,13 @@ export default function App() {
                 onInspect={(id) => show(model.entities[id])}
               />
             )}
+            {tab === "Sensitivity analysis" && (
+              <SensitivityView
+                key={`${model.id}:${model.revision}`}
+                model={model}
+                busy={busy}
+              />
+            )}
             {tab === "Design inputs" && (
               <section className="panel">
                 <h2>Accepted calculation inputs</h2>
@@ -1210,7 +1219,8 @@ export default function App() {
             )}
             {tab !== "Overview" &&
               tab !== "Coverage & access" &&
-              tab !== "Data delivery" && (
+              tab !== "Data delivery" &&
+              tab !== "Sensitivity analysis" && (
                 <section>
                   <div className="section-title">
                     <h2>{tab}</h2>
