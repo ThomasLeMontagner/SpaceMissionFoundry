@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.7. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.9. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -91,6 +91,12 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ANL-022 | Implemented | Each reference/trial reruns data, RF and delivery tools; tests demonstrate storage overflow, incomplete delivery and higher-rate RF failure. |
 | MF-ANL-023 | Implemented | Read-only study API; baseline export and mission remain identical after studies. Approved criteria are compared without writing verification objects. |
 | MF-ANL-024 | Implemented | SensitivityView comparison table and JSON export; keyed mission/revision view, setting invalidation, error handling, unit and browser regressions. |
+| MF-ANL-025 | Implemented | Separate mission-scoped StudyRow, server-recomputed save endpoint, stale/archive guards and rejection of supplied result payloads; test_saved_studies.py. |
+| MF-ANL-026 | Implemented | Alembic 0002, ORM update/delete guards, database triggers, source/baseline preservation and independent store reload tests. SQLite migration exercised; PostgreSQL migration requires environment validation. |
+| MF-ANL-027 | Implemented | SavedStudies library, historical labels, setting/source comparison warning, recorded unknowns, JSON export, delayed-response unit tests and reload/comparison browser workflow. |
+| MF-ANL-028 | Implemented | Mission-scoped saved-trial proposal endpoint, server-resolved single input and existing revision/pending/archive/baseline guards; test_trial_proposals.py. |
+| MF-ANL-029 | Implemented | Current source/input equality guards, reopened-baseline eligibility, semantic quantity no-op rejection and recorded Proposal.source_study; changed-design regression. |
+| MF-ANL-030 | Implemented | Trial preview and rationale, normal human proposal acceptance/rejection, dependent-result staleness and fresh calculations; browser regression plus immutable saved-study/baseline assertions. |
 | MF-EVD-001 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-002 | Partial | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |
 | MF-EVD-003 | Implemented | Assumptions and deterministic provenance; no external evidence ingestion or contradiction engine. |

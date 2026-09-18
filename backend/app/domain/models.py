@@ -114,6 +114,7 @@ class Operation(Strict):
 
 
 class Proposal(Strict):
+    source_study: dict[str, Any] | None = None
     created_at: str = Field(default_factory=now)
     modified_at: str = Field(default_factory=now)
     revision: int = 0

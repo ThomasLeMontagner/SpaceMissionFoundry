@@ -85,3 +85,19 @@ The API test client emits two upstream deprecation warnings about httpx and AnyI
 - All six Playwright workflows passed. The new baseline sensitivity test compares on-time and late trials, downloads JSON and verifies unchanged source data. Its browser test was rerun after improving table column widths, and the updated screenshot was visually inspected.
 - Ruff, TypeScript/Vite production build, Prettier and patch whitespace checks passed. No schema migration or new dependency was needed. The local backend was restarted and its sensitivity route verified. PostgreSQL was not rerun.
 - Specification version 0.7 adds MF-ANL-021–024; MF-ANL-010 is partial because only five delivery parameters support one-at-a-time sweeps. Studies are temporary and exportable, not persisted or automatically adopted.
+
+## Saved sensitivity evidence and comparison — 2026-09-18
+
+- Full SQLite backend regression: 76 passed, one PostgreSQL-only skip. New saved-study tests cover separate-store reloads, mission scoping, baseline preservation, archived/stale request rejection, client-result rejection, ORM immutability and an actual 0001-to-0002 SQLite migration with raw-SQL update/delete rejection.
+- Frontend unit tests: 20 passed, including historical labels, incomplete latency, library failure/retry and delayed-response isolation across missions.
+- Five existing browser workflows passed. The expanded sensitivity workflow passed after adding explicit accessible names to saved-study selectors; it saves two studies, reloads, compares different deadlines, downloads saved evidence and verifies unchanged mission/baseline exports. Comparison screenshots were inspected and the layout was adjusted to keep latency and deadlines visible side by side.
+- Ruff, TypeScript/Vite build, Prettier and whitespace checks passed. The additive migration was applied locally and the saved-study endpoint verified. PostgreSQL migration trigger logic is included but was not exercised in this milestone.
+- Specification version 0.8 adds MF-ANL-025–027 and updates MF-ANL-024. Saved studies are immutable records outside mission history; adopting inputs still requires the existing reviewed edit workflow.
+
+## Reviewed proposals from saved trials — 2026-09-18
+
+- Existing 76 SQLite regressions passed with one PostgreSQL-only skip. Three new trial-proposal regressions pass after correcting the rejection assertion to allow the existing audit Decision while preserving all prior design entities. They cover approval/recalculation, source provenance, baseline/study immutability, rejection, mission scoping, stale revisions, invalid indexes, blank rationale, equivalent-value no-ops, changed inputs, pending proposals and archived/baselined guards.
+- Frontend unit tests: 21 passed. The new preview test covers baseline reopening, current/proposed values, required rationale and the server-resolved study/trial request.
+- All six browser workflows passed. The sensitivity flow now reopens a baseline, proposes a saved trial, verifies inputs are unchanged before approval, approves and waits for fresh calculations, then verifies the saved evidence and original baseline export remain identical.
+- Ruff, TypeScript/Vite build, Prettier and whitespace checks passed. The optional Proposal.source_study field is included in the schema artifact and requires no additional migration beyond the saved-study table. No user mission input or approval was changed during verification.
+- Requirements version 0.9 adds MF-ANL-028–030. Trial results remain exploratory and are never copied into approved verification conclusions. Recorded input equality is deliberately conservative; changed inputs require a new study.

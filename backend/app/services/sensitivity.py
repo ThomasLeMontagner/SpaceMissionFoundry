@@ -101,6 +101,7 @@ def study(model, request: Study):
         return result
 
     return dict(
+        study_request=request.model_dump(mode="json"),
         schema_version="1.0",
         tool="delivery-sensitivity",
         version="1.0",
@@ -121,6 +122,6 @@ def study(model, request: Study):
             "Each trial reruns daily data and RF calculations before delivery. Higher downlink rates can reduce RF margin and prevent transmission.",
             "Geometry and all other recorded assumptions remain fixed. Delivery retains its finite-horizon, target-window workload and FIFO limitations.",
             "The optional study deadline is exploratory. Requirement comparisons use accepted numeric criteria but do not replace approved verification evidence.",
-            "Results are held in this view; export JSON to retain the study. Apply chosen inputs separately through the reviewed design-edit workflow.",
+            "Unsaved results are held in this view; save the study or export JSON to retain it. Apply chosen inputs separately through the reviewed design-edit workflow.",
         ],
     )

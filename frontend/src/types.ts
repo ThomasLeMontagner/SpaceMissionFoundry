@@ -10,6 +10,14 @@ export type Entity = {
   data: Record<string, any>;
 };
 export type Proposal = {
+  source_study?: {
+    id: string;
+    name: string;
+    source_revision: number;
+    trial_index: number;
+    candidate: string;
+    parameter: string;
+  } | null;
   id: string;
   proposal_type: string;
   agent: string;

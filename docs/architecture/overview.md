@@ -1,6 +1,6 @@
 # Architecture and implementation plan
 
-Delivery sensitivity studies run as read-only calculations over the current recorded delivery evidence, including saved baselines. One parameter varies per study; data, RF and delivery tools rerun for each case. Results remain outside mission history and may be exported as JSON. See [sensitivity architecture and limits](sensitivity-analysis.md).
+Delivery sensitivity studies run as read-only calculations over the current recorded delivery evidence, including saved baselines. One parameter varies per study; data, RF and delivery tools rerun for each case. Results remain outside mission history and may be exported as JSON or saved to a separate immutable study table. The saved-study library supports historical retrieval and comparison. See [sensitivity architecture and limits](sensitivity-analysis.md).
 
 ## Vertical slice
 

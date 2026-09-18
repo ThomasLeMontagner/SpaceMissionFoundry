@@ -134,6 +134,8 @@ class Workflow:
         return self.store.save(m, "human", reason, old)
 
     def submit(self, id, p):
+        if p.source_study is not None:
+            raise ValueError("Study provenance must come from the saved-trial proposal endpoint")
         old = self.store.get(id)
         self.guard(old, p.target_revision)
         if p.id in old.proposals or p.status != "submitted":
@@ -459,7 +461,65 @@ class Workflow:
         m.entities[b.id] = b
         return self.store.save(m, "human", d.data["rationale"], old, baseline=True)
 
-    def edit(self, id, object_id, revision, changes, reason):
+    def propose_study_trial(self, id, study_id, revision, trial_index, reason):
+        from copy import deepcopy
+
+        from app.engineering_tools.calculations import q
+        from app.services.design_inputs import EditChanges
+        from app.services.sensitivity import PARAMETERS
+
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        saved = self.store.study(id, study_id)
+        result = saved["result"]
+        trials = result["trials"]
+        if trial_index < 0 or trial_index >= len(trials):
+            raise ValueError("Choose a recorded trial from this study")
+        trial = trials[trial_index]
+        if trial["status"] != "valid":
+            raise ValueError("Invalid trial results cannot propose a design change")
+        candidate = result["candidate"]
+        source = old.entities.get(f"{candidate}-delivery-analysis")
+        reference = result["reference"]["delivery_analysis"]["inputs"]
+        if (
+            not source
+            or source.state != "accepted"
+            or source.data.get("status") != "valid"
+            or source.data["inputs"] != reference
+        ):
+            raise ValueError(
+                "Design assumptions differ from this study; run and save a new study before proposing a trial"
+            )
+        for group, tool in [("payload", "data"), ("link", "link"), ("delays", "delivery")]:
+            if read_inputs(old, candidate, tool) != reference[group]:
+                raise ValueError("Design inputs differ from the study; run and save a new study")
+        group, field, unit = PARAMETERS[result["parameter"]]
+        tool = {"payload": "data", "link": "link", "delays": "delivery"}[group]
+        values = deepcopy(read_inputs(old, candidate, tool))
+        if q(values[field], unit) == q(trial["value"], unit):
+            raise ValueError("This trial already matches the accepted input")
+        prior = deepcopy(values[field])
+        values[field] = trial["value"]
+        return self.edit(
+            id,
+            parameter_id(candidate, tool),
+            revision,
+            EditChanges(inputs=values),
+            reason,
+            source_study=dict(
+                id=study_id,
+                name=saved["name"],
+                source_revision=result["source_revision"],
+                trial_index=trial_index,
+                candidate=candidate,
+                parameter=result["parameter"],
+                previous_value=prior,
+                proposed_value=trial["value"],
+            ),
+        )
+
+    def edit(self, id, object_id, revision, changes, reason, source_study=None):
         old = self.store.get(id)
         self.guard(old, revision)
         self.no_pending(old)
@@ -473,6 +533,7 @@ class Workflow:
             raise ValueError("Initialize editable inputs from recorded analyses first")
         e = edited_entity(prior, changes)
         p = Proposal(
+            source_study=source_study,
             proposal_type="design change",
             agent="human",
             target_revision=old.revision,

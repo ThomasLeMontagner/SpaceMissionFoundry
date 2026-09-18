@@ -11,6 +11,9 @@ import SensitivityView from "./SensitivityView";
 import type { Model } from "./types";
 
 vi.mock("./api", () => ({ request: vi.fn() }));
+vi.mock("./SavedStudies", () => ({
+  default: () => <div>Saved study library</div>,
+}));
 beforeEach(() => vi.clearAllMocks());
 const model = {
   id: "mission-a",

@@ -140,6 +140,11 @@
     "Proposal": {
       "additionalProperties": false,
       "properties": {
+        "source_study": {
+          "anyOf": [{"type": "object", "additionalProperties": true}, {"type": "null"}],
+          "default": null,
+          "title": "Source Study"
+        },
         "created_at": {
           "title": "Created At",
           "type": "string"

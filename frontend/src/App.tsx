@@ -329,6 +329,14 @@ export default function App() {
             )}
           </div>
         ))}
+        {p.source_study && (
+          <p>
+            From saved study “{p.source_study.name}”, trial{" "}
+            {p.source_study.trial_index + 1}, source revision{" "}
+            {p.source_study.source_revision}. Study outcomes are exploratory;
+            approval requires recalculation against the current requirements.
+          </p>
+        )}
         <p className="muted">
           {p.expected_consequences} · Confidence {p.confidence}
         </p>
@@ -853,7 +861,13 @@ export default function App() {
               <SensitivityView
                 key={`${model.id}:${model.revision}`}
                 model={model}
-                busy={busy}
+                busy={busy || pending.length > 0}
+                onPropose={(studyId, trialIndex, rationale) =>
+                  void act(`/sensitivity-studies/${studyId}/propose`, {
+                    trial_index: trialIndex,
+                    reason: rationale,
+                  })
+                }
               />
             )}
             {tab === "Design inputs" && (

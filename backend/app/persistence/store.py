@@ -1,4 +1,5 @@
 import os
+from uuid import uuid4
 
 from sqlalchemy import JSON, Integer, String, create_engine, event, select, update
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column
@@ -41,11 +42,20 @@ class RelationshipRow(Base):
     type: Mapped[str] = mapped_column(String, primary_key=True)
 
 
+class StudyRow(Base):
+    __tablename__ = "sensitivity_studies"
+    id: Mapped[str] = mapped_column(String, primary_key=True)
+    mission_id: Mapped[str] = mapped_column(String, index=True)
+    name: Mapped[str] = mapped_column(String)
+    created_at: Mapped[str] = mapped_column(String)
+    result: Mapped[dict] = mapped_column(JSON)
+
+
 def immutable(*args):
     raise ValueError("History and baselines are append-only")
 
 
-for table in [RevisionRow, BaselineRow, RelationshipRow]:
+for table in [RevisionRow, BaselineRow, RelationshipRow, StudyRow]:
     event.listen(table, "before_update", immutable)
     event.listen(table, "before_delete", immutable)
 
@@ -66,6 +76,60 @@ class Store:
             if not row:
                 raise KeyError("Mission does not exist")
             return Model.model_validate(row.model)
+
+    def save_study(self, mission_id, name, result):
+        with Session(self.engine) as s, s.begin():
+            mission = s.get(MissionRow, mission_id, with_for_update=True)
+            if not mission:
+                raise KeyError("Mission does not exist")
+            if mission.model.get("archived"):
+                raise ValueError("Restore the archived mission before saving studies")
+            if mission.revision != result["source_revision"]:
+                raise ValueError("Mission changed; rerun the study before saving")
+            row = StudyRow(
+                id=str(uuid4()), mission_id=mission_id, name=name, created_at=now(), result=result
+            )
+            s.add(row)
+            return dict(
+                id=row.id,
+                mission_id=mission_id,
+                name=name,
+                created_at=row.created_at,
+                result=result,
+            )
+
+    def studies(self, mission_id):
+        self.get(mission_id)
+        with Session(self.engine) as s:
+            return [
+                dict(
+                    id=r.id,
+                    name=r.name,
+                    created_at=r.created_at,
+                    source_revision=r.result["source_revision"],
+                    candidate=r.result["candidate"],
+                    parameter=r.result["parameter"],
+                )
+                for r in s.scalars(
+                    select(StudyRow)
+                    .where(StudyRow.mission_id == mission_id)
+                    .order_by(StudyRow.created_at.desc(), StudyRow.id)
+                )
+            ]
+
+    def study(self, mission_id, study_id):
+        self.get(mission_id)
+        with Session(self.engine) as s:
+            row = s.get(StudyRow, study_id)
+            if not row or row.mission_id != mission_id:
+                raise KeyError("Saved study does not belong to this mission")
+            return dict(
+                id=row.id,
+                mission_id=mission_id,
+                name=row.name,
+                created_at=row.created_at,
+                result=row.result,
+            )
 
     def list(self, archived=False):
         with Session(self.engine) as s:

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { request } from "./api";
+import SavedStudies from "./SavedStudies";
 import type { Model } from "./types";
 
 const parameters: Record<
@@ -40,9 +41,11 @@ const number = (v: number | null | undefined, scale = 1) =>
 export default function SensitivityView({
   model,
   busy,
+  onPropose,
 }: {
   model: Model;
   busy: boolean;
+  onPropose?: (studyId: string, trialIndex: number, reason: string) => void;
 }) {
   const [candidate, setCandidate] = useState(model.selected || "selective");
   const [parameter, setParameter] = useState("ground_delay");
@@ -52,11 +55,15 @@ export default function SensitivityView({
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [studyName, setStudyName] = useState("");
+  const [savedId, setSavedId] = useState("");
+  const [libraryVersion, setLibraryVersion] = useState(0);
   const source = model.entities[`${candidate}-delivery-analysis`];
   const ready = source?.state === "accepted" && source.data.status === "valid";
   function invalidate() {
     setResult(null);
     setError("");
+    setSavedId("");
   }
   async function run(event: React.FormEvent) {
     event.preventDefault();
@@ -83,6 +90,22 @@ export default function SensitivityView({
             : null,
         }),
       );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function save() {
+    setLoading(true);
+    setError("");
+    try {
+      const saved = await request(`/missions/${model.id}/sensitivity-studies`, {
+        name: studyName.trim(),
+        study: result.study_request,
+      });
+      setSavedId(saved.id);
+      setLibraryVersion((v) => v + 1);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -211,10 +234,32 @@ export default function SensitivityView({
             Export sensitivity JSON
           </button>
           <p>
-            Results are temporary in this view. Export them before changing
-            settings, revision, or tab. To adopt a value, edit the corresponding
-            Design inputs and follow the normal review workflow.
+            Save this study to revisit it later, or export JSON. Unsaved results
+            disappear when settings, revision or tab changes. To adopt a value,
+            edit the corresponding Design inputs and follow the normal review
+            workflow.
           </p>
+          <label>
+            Study name
+            <input
+              maxLength={120}
+              value={studyName}
+              disabled={loading || !!savedId}
+              onChange={(e) => setStudyName(e.target.value)}
+            />
+          </label>
+          <button
+            disabled={
+              busy ||
+              loading ||
+              !!savedId ||
+              !studyName.trim() ||
+              model.archived
+            }
+            onClick={() => void save()}
+          >
+            {savedId ? "Study saved" : "Save study"}
+          </button>
           <div className="diff-table-wrap">
             <table>
               <caption>
@@ -309,6 +354,15 @@ export default function SensitivityView({
           </details>
         </>
       )}
+      <SavedStudies
+        key={model.id}
+        missionId={model.id}
+        revision={model.revision}
+        refresh={libraryVersion}
+        model={model}
+        busy={busy || loading}
+        onPropose={onPropose}
+      />
     </section>
   );
 }

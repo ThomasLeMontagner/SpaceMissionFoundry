@@ -874,6 +874,17 @@ footer span {
   margin-bottom: 24px;
   min-width: 0;
 }
+.sensitivity-view .comparison article {
+  min-width: 0;
+}
+.sensitivity-view .comparison article table {
+  min-width: 340px;
+  table-layout: fixed;
+}
+.sensitivity-view .comparison article th:first-child {
+  width: 32%;
+  min-width: 0;
+}
 .coverage-view > svg {
   width: 100%;
   max-height: 430px;

@@ -40,6 +40,11 @@ class Archive(Command):
     archived: bool
 
 
+class SaveStudy(Strict):
+    name: str = Field(min_length=1, max_length=120)
+    study: Study
+
+
 class Decide(Command):
     action: str
     reason: str = Field(min_length=3, max_length=2000)
@@ -67,6 +72,11 @@ class Impact(Command):
 
 
 class Reopen(Command):
+    reason: str = Field(min_length=3, max_length=2000)
+
+
+class ProposeTrial(Command):
+    trial_index: int = Field(ge=0, le=14)
     reason: str = Field(min_length=3, max_length=2000)
 
 
@@ -119,6 +129,31 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/sensitivity")
     def sensitivity(id: str, body: Study):
         return study(store.get(id), body)
+
+    @app.post("/api/missions/{id}/sensitivity-studies", status_code=201)
+    def save_study(id: str, body: SaveStudy):
+        name = body.name.strip()
+        if not name:
+            raise ValueError("Study name cannot be blank")
+        model = store.get(id)
+        if model.archived:
+            raise ValueError("Restore the archived mission before saving studies")
+        result = study(model, body.study)
+        return store.save_study(id, name, result)
+
+    @app.get("/api/missions/{id}/sensitivity-studies")
+    def saved_studies(id: str):
+        return store.studies(id)
+
+    @app.get("/api/missions/{id}/sensitivity-studies/{study_id}")
+    def saved_study(id: str, study_id: str):
+        return store.study(id, study_id)
+
+    @app.post("/api/missions/{id}/sensitivity-studies/{study_id}/propose")
+    def propose_trial(id: str, study_id: str, body: ProposeTrial):
+        if len(body.reason.strip()) < 3:
+            raise ValueError("Explain why this trial should be proposed")
+        return service.propose_study_trial(id, study_id, **body.model_dump())
 
     @app.post("/api/missions/{id}/objects/{object_id}/edit")
     def edit(id: str, object_id: str, body: Edit):
