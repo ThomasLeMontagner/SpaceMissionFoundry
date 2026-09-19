@@ -4,6 +4,7 @@ import DesignEditor from "./DesignEditor";
 import BaselineComparison from "./BaselineComparison";
 import CoverageView from "./CoverageView";
 import DeliveryView from "./DeliveryView";
+import InterfaceChecks from "./InterfaceChecks";
 import SensitivityView from "./SensitivityView";
 import type { Entity, Model, Proposal } from "./types";
 
@@ -857,6 +858,13 @@ export default function App() {
                 onInspect={(id) => show(model.entities[id])}
               />
             )}
+            {tab === "Interfaces" && (
+              <InterfaceChecks
+                model={model}
+                busy={busy || pending.length > 0}
+                onInspect={(id) => show(model.entities[id])}
+              />
+            )}
             {tab === "Sensitivity analysis" && (
               <SensitivityView
                 key={`${model.id}:${model.revision}`}
@@ -964,10 +972,21 @@ export default function App() {
                         (e.state === "stale" ||
                           ["fail", "stale"].includes(e.data.status)),
                     );
+                    const failedInterfaces = objects.some(
+                      (e) =>
+                        e.data.check_type === "interface_consistency" &&
+                        (e.state === "stale" ||
+                          ["fail", "stale"].includes(e.data.status)),
+                    );
                     return (
                       <div key={candidate}>
                         <button
-                          disabled={busy || !compliant || failedRequirements}
+                          disabled={
+                            busy ||
+                            !compliant ||
+                            failedRequirements ||
+                            failedInterfaces
+                          }
                           onClick={() =>
                             act("/select", { candidate, weights, reason })
                           }
@@ -981,6 +1000,12 @@ export default function App() {
                           <p className="fail">
                             Resolve failing or stale budgets before selecting
                             this concept.
+                          </p>
+                        )}
+                        {failedInterfaces && (
+                          <p className="fail">
+                            Resolve failing or stale interface checks before
+                            selecting a concept.
                           </p>
                         )}
                       </div>
@@ -1423,7 +1448,7 @@ export default function App() {
               !model.baseline &&
               !pending.length &&
               ["accepted", "stale"].includes(detail.state) &&
-              ["Assumption", "Requirement", "Parameter"].includes(
+              ["Assumption", "Requirement", "Parameter", "Interface"].includes(
                 detail.kind,
               ) &&
               model.entities[detail.id] && (

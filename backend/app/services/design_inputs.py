@@ -4,6 +4,7 @@ from typing import Literal
 from pydantic import Field, field_validator
 
 from app.domain.engineering_inputs import validate_inputs
+from app.domain.interfaces import DataContract
 from app.domain.models import Strict
 from app.domain.requirement_checks import Criterion
 from app.orchestration.scenario import Q, entity, inputs
@@ -24,6 +25,7 @@ IMPACT_KINDS = {
 
 
 class EditChanges(Strict):
+    data_contract: DataContract | None = None
     criterion: Criterion | None = None
     title: str | None = Field(default=None, min_length=1, max_length=2000)
     inputs: dict | None = None
@@ -171,6 +173,7 @@ def read_inputs(model, candidate, tool):
 
 def edited_entity(prior, changes: EditChanges):
     allowed = {
+        "Interface": {"data_contract"},
         "Parameter": {"inputs"},
         "Assumption": {"title", "rationale", "impact", "confidence", "validation_plan"},
         "Requirement": {
@@ -183,7 +186,9 @@ def edited_entity(prior, changes: EditChanges):
         },
     }
     values = changes.model_dump(exclude_unset=True)
-    if not values or any(v is None and k != "criterion" for k, v in values.items()):
+    if not values or any(
+        v is None and k not in ["criterion", "data_contract"] for k, v in values.items()
+    ):
         raise ValueError("Provide at least one nonempty edit")
     if prior.kind not in allowed or set(values) - allowed[prior.kind]:
         raise ValueError("This field is not editable for this object type")

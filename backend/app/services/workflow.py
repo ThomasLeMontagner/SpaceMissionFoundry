@@ -19,6 +19,7 @@ from app.services.design_inputs import (
     parameter_id,
     read_inputs,
 )
+from app.services.interface_checks import guard_interfaces, refresh_interfaces
 from app.services.requirement_checks import guard_candidate, refresh
 
 
@@ -99,7 +100,7 @@ class Workflow:
             accept(m, p)
             if any(
                 op.action == "replace"
-                and op.entity.kind in ["Assumption", "Requirement", "Parameter"]
+                and op.entity.kind in ["Assumption", "Requirement", "Parameter", "Interface"]
                 for op in p.operations
             ):
                 self.after_change(m)
@@ -356,6 +357,7 @@ class Workflow:
         if old.phase != "Trade study" or candidate not in ["wide", "selective"]:
             raise ValueError("Selection requires analyzed alternatives and a trade study")
         guard_candidate(old, candidate)
+        guard_interfaces(old)
         if any(
             old.entities[f"{candidate}-{tool}"].state != "accepted"
             or old.entities[f"{candidate}-{tool}"].data.get("compliant") is not True
@@ -388,6 +390,7 @@ class Workflow:
             f"Mission owner selected {candidate}",
             "human",
             refs=["trade", f"{candidate}-link"]
+            + [e.id for e in m.entities.values() if e.kind == "Interface"]
             + (
                 [f"{candidate}-delivery-analysis"]
                 if f"{candidate}-delivery-analysis" in m.entities
@@ -428,7 +431,9 @@ class Workflow:
         m = old.model_copy(deep=True)
         m.baseline = str(uuid4())
         guard_candidate(old, old.selected)
+        guard_interfaces(old)
         refresh(m)
+        refresh_interfaces(m)
         m.phase = "Baselined"
         d = entity(
             "baseline-approval",
@@ -448,6 +453,12 @@ class Workflow:
             if e.kind == "VerificationItem"
             and e.data.get("candidate") == m.selected
             and e.data.get("status") in ["unverified", "fail"]
+        ]
+        d.data["outstanding_interfaces"] = [
+            e.data["interface"]
+            for e in m.entities.values()
+            if e.data.get("check_type") == "interface_consistency"
+            and e.data.get("status") != "pass"
         ]
         b = entity(
             m.baseline,
@@ -825,4 +836,5 @@ class Workflow:
             score_basis="Engineering estimates on a 0–5 scale; capacity scored by deterministic compliance",
         )
         refresh(m)
+        refresh_interfaces(m)
         m.phase = "Trade study"

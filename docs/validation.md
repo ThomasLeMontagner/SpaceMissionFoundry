@@ -1,5 +1,12 @@
 # Validation record — 2026-09-09
 
+## Declared data-interface consistency — 2026-09-18
+
+- Full SQLite backend regression: 83 passed, one PostgreSQL-only skip. Four new tests cover reviewed contract edits, compatible rate units, missing declarations, protocol/rate/endpoint failures, stale dependencies, selection guards, outstanding baseline evidence and unchanged historical exports.
+- Frontend unit tests: 22 passed. All seven browser workflows passed, including approval while paused, stale-result hiding, failed-rate selection blocking and correction using compatible units. The interface-check screenshot was visually inspected.
+- Ruff lint/format, TypeScript/Vite production build, Prettier and patch whitespace checks passed. The local app was restarted and the API's DataContract schema verified. No database migration or new dependency was required; PostgreSQL was not rerun.
+- Requirements version 0.10 adds MF-ARC-010–013 and updates traceability. Checks validate declared shared point-to-point data contracts only; physical interface verification remains deferred. Existing user missions were not edited during verification.
+
 ## Exercised
 
 - Backend on SQLite: **21 passed, 1 skipped** (the skip is PostgreSQL-specific trigger enforcement).

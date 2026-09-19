@@ -1,0 +1,94 @@
+{
+  "$defs": {
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "number"
+        },
+        "unit": {
+          "maxLength": 40,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "source_endpoint": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Source Endpoint",
+      "type": "string"
+    },
+    "sink_endpoint": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Sink Endpoint",
+      "type": "string"
+    },
+    "source_protocol": {
+      "anyOf": [
+        {
+          "maxLength": 120,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Source Protocol"
+    },
+    "sink_protocol": {
+      "anyOf": [
+        {
+          "maxLength": 120,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Sink Protocol"
+    },
+    "source_rate": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Quantity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "sink_capacity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Quantity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "source_endpoint",
+    "sink_endpoint"
+  ],
+  "title": "DataContract",
+  "type": "object"
+}

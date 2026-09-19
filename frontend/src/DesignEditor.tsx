@@ -169,6 +169,15 @@ export default function DesignEditor({
     [saving, setSaving] = useState(false);
   const [targetRevision] = useState(revision);
   const parameter = entity.kind === "Parameter";
+  const isInterface = entity.kind === "Interface";
+  const emptyContract = () => ({
+    source_endpoint: entity.data.endpoints?.[0] || "",
+    sink_endpoint: entity.data.endpoints?.[1] || "",
+    source_protocol: null,
+    sink_protocol: null,
+    source_rate: { value: "", unit: "Mbit/s" },
+    sink_capacity: { value: "", unit: "Mbit/s" },
+  });
   const [metrics, setMetrics] = useState<
     Record<string, { label: string; unit: string }>
   >({});
@@ -179,23 +188,39 @@ export default function DesignEditor({
         .catch((e) => setError(e.message));
   }, [editing, entity.kind]);
   const [changes, setChanges] = useState<Changes>(() =>
-    parameter
-      ? { inputs: structuredClone(entity.data.inputs) }
-      : {
-          title: entity.title,
-          rationale: entity.data.rationale,
-          ...(entity.kind === "Assumption"
+    isInterface
+      ? {
+          data_contract: entity.data.data_contract
             ? {
-                impact: entity.data.impact,
-                confidence: entity.data.confidence,
-                validation_plan: entity.data.validation_plan,
+                ...structuredClone(entity.data.data_contract),
+                source_rate: entity.data.data_contract.source_rate || {
+                  value: "",
+                  unit: "Mbit/s",
+                },
+                sink_capacity: entity.data.data_contract.sink_capacity || {
+                  value: "",
+                  unit: "Mbit/s",
+                },
               }
-            : {
-                level: entity.data.level,
-                priority: entity.data.priority,
-                verification_method: entity.data.verification_method,
-              }),
-        },
+            : emptyContract(),
+        }
+      : parameter
+        ? { inputs: structuredClone(entity.data.inputs) }
+        : {
+            title: entity.title,
+            rationale: entity.data.rationale,
+            ...(entity.kind === "Assumption"
+              ? {
+                  impact: entity.data.impact,
+                  confidence: entity.data.confidence,
+                  validation_plan: entity.data.validation_plan,
+                }
+              : {
+                  level: entity.data.level,
+                  priority: entity.data.priority,
+                  verification_method: entity.data.verification_method,
+                }),
+          },
   );
   const criterion: any =
     "criterion" in changes ? changes.criterion : entity.data.criterion;
@@ -211,7 +236,12 @@ export default function DesignEditor({
   if (!editing)
     return (
       <button className="secondary" onClick={() => setEditing(true)}>
-        Edit {parameter ? "calculation inputs" : entity.kind.toLowerCase()}
+        Edit{" "}
+        {isInterface
+          ? "interface data contract"
+          : parameter
+            ? "calculation inputs"
+            : entity.kind.toLowerCase()}
       </button>
     );
   return (
@@ -222,9 +252,15 @@ export default function DesignEditor({
         setSaving(true);
         setError("");
         try {
+          const payload = structuredClone(changes);
+          if (isInterface && payload.data_contract) {
+            const contract = payload.data_contract as any;
+            for (const field of ["source_rate", "sink_capacity"])
+              if (contract[field]?.value === "") contract[field] = null;
+          }
           const result = await request(
             `/missions/${missionId}/objects/${entity.id}/edit`,
-            { revision: targetRevision, changes, reason },
+            { revision: targetRevision, changes: payload, reason },
           );
           onProposed(result);
         } catch (e) {
@@ -245,7 +281,139 @@ export default function DesignEditor({
           {error}
         </p>
       )}
-      {parameter ? (
+      {isInterface ? (
+        <fieldset>
+          <legend>Point-to-point data contract</legend>
+          <p>
+            Declare each endpoint's protocol and rate. Blank values stay
+            unverified. These limits are separate from payload/link budgets and
+            narrative interface text.
+          </p>
+          {changes.data_contract ? (
+            <>
+              {["source_endpoint", "sink_endpoint"].map((field) => (
+                <label key={field}>
+                  {field === "source_endpoint"
+                    ? "Sender endpoint"
+                    : "Receiver endpoint"}
+                  <select
+                    aria-label={
+                      field === "source_endpoint"
+                        ? "Sender endpoint"
+                        : "Receiver endpoint"
+                    }
+                    value={(changes.data_contract as any)[field]}
+                    onChange={(e) =>
+                      setChanges({
+                        data_contract: {
+                          ...(changes.data_contract as any),
+                          [field]: e.target.value,
+                        },
+                      })
+                    }
+                  >
+                    {entity.data.endpoints.map((id: string) => (
+                      <option key={id} value={id}>
+                        {id}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+              {["source_protocol", "sink_protocol"].map((field) => (
+                <label key={field}>
+                  {field === "source_protocol"
+                    ? "Sender protocol"
+                    : "Receiver protocol"}
+                  <input
+                    maxLength={120}
+                    value={(changes.data_contract as any)[field] || ""}
+                    onChange={(e) =>
+                      setChanges({
+                        data_contract: {
+                          ...(changes.data_contract as any),
+                          [field]: e.target.value || null,
+                        },
+                      })
+                    }
+                  />
+                </label>
+              ))}
+              {["source_rate", "sink_capacity"].map((field) => (
+                <div key={field} className="quantity-fields">
+                  <label>
+                    {field === "source_rate"
+                      ? "Sender peak rate"
+                      : "Receiver capacity"}
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      value={(changes.data_contract as any)[field]?.value ?? ""}
+                      onChange={(e) =>
+                        setChanges({
+                          data_contract: {
+                            ...(changes.data_contract as any),
+                            [field]: {
+                              ...(changes.data_contract as any)[field],
+                              value:
+                                e.target.value === ""
+                                  ? ""
+                                  : Number(e.target.value),
+                            },
+                          },
+                        })
+                      }
+                    />
+                  </label>
+                  <label>
+                    {field === "source_rate"
+                      ? "Sender rate unit"
+                      : "Receiver capacity unit"}
+                    <input
+                      required
+                      value={
+                        (changes.data_contract as any)[field]?.unit || "Mbit/s"
+                      }
+                      onChange={(e) =>
+                        setChanges({
+                          data_contract: {
+                            ...(changes.data_contract as any),
+                            [field]: {
+                              ...(changes.data_contract as any)[field],
+                              unit: e.target.value,
+                            },
+                          },
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+              ))}
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => setChanges({ data_contract: null })}
+              >
+                Clear data contract
+              </button>
+            </>
+          ) : (
+            <>
+              <p>
+                No structured contract will be retained; compatibility remains
+                unverified.
+              </p>
+              <button
+                type="button"
+                onClick={() => setChanges({ data_contract: emptyContract() })}
+              >
+                Add data contract
+              </button>
+            </>
+          )}
+        </fieldset>
+      ) : parameter ? (
         <QuantityFields value={changes.inputs} update={update} />
       ) : (
         Object.entries(changes)

@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.9. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.10. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -62,11 +62,15 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-ARC-002 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-003 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-004 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
-| MF-ARC-005 | Deferred | Reference functional/physical records and interface drilldown; no general compatibility engine. |
+| MF-ARC-005 | Partial | Declared point-to-point data contracts check endpoint identity/roles, protocol-name equality and peak-rate capacity. Electrical, timing, packet-format, mechanical, thermal and power checks remain deferred. |
 | MF-ARC-006 | Implemented | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-007 | Implemented | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-008 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-009 | Deferred | Reference functional/physical records and interface drilldown; no general compatibility engine. |
+| MF-ARC-010 | Implemented | DataContract schema and reviewed Interface edits; optional protocol/rate declarations and unit validation. |
+| MF-ARC-011 | Implemented | services/interface_checks.py records checks, reasons, source and endpoint evidence; test_interface_checks.py covers comparisons, unknowns, missing endpoints and stale states. |
+| MF-ARC-012 | Implemented | Human edit authority, dependency invalidation, fresh selection/baseline guards, baseline outstanding_interfaces and immutable-export regression. |
+| MF-ARC-013 | Implemented | InterfaceChecks view and DesignEditor contract fields; stale hiding unit test and interfaces.spec.ts review/correction browser workflow. Explicit scoped limitations remain visible. |
 | MF-ANL-001 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |
 | MF-ANL-002 | Implemented | Versioned executions record accepted inputs/units, source revision, elapsed time, outputs and failures; test_iteration.py. |
 | MF-ANL-003 | Implemented | Tested resource budgets and circular orbit; sampled point coverage/station access added. Full regional coverage, operational latency and lifetime remain unverified. |

@@ -1,0 +1,15 @@
+# Declared data-interface checks
+
+The structured contract is published as [JSON Schema](data-interface-contract.schema.json).
+
+This Phase 2 increment covers the reference mission's shared payload-to-bus point-to-point data interface. An optional `Interface.data.data_contract` identifies sender and receiver using the existing endpoint IDs, declared protocol names, sender peak data rate and receiver capacity. The typed DataContract validates unit-bearing, finite, nonnegative bit rates. Blank protocol names and absent rates remain unknown. Existing interfaces are not silently assigned new limits from prose.
+
+Checks resolve two distinct Component endpoints, verify that sender/receiver roles agree with the endpoint list, compare trimmed case-insensitive protocol names, and compare sender peak rate with receiver capacity in bit/s. Matching names are only a declared compatibility check; they do not certify a protocol implementation. A negative capacity margin fails. Missing values remain unverified. Unsupported/invalid structured evidence cannot pass. Stale dependencies take precedence over old outcomes; unaccepted objects cannot produce current verified conclusions.
+
+The workflow writes a `VerificationItem` with `check_type=interface_consistency`, tool/version, model/interface source revisions, input contract, endpoint identities/states/revisions, per-check reasons and limitations. Its dependency relationships reference the interface and endpoints. Interface or endpoint edits invalidate the evidence transitively. Human interface edits are restricted to `data_contract`; proposal validation applies the typed schema before approval. Existing narratives, endpoints and unrelated budgets are preserved.
+
+Calculations and baseline creation refresh checks. Selection and baseline guards recompute from current objects instead of trusting an editable status field. Shared failed or stale checks block both candidates. Unverified checks permit a conceptual baseline but are explicitly retained in `baseline-approval.data.outstanding_interfaces`. Selection depends directly on interfaces so an approved contract edit invalidates an earlier selection. Baselines keep their recorded snapshots.
+
+The Interfaces tab shows per-interface check reasons and links to recorded evidence. Stale conclusions are hidden. Inspect an interface and choose **Edit interface data contract** to propose values; review and approve, then recalculate (automatic while the workflow is running). Existing baselines must reopen before edits. Historical snapshots without recorded checks stay unverified until a subsequent calculation records evidence.
+
+These checks do not analyze electrical signaling, pinouts, voltage/current, packet formats, timing, endianness, backpressure, buffering, thermal or mechanical properties. Protocol-name agreement and rate allocations are owner-approved declarations. They are not automatically coupled to payload/link budgets or narrative direction/medium strings. General interface creation/topology editing and ICD generation remain outside this increment. No database migration or new external dependency is required.

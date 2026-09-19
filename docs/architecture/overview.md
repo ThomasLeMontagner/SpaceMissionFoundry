@@ -4,6 +4,8 @@ Delivery sensitivity studies run as read-only calculations over the current reco
 
 ## Vertical slice
 
+Point-to-point data interfaces now support reviewed structured protocol/rate declarations and deterministic consistency checks. Evidence participates in dependency invalidation and selection/baseline guards; missing declarations remain explicitly unverified. See [interface checks and limitations](interface-checks.md).
+
 1. Domain schema and proposal invariants.
 2. Transactional SQL storage, revisions, relationships and migrations.
 3. Unit-aware tools and fixed six-role reference workflow.

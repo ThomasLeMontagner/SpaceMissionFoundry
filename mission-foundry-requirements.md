@@ -2,9 +2,9 @@
 
 ## System Requirements Specification
 
-**Version:** 0.9
+**Version:** 0.10
 
-**Status:** Requirements revision — reviewed design changes from saved trials
+**Status:** Requirements revision — declared data-interface consistency checks
 
 **Date:** 2026-09-18
 
@@ -204,6 +204,10 @@ Quantitative verification scope for version 0.2: the initial metric registry cov
 | MF-ARC-007 | Every architecture candidate shall identify its driving assumptions, expected benefits, disadvantages, major risks, and resource estimates. | Must | Inspection |
 | MF-ARC-008 | The system shall generate synchronized functional, physical, and interface views from the model. | Must | Demonstration |
 | MF-ARC-009 | The system should generate an initial interface-control document from accepted model data. | Should | Demonstration |
+| MF-ARC-010 | Point-to-point data interfaces shall support explicitly approved sender and receiver endpoint roles, protocol names, sender peak rate and receiver capacity, with validated compatible rate units. Missing protocol/rate values shall be representable without substituting assumed performance. | Must | Test |
+| MF-ARC-011 | The system shall record deterministic checks for distinct resolvable component endpoints, consistent sender/receiver roles, matching declared protocol names, and sender peak rate not exceeding receiver capacity. Evidence shall include source revisions, declared inputs, endpoint states, check reasons, and pass/fail/unverified/stale status. Missing or invalid evidence shall not produce a pass. | Must | Test |
+| MF-ARC-012 | Interface-contract edits shall use the reviewed design-change workflow and invalidate dependent checks and decisions. Recalculation shall refresh evidence. Known failed or stale interface checks shall block concept selection and baseline approval; unverified interfaces shall be identified as outstanding in a conceptual baseline. Historical baselines shall remain immutable. | Must | Test |
+| MF-ARC-013 | The workbench shall show interface checks, evidence and editable data contracts, hiding stale conclusions. It shall distinguish declared protocol/rate compatibility from electrical, timing, packet-format, power, mechanical and thermal verification, and shall not infer numeric limits or protocol compatibility from narrative text or unrelated budgets. | Must | Demonstration |
 
 ### 7.6 Engineering analyses and budgets
 

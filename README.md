@@ -4,6 +4,10 @@ Open **Sensitivity analysis** after calculating delivery results to compare stor
 
 To use a saved study result, open it under **Sensitivity analysis → Saved studies**, then choose **Propose trial** beside the desired value. Reopen a baseline first if necessary. Review the current/proposed quantities, enter a rationale, and submit the proposal; the normal **Approve design change** step applies it and triggers recalculation. If the source assumptions have changed, run and save a new study before proposing its result. Saved evidence and old baselines remain unchanged.
 
+## Data interface checks
+
+Open **Interfaces** to inspect declared sender/receiver compatibility. Select **Inspect or edit interface contract → Edit interface data contract**, declare each endpoint's protocol and peak-rate/capacity limits, then submit and approve the change. Blank values remain unverified. Failed protocol, endpoint or rate checks block concept selection; unknown checks remain outstanding in a conceptual baseline. Reopen a baseline before editing. These checks cover declared data compatibility, not physical hardware verification; [scope and evidence](docs/architecture/interface-checks.md).
+
 ## Archive and restore saved missions
 
 Use **Archive** beside a saved mission, or **Archive mission** inside its workspace, and confirm the action. It disappears from the active list. Select **Show archived missions** and **Restore** to bring it back. Archiving keeps the mission's workflow, pending proposals, history and immutable baseline exports; it does not permanently delete any data. Archived missions cannot be edited until restored. Both actions are recorded in history.
