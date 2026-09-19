@@ -2,6 +2,8 @@
 
 The structured contract is published as [JSON Schema](data-interface-contract.schema.json).
 
+Proposal validation requires endpoint lists containing nonblank string object IDs. Malformed legacy endpoint data produces a failed endpoint check instead of a calculation exception; the evidence retains the original value. Endpoint existence, distinctness and component kind remain deterministic checks, not inferred repairs.
+
 This Phase 2 increment covers the reference mission's shared payload-to-bus point-to-point data interface. An optional `Interface.data.data_contract` identifies sender and receiver using the existing endpoint IDs, declared protocol names, sender peak data rate and receiver capacity. The typed DataContract validates unit-bearing, finite, nonnegative bit rates. Blank protocol names and absent rates remain unknown. Existing interfaces are not silently assigned new limits from prose.
 
 Checks resolve two distinct Component endpoints, verify that sender/receiver roles agree with the endpoint list, compare trimmed case-insensitive protocol names, and compare sender peak rate with receiver capacity in bit/s. Matching names are only a declared compatibility check; they do not certify a protocol implementation. A negative capacity margin fails. Missing values remain unverified. Unsupported/invalid structured evidence cannot pass. Stale dependencies take precedence over old outcomes; unaccepted objects cannot produce current verified conclusions.

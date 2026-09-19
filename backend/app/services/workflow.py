@@ -99,9 +99,7 @@ class Workflow:
         if action == "accept":
             accept(m, p)
             if any(
-                op.action == "replace"
-                and op.entity.kind in ["Assumption", "Requirement", "Parameter", "Interface"]
-                for op in p.operations
+                op.action == "replace" and op.entity.kind in IMPACT_KINDS for op in p.operations
             ):
                 self.after_change(m)
             elif p.proposal_type == "assumptions":
@@ -354,6 +352,7 @@ class Workflow:
     def select(self, id, revision, candidate, weights, reason):
         old = self.store.get(id)
         self.guard(old, revision)
+        self.no_pending(old)
         if old.phase != "Trade study" or candidate not in ["wide", "selective"]:
             raise ValueError("Selection requires analyzed alternatives and a trade study")
         guard_candidate(old, candidate)

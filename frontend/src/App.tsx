@@ -954,6 +954,11 @@ export default function App() {
                     onChange={(e) => setReason(e.target.value)}
                   />
                 </label>
+                {pending.length > 0 && (
+                  <p className="notice">
+                    Resolve pending proposals before selecting a concept.
+                  </p>
+                )}
                 <div className="actions">
                   {["wide", "selective"].map((candidate) => {
                     const compliant = ["mass", "power", "data", "link"].every(
@@ -983,6 +988,7 @@ export default function App() {
                         <button
                           disabled={
                             busy ||
+                            pending.length > 0 ||
                             !compliant ||
                             failedRequirements ||
                             failedInterfaces

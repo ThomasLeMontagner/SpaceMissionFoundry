@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.10. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.10.1. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -20,7 +20,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-AGT-001 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-002 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-003 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-004 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
+| MF-AGT-004 | Implemented | Structured proposal validation, stage phase/role/content guards at submission and acceptance, and interface endpoint shape validation; test_workflow_sanity.py. Fully discriminated payload schemas remain deferred. |
 | MF-AGT-005 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-006 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
 | MF-AGT-007 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
@@ -40,7 +40,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MDL-006 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-007 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-008 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
-| MF-MDL-009 | Implemented | Transitive invalidation, human impact review and recalculation of the reference model; test_iteration.py. |
+| MF-MDL-009 | Implemented | Transitive invalidation, human impact review and recalculation for engineering replacements including custom component proposals; test_iteration.py and test_workflow_sanity.py. |
 | MF-MDL-010 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-011 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-REQ-001 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
@@ -115,7 +115,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-TRD-004 | Implemented | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-TRD-005 | Partial | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-TRD-006 | Implemented | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
-| MF-TRD-007 | Implemented | Input changes stale dependent selection decisions and force recalculation and reselection; test_iteration.py. |
+| MF-TRD-007 | Implemented | Input/design changes stale dependent selection decisions and force recalculation and reselection. API and UI block selection with pending proposals; test_workflow_sanity.py and interfaces.spec.ts. |
 | MF-TRD-008 | Deferred | Editable weights and deterministic totals over explicit estimated scores; no automatic sensitivity sweep. |
 | MF-REV-001 | Implemented | One concept review with seeded defect and verified evidence correction; no broad finding lifecycle editor. |
 | MF-REV-002 | Partial | One concept review with seeded defect and verified evidence correction; no broad finding lifecycle editor. |

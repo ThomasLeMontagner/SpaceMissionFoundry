@@ -5,6 +5,14 @@ from app.domain.models import Strict
 from app.engineering_tools.calculations import q
 
 
+def validate_endpoints(value):
+    if not isinstance(value, list) or any(
+        not isinstance(endpoint, str) or not endpoint.strip() for endpoint in value
+    ):
+        raise ValueError("Interface endpoints must be a list of nonblank object IDs")
+    return value
+
+
 class DataContract(Strict):
     source_endpoint: str = Field(min_length=1, max_length=120)
     sink_endpoint: str = Field(min_length=1, max_length=120)

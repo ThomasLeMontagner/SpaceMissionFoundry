@@ -1,6 +1,6 @@
 """Deterministic checks of explicitly declared point-to-point data contracts."""
 
-from app.domain.interfaces import DataContract
+from app.domain.interfaces import DataContract, validate_endpoints
 from app.domain.models import Relation
 from app.engineering_tools.calculations import q
 from app.orchestration.scenario import entity
@@ -14,6 +14,10 @@ def evaluate(model, interface):
     def add(key, status, reason, **evidence):
         checks.append(dict(check=key, status=status, reason=reason, **evidence))
 
+    try:
+        validate_endpoints(endpoints)
+    except ValueError:
+        endpoints = []
     if len(endpoints) != 2 or len(set(endpoints)) != 2:
         add("endpoints", "fail", "A point-to-point data interface requires two distinct endpoints.")
     else:
@@ -117,7 +121,7 @@ def evaluate(model, interface):
         tool_version="1.0",
         source_revision=model.revision,
         interface_revision=interface.revision,
-        inputs=dict(endpoints=endpoints, data_contract=raw),
+        inputs=dict(endpoints=interface.data.get("endpoints"), data_contract=raw),
         endpoint_evidence=[
             dict(
                 id=key,

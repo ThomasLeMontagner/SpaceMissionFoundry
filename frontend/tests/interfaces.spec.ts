@@ -55,6 +55,20 @@ test("review an interface contract, expose stale checks, block mismatch and corr
   await page
     .getByRole("button", { name: "Propose change", exact: true })
     .click();
+  await expect(
+    page.getByRole("button", { name: "Resume", exact: true }),
+  ).toBeEnabled();
+  await page.getByRole("button", { name: "Trades", exact: true }).click();
+  await expect(
+    page.getByText("Resolve pending proposals before selecting a concept."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Select B · Event-selective imaging + X-band",
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Interfaces", exact: true }).click();
   await page
     .getByRole("button", { name: "Approve design change", exact: true })
     .click();

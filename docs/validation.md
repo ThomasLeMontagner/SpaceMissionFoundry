@@ -1,5 +1,14 @@
 # Validation record — 2026-09-09
 
+## Business-logic sanity fixes — 2026-09-19
+
+- Full SQLite backend regression: 95 passed, one PostgreSQL-only skip.
+- Added 12 passing backend regression cases for pending-proposal selection blocking without revision changes, successful subsequent approval, custom component replacements entering impact review and recalculation, stage-label/phase/content mismatches, and malformed interface endpoint rejection with safe legacy evaluation.
+- Frontend unit tests: 22 passed. All seven browser workflows passed; the interface workflow now checks the pending-proposal notice and disabled selection before approving the unchanged proposal.
+- The parallel browser run logged transient SQLite database-lock errors while using the shared browser-test database, although every workflow passed. SQLite contention remains a separate limitation; these fixes do not change persistence concurrency or claim to resolve that behavior.
+- Ruff lint/format, TypeScript/Vite production build, Prettier and patch whitespace checks passed. The local app was restarted and its read-only scenario endpoint checked. PostgreSQL was not rerun, and no user mission data was edited.
+- Requirements clarification version 0.10.1 updates MF-AGT-004, MF-MDL-009 and MF-TRD-007 with corresponding traceability. No schema migration or dependency change was needed.
+
 ## Declared data-interface consistency — 2026-09-18
 
 - Full SQLite backend regression: 83 passed, one PostgreSQL-only skip. Four new tests cover reviewed contract edits, compatible rate units, missing declarations, protocol/rate/endpoint failures, stale dependencies, selection guards, outstanding baseline evidence and unchanged historical exports.

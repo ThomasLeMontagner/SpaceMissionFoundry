@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.10
+**Version:** 0.10.1
 
-**Status:** Requirements revision — declared data-interface consistency checks
+**Status:** Requirements clarification — proposal validation and workflow consistency
 
-**Date:** 2026-09-18
+**Date:** 2026-09-19
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -140,7 +140,7 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-AGT-001 | Every agent shall have a versioned definition containing its role, objective, responsibilities, authority, constraints, required inputs, required outputs, and permitted tools. | Must | Inspection |
 | MF-AGT-002 | The orchestrator shall assign work according to dependencies in the engineering workflow rather than invoking every agent indiscriminately. | Must | Test |
 | MF-AGT-003 | An agent shall receive the relevant current model state and referenced artifacts, not rely solely on the conversation transcript. | Must | Test |
-| MF-AGT-004 | Agent outputs that modify the design shall use schema-valid structured proposals. | Must | Test |
+| MF-AGT-004 | Agent outputs that modify the design shall use schema-valid structured proposals. Proposals that advance a workflow stage shall match the current phase, authorized role and permitted operation contents at submission and acceptance. | Must | Test |
 | MF-AGT-005 | The system shall reject malformed or unauthorized model mutations without corrupting the current model. | Must | Test |
 | MF-AGT-006 | The system shall record the originating agent, model, agent-definition version, timestamp, inputs, tool calls, and result for every agent run. | Must | Inspection |
 | MF-AGT-007 | Agents shall be able to accept, challenge, counter-propose, or request clarification on another agent's proposal. | Must | Demonstration |
@@ -165,7 +165,7 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-MDL-006 | The system shall retain the complete before-and-after history of every accepted model mutation. | Must | Test |
 | MF-MDL-007 | The system shall prevent deletion from silently removing traceability links or historical evidence. | Must | Test |
 | MF-MDL-008 | All user-interface views and generated reports shall derive from the same authoritative model revision. | Must | Test |
-| MF-MDL-009 | The system shall identify stale downstream objects when an upstream assumption, requirement, parameter, or analysis changes. | Must | Test |
+| MF-MDL-009 | The system shall identify stale downstream objects when an upstream assumption, requirement, parameter, analysis or other engineering design object changes. Approved replacements shall route affected design content through impact review and dependent calculations through recalculation, regardless of the proposal label. | Must | Test |
 | MF-MDL-010 | The system should support branches for competing architecture alternatives. | Should | Demonstration |
 | MF-MDL-011 | The system should allow comparison and controlled merging of model branches. | Should | Demonstration |
 
@@ -269,7 +269,7 @@ Preliminary access scope for version 0.4: one shared circular orbit and nadir-ce
 | MF-TRD-004 | The system shall distinguish the agent recommendation from the human decision. | Must | Test |
 | MF-TRD-005 | Every accepted design decision shall include context, considered alternatives, rationale, approving authority, consequences, and linked evidence. | Must | Test |
 | MF-TRD-006 | Rejected alternatives and dissenting agent opinions shall remain available in the historical record. | Must | Inspection |
-| MF-TRD-007 | A change that invalidates a decision premise shall reopen or flag the decision for review. | Must | Test |
+| MF-TRD-007 | A change that invalidates a decision premise shall reopen or flag the decision for review. Concept selection shall be blocked while proposals are pending, preserving their reviewed target revision. | Must | Test |
 | MF-TRD-008 | The system should support Pareto views for multi-objective trades. | Should | Demonstration |
 
 ### 7.9 Conflict management and design reviews
