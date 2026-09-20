@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.10.1. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.10.2. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -165,6 +165,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-NFR-REL-002 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-REL-003 | Partial | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-REL-004 | Partial | See architecture and README limitations; local single-owner reference workflow only. |
+| MF-NFR-REL-005 | Implemented | SQLite WAL and bounded busy timeout, atomic revision writes, BEGIN IMMEDIATE saved-study validation, and HTTP 503 contention response; test_sqlite_concurrency.py covers overlapping readers/writers, stale writes, archive/edit races, rollback and retry. |
 | MF-NFR-AUD-001 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-AUD-002 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-AUD-003 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |

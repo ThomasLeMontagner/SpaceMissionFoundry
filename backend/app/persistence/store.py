@@ -64,8 +64,27 @@ class Store:
     def __init__(self, url=None):
         url = url or os.getenv("DATABASE_URL", "sqlite:///./mission-foundry.db")
         self.engine = create_engine(
-            url, connect_args={"check_same_thread": False} if url.startswith("sqlite") else {}
+            url,
+            connect_args={"check_same_thread": False, "timeout": 30}
+            if url.startswith("sqlite")
+            else {},
         )
+        if self.engine.dialect.name == "sqlite":
+            event.listen(self.engine, "connect", self.configure_sqlite)
+
+    @staticmethod
+    def configure_sqlite(connection, record):
+        # Keep readers independent of commits without weakening synchronous durability.
+        cursor = connection.cursor()
+        try:
+            cursor.execute("PRAGMA busy_timeout=30000")
+            mode = cursor.execute("PRAGMA journal_mode").fetchone()[0]
+            if mode not in ["wal", "memory"]:
+                actual = cursor.execute("PRAGMA journal_mode=WAL").fetchone()[0]
+                if actual != "wal":
+                    raise ValueError("File-backed SQLite requires WAL journal mode")
+        finally:
+            cursor.close()
 
     def initialize(self):
         Base.metadata.create_all(self.engine)
@@ -79,6 +98,10 @@ class Store:
 
     def save_study(self, mission_id, name, result):
         with Session(self.engine) as s, s.begin():
+            if self.engine.dialect.name == "sqlite":
+                # SQLite ignores FOR UPDATE. Reserve its writer before reading the
+                # revision so a design change cannot commit between check and insert.
+                s.connection().exec_driver_sql("BEGIN IMMEDIATE")
             mission = s.get(MissionRow, mission_id, with_for_update=True)
             if not mission:
                 raise KeyError("Mission does not exist")

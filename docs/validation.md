@@ -1,5 +1,13 @@
 # Validation record — 2026-09-09
 
+## SQLite contention and study-save consistency — 2026-09-20
+
+- Full SQLite backend regression: 102 passed, one PostgreSQL-only skip. Seven added cases cover a reader snapshot surviving a concurrent commit, two competing updates accepting exactly one revision, saved-study insertion waiting for an edit or archive then rejecting the outdated source, API lock exhaustion rolling back with HTTP 503 and succeeding on retry, in-memory compatibility, and unrelated operational errors remaining server errors. Original revision and baseline snapshots remain unchanged.
+- All seven Playwright workflows passed using two workers (1.3 minutes). The captured server log contained no SQLite lock or OperationalError messages. This checks the workload that previously showed contention; it does not guarantee unlimited concurrent writes.
+- Ruff lint/format and patch whitespace checks passed. Frontend source and dependencies were unchanged, so unit/build checks were not rerun. PostgreSQL was not rerun; its existing row-lock path is unchanged.
+- The local app was started, its mission-list endpoint was read successfully, and the database journal mode was verified as WAL. No user mission records were edited. The connection policy requires no table migration. SQLite still has a single writer; bounded waiting, explicit retry responses and backup constraints are documented in `docs/architecture/sqlite-concurrency.md`.
+- Specification version 0.10.2 adds MF-NFR-REL-005 and matching traceability. Saved-study revision/archive checks now run under a SQLite write reservation; no engineering action is automatically replayed.
+
 ## Business-logic sanity fixes — 2026-09-19
 
 - Full SQLite backend regression: 95 passed, one PostgreSQL-only skip.

@@ -2,10 +2,12 @@ import asyncio
 import hmac
 import json
 import os
+import sqlite3
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
 from pydantic import Field
+from sqlalchemy.exc import OperationalError
 
 from app.domain.models import Proposal, Strict
 from app.domain.requirement_checks import METRICS
@@ -89,6 +91,28 @@ def create_app(store=None):
     service = Workflow(store)
     app = FastAPI(title="Mission Foundry", version="0.1.0", dependencies=[Depends(authorize)])
     app.state.store = store
+
+    @app.exception_handler(OperationalError)
+    async def database_busy(request, exc):
+        code = getattr(exc.orig, "sqlite_errorcode", None)
+        if (
+            isinstance(exc.orig, sqlite3.Error)
+            and code is not None
+            and (code & 0xFF)
+            in (
+                sqlite3.SQLITE_BUSY,
+                sqlite3.SQLITE_LOCKED,
+            )
+        ):
+            return Response(
+                json.dumps(
+                    {"detail": "Database is busy. Reload the mission and retry the action."}
+                ),
+                status_code=503,
+                media_type="application/json",
+                headers={"Retry-After": "1"},
+            )
+        raise exc
 
     @app.exception_handler(ValueError)
     async def invalid(request, exc):

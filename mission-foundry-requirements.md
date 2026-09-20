@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.10.1
+**Version:** 0.10.2
 
-**Status:** Requirements clarification — proposal validation and workflow consistency
+**Status:** Requirements clarification — SQLite concurrency and recoverable contention
 
-**Date:** 2026-09-19
+**Date:** 2026-09-20
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -353,6 +353,7 @@ Baseline comparison scope for version 0.3: comparisons use immutable, mission-sc
 | MF-NFR-REL-002 | Retrying an operation shall not create duplicate accepted proposals or model objects. | Must |
 | MF-NFR-REL-003 | The system shall validate persisted model data against a versioned schema. | Must |
 | MF-NFR-REL-004 | The system shall provide recoverable checkpoints during long-running workflows. | Must |
+| MF-NFR-REL-005 | File-backed local SQLite storage shall allow committed writes while readers retain consistent snapshots, bound waits for write contention, and return an actionable retry response when lock waits expire. Competing mission updates shall retain optimistic revision checks and atomic history. Saved-study insertion shall check source revision and archive state under the same write transaction. | Must |
 
 ### 8.2 Auditability and reproducibility
 
