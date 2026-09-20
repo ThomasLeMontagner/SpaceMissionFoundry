@@ -1,6 +1,8 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.10.2. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.11. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+
+Agent collaboration and progress monitoring (specification section 7.14) is planned alongside the first genuine design-agent loop. Existing scripted agent runs, model revision events, approval controls and replay are reusable foundations, not evidence that live LLM collaboration is implemented. The current optional LLM adapter only refines proposal rationale.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -147,6 +149,19 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-UI-012 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-013 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-014 | Deferred | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
+| MF-COL-001 | Planned | Agent team view with task, status and source revision; existing AgentRun records are only a foundation. |
+| MF-COL-002 | Planned | Structured task and collaboration events with durable identifiers and correlation. |
+| MF-COL-003 | Planned | Sender/recipient, purpose, affected objects and request/reply links. |
+| MF-COL-004 | Planned | Live collaboration timeline with agent/task/event/object filters. |
+| MF-COL-005 | Planned | Recorded action explanations linked to evidence and proposals; existing object inspection is reusable. |
+| MF-COL-006 | Planned | Explicit distinction between simulation, live execution, proposed data and accepted data across collaboration views. |
+| MF-COL-007 | Planned | Disagreements, competing alternatives and unresolved questions linked to progress and review readiness. |
+| MF-COL-008 | Planned | Waiting/blocked task dependencies with reasons and responsible roles. |
+| MF-COL-009 | Planned | Existing approval/pause controls extended to genuine agent tasks and clarification exchanges. |
+| MF-COL-010 | Planned | Durable collaboration event recovery and historical replay; current model replay does not yet cover these exchanges. |
+| MF-COL-011 | Planned | Source-revision tracking and stale-work handling for active agent tasks, building on current proposal revision guards. |
+| MF-COL-012 | Planned | Duration, tokens and cost with explicit measurement basis and unknown values; aggregate provider accounting is not implemented. |
+| MF-COL-013 | Planned | Interactive agent dependency/request/disagreement graph; Should priority after core views. |
 | MF-IO-001 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-002 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-003 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |

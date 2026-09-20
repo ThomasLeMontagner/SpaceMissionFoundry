@@ -2,9 +2,9 @@
 
 ## System Requirements Specification
 
-**Version:** 0.10.2
+**Version:** 0.11
 
-**Status:** Requirements clarification — SQLite concurrency and recoverable contention
+**Status:** Requirements revision — agent collaboration and progress monitoring (planned)
 
 **Date:** 2026-09-20
 
@@ -343,6 +343,46 @@ Baseline comparison scope for version 0.3: comparisons use immutable, mission-sc
 | MF-EVL-006 | The system should allow two agent configurations or model versions to be compared on the same scenario. | Should | Demonstration |
 | MF-EVL-007 | The system should detect when an agent cites nonexistent evidence, exceeds its authority, or accepts an unsupported numerical result. | Should | Test |
 
+### 7.14 Agent collaboration and progress monitoring
+
+The user shall be able to understand who is doing what, why agents are interacting, what evidence supports their proposals, and where human intervention is needed. This capability accompanies a genuine design-agent loop: agents interpret the brief, request missing information, generate structured proposals beyond the fixed reference template, invoke validated engineering tools, review one another's proposals, and revise them in response to constraints and findings. Human approval remains required for accepted design changes and baselines.
+
+Implementation boundary: the current application provides a scripted reference workflow, deterministic calculations, recorded agent runs and human approvals. Its optional LLM adapter refines proposal rationale only. Those foundations do not constitute the genuine design-agent loop or the live collaboration feature specified here.
+
+| ID | Requirement | Priority | Verification |
+|---|---|---:|---|
+| MF-COL-001 | The system shall display each agent's role, assigned task, current status and source mission revision. Statuses shall distinguish waiting, working, running a tool, reviewing, blocked, awaiting human approval, completed and failed work. | Must | Demonstration |
+| MF-COL-002 | The system shall record task starts, completions, failures, tool executions, proposals, review requests, objections and decisions as structured events with stable identifiers, timestamps and mission/task correlation. | Must | Test |
+| MF-COL-003 | Each collaboration exchange shall identify its sender, recipient, affected design objects and purpose, and link replies or follow-up actions to the originating request. | Must | Test |
+| MF-COL-004 | The workbench shall present a live collaboration timeline with filters by agent, task, event type and design object. | Must | Demonstration |
+| MF-COL-005 | The workbench shall show concise explanations of recorded actions and decisions, with links to applicable assumptions, calculations, sources and proposed changes. | Must | Demonstration |
+| MF-COL-006 | The workbench shall distinguish proposed changes from accepted design data and simulated or recorded-fixture activity from actual model and tool execution. | Must | Test |
+| MF-COL-007 | The workbench shall show disagreements, competing alternatives and unresolved questions, including their effect on task progress and review readiness. | Must | Demonstration |
+| MF-COL-008 | Waiting or blocked work shall identify the unmet dependency, the reason work cannot proceed and the agent or human role able to resolve it. | Must | Test |
+| MF-COL-009 | The user shall be able to pause future work, challenge proposals, provide clarification, and approve or reject changes through the existing authority and approval rules. The interface shall distinguish a requested pause from any already-running work that has not stopped. | Must | Test |
+| MF-COL-010 | Collaboration activity shall survive refreshes and reconnects without lost or duplicated displayed events, and support historical replay without modifying the current design. Historical activity shall be distinguishable from live activity. | Must | Test |
+| MF-COL-011 | The system shall identify agent work based on outdated mission revisions and prevent stale results from being silently accepted. It shall show when review, replanning or recalculation is required. | Must | Test |
+| MF-COL-012 | The system should display execution duration, token usage, and estimated or provider-reported cost when available, identifying the basis and marking unavailable values as unknown. | Should | Test |
+| MF-COL-013 | The workbench should provide an agent interaction graph showing active dependencies, requests and unresolved disagreements, with navigation to their recorded events and affected design objects. | Should | Demonstration |
+
+Progress shall be expressed through engineering milestones, task completion, evidence availability and explicit blockers. A percentage shall only be shown when its denominator and completion rules are defined; activity volume alone shall not imply design maturity or verified feasibility. For example, “three of five input groups approved; link analysis blocked by missing station assumptions” is an acceptable progress explanation.
+
+Displayed collaboration shall come from actual recorded events, not fabricated conversations or decorative activity indicators. Explanations shall summarize actions, evidence and decisions without exposing private model chain-of-thought, API credentials or authentication tokens. Simulated acceptance fixtures shall be visibly labeled and shall not be presented as evidence of live LLM collaboration.
+
+The implementation shall provide orchestration events and durable task/exchange identities alongside the first genuine design-agent loop. Reusing the existing Agent activity view or revision notifications alone does not satisfy these requirements. The initial implementation should deliver the agent team view, collaboration timeline and milestone/blocker summary together; the interaction graph is a subsequent Should-priority capability.
+
+Acceptance scenario:
+
+1. Payload proposes an observation configuration linked to the mission brief and approved assumptions.
+2. A validated engineering tool identifies a downlink constraint violation and records its inputs, outputs and source revision.
+3. Bus & Ground requests a revision or proposes an alternative; the timeline links this exchange to the failed constraint and Payload's proposal.
+4. Systems compares the options, preserving competing arguments and uncertainty.
+5. Independent Review raises a finding with linked evidence and an explicit effect on review readiness.
+6. The user inspects the evidence, supplies any required clarification, and approves a revised proposal. Proposed values remain separate from accepted design data until approval.
+7. Refreshing, reconnecting and replaying preserve the exchanges and their connection to the resulting design without mutating it. A concurrent source-revision change marks affected work outdated and prevents silent acceptance; tool failure and missing evidence remain visible rather than appearing as completion.
+
+Automated orchestration and UI tests may use clearly labeled mocked or recorded model responses without paid API calls. Verification records shall distinguish these tests from any separately executed live-provider integration run.
+
 ## 8. Non-functional requirements
 
 ### 8.1 Reliability and data integrity
@@ -534,6 +574,7 @@ The acceptance run fails if an unsupported numerical claim is accepted as author
 
 ### Phase 2 — Engineering depth
 
+- Prioritize the first genuine design-agent loop with structured proposals, validated tool use, cross-agent review and revision, and human approval. Implement its agent team view, collaboration timeline and milestone/blocker progress together (MF-COL-001–012); follow with the interaction graph (MF-COL-013).
 - Add orbit/coverage/access analysis.
 - Split the spacecraft-bus role into subsystem agents.
 - Add interface consistency, risk, FMEA, and verification planning.
