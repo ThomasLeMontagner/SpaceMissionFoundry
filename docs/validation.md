@@ -1,5 +1,11 @@
 # Validation record — 2026-09-09
 
+## PostgreSQL saved-study reload test correction — 2026-09-20
+
+- Reproduced the pipeline failure against an isolated PostgreSQL 16 database on localhost port 55447, migrated to head and configured with SCRAM password authentication. The original saved-study reload test failed because `str(engine.url)` substituted a masked password when constructing its second Store.
+- The test now renders the connection URL with credentials preserved for internal connection creation only, and closes the reopened client and engine afterward. No credentials are logged by the fix. Production code, requirements and database schemas are unchanged.
+- Full migrated PostgreSQL regression: 103 passed, including the previously failing reload test and PostgreSQL immutability trigger test. SQLite saved-study regressions: 3 passed. Ruff lint/format and patch whitespace checks passed. The disposable PostgreSQL instance was stopped after verification; no hosted pipeline rerun is claimed.
+
 ## SQLite contention and study-save consistency — 2026-09-20
 
 - Full SQLite backend regression: 102 passed, one PostgreSQL-only skip. Seven added cases cover a reader snapshot surviving a concurrent commit, two competing updates accepting exactly one revision, saved-study insertion waiting for an edit or archive then rejecting the outdated source, API lock exhaustion rolling back with HTTP 503 and succeeding on retry, in-memory compatibility, and unrelated operational errors remaining server errors. Original revision and baseline snapshots remain unchanged.

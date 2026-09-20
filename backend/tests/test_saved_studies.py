@@ -40,9 +40,14 @@ def test_save_reload_scope_archive_and_baseline_integrity(client):
     assert saved["result"]["trials"][1]["deadline_check"]["status"] == "fail"
     assert client.get(base).json() == m
     assert client.get(base + "/export/json").json() == snapshot
-    reopened = TestClient(create_app(Store(str(client.app.state.store.engine.url))))
-    assert reopened.get(base + "/sensitivity-studies/" + saved["id"]).json() == saved
-    assert reopened.get(base + "/sensitivity-studies").json()[0]["id"] == saved["id"]
+    # str(URL) masks passwords; connection reuse must preserve the actual credentials.
+    reopened_store = Store(client.app.state.store.engine.url.render_as_string(hide_password=False))
+    try:
+        with TestClient(create_app(reopened_store)) as reopened:
+            assert reopened.get(base + "/sensitivity-studies/" + saved["id"]).json() == saved
+            assert reopened.get(base + "/sensitivity-studies").json()[0]["id"] == saved["id"]
+    finally:
+        reopened_store.engine.dispose()
     other = create(client)
     assert (
         client.get(f"/api/missions/{other['id']}/sensitivity-studies/{saved['id']}").status_code
