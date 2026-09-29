@@ -37,6 +37,8 @@ export default function CollaborationView({
   const [kind, setKind] = useState("");
   const [task, setTask] = useState("");
   const [query, setQuery] = useState("");
+  const [feedback, setFeedback] = useState("");
+  const [minimumDuty, setMinimumDuty] = useState("");
   const [graph, setGraph] = useState<{
     run: string;
     label: string;
@@ -160,6 +162,8 @@ export default function CollaborationView({
                 setKind("");
                 setTask("");
                 setQuery("");
+                setFeedback("");
+                setMinimumDuty("");
               }}
             >
               {runs.map((r) => (
@@ -177,9 +181,10 @@ export default function CollaborationView({
             · {proposal?.status || data.status}
           </h3>
           <p>
-            Source revision {data.source_revision} · {data.completed.length} of
-            5 execution tasks completed. This measures workflow progress, not
-            mission feasibility. Recorded results describe their source inputs;
+            Revision round {data.round || 0} · Source revision{" "}
+            {data.source_revision} · {data.completed.length} of 5 execution
+            tasks completed. This measures workflow progress, not mission
+            feasibility. Recorded results describe their source inputs;
             subsequent design changes require a new run.
           </p>
           {model.paused && (
@@ -250,6 +255,80 @@ export default function CollaborationView({
               controls to inspect, approve, challenge or reject it. Only
               approval changes accepted inputs; calculations run again
               afterward.
+            </p>
+          )}
+          {(proposal?.status === "challenged" || data.status === "blocked") && (
+            <form
+              className="panel"
+              aria-label="Clarify and revise"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setGraph(null);
+                setAgent("");
+                setKind("");
+                setTask("");
+                setQuery("");
+                act(`/collaboration/${run!.id}/clarify`, {
+                  feedback,
+                  minimum_duty: minimumDuty === "" ? null : Number(minimumDuty),
+                });
+              }}
+            >
+              <h3>Clarify and revise</h3>
+              <p>
+                Explain what the agents should change. A new round preserves
+                earlier evidence and supersedes the challenged proposal. Run the
+                five tasks again; the revised proposal still needs your
+                approval.
+              </p>
+              <label>
+                Revision feedback
+                <textarea
+                  value={feedback}
+                  maxLength={2000}
+                  onChange={(e) => setFeedback(e.target.value)}
+                />
+              </label>
+              <label>
+                Minimum observation duty fraction
+                <input
+                  type="number"
+                  min="0"
+                  max="1"
+                  step="any"
+                  value={minimumDuty}
+                  onChange={(e) => setMinimumDuty(e.target.value)}
+                />
+              </label>
+              <p className="muted">
+                Use 0.035 for 3.5%. Blank retains the previous minimum (
+                {data.minimum_duty ?? "none"}); enter 0 to remove a positive
+                minimum. Simulation applies this numeric constraint but does not
+                interpret free text. Infeasible constraints block submission
+                rather than being silently relaxed.
+              </p>
+              <button
+                disabled={
+                  busy ||
+                  !editable ||
+                  feedback.trim().length < 3 ||
+                  (data.round || 0) >= 3
+                }
+              >
+                Request revised proposal
+              </button>
+              {(data.round || 0) >= 3 && (
+                <p>
+                  Three revision rounds reached. Resolve the pending proposal
+                  and start a new collaboration.
+                </p>
+              )}
+            </form>
+          )}
+          {proposal?.status === "submitted" && (
+            <p className="muted">
+              To request a different design, use Challenge above, then provide
+              clarification here.
             </p>
           )}
           <h3>Collaboration timeline</h3>
@@ -323,6 +402,7 @@ export default function CollaborationView({
                 <p>{e.summary}</p>
                 <small>
                   {e.timestamp} · {labels[e.task]} · source r{e.source_revision}
+                  {` · round ${e.round || 0}`}
                   {e.elapsed_seconds != null
                     ? ` · ${e.elapsed_seconds.toFixed(2)}s`
                     : ""}

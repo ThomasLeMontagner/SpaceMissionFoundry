@@ -8,6 +8,152 @@ from app.agents.design_provider import DutyProposal, propose
 from app.services.collaboration import get_run
 
 
+def pending_collaboration(client):
+    source, model, run_id = start(client)
+    for _ in range(5):
+        model = command(client, model, f"collaboration/{run_id}/step")
+    proposal_id = model["entities"][run_id]["data"]["proposal_id"]
+    return source, model, run_id, proposal_id
+
+
+def test_clarification_supersedes_challenged_proposal_and_recalculates(client):
+    source, model, run_id, proposal_id = pending_collaboration(client)
+    root = f"/api/missions/{model['id']}"
+    request = {
+        "revision": model["revision"],
+        "feedback": "Science needs more observation",
+        "minimum_duty": 0.035,
+    }
+    assert client.post(root + f"/collaboration/{run_id}/clarify", json=request).status_code == 409
+    model = command(
+        client,
+        model,
+        f"proposals/{proposal_id}/decision",
+        action="challenge",
+        reason="Science duty is too low",
+    )
+    challenged = model
+    model = command(
+        client,
+        model,
+        f"collaboration/{run_id}/clarify",
+        feedback="Science needs more observation",
+        minimum_duty=0.035,
+    )
+    assert model["proposals"][proposal_id]["status"] == "superseded"
+    run = model["entities"][run_id]["data"]
+    assert run["round"] == 1 and run["completed"] == []
+    assert run["round_history"][0]["proposal_id"] == proposal_id
+    assert (
+        client.post(
+            root + f"/proposals/{proposal_id}/decision",
+            json={
+                "revision": model["revision"],
+                "action": "accept",
+                "reason": "Cannot accept superseded result",
+            },
+        ).status_code
+        == 409
+    )
+    for _ in range(5):
+        model = command(client, model, f"collaboration/{run_id}/step")
+        assert (
+            model["entities"]["selective-data-inputs"]
+            == source["entities"]["selective-data-inputs"]
+        )
+    run = model["entities"][run_id]["data"]
+    assert run["proposal_id"] != proposal_id
+    assert run["bus"]["duty"] == 0.035
+    assert run["evaluate_bus"]["data"]["inputs"]["duty"]["value"] == 0.035
+    assert client.get(root + f"/revisions/{challenged['revision']}").json() == challenged
+    model = approve(client, model)
+    assert model["entities"]["selective-data-inputs"]["data"]["inputs"]["duty"]["value"] == 0.035
+
+
+def test_infeasible_clarification_blocks_and_can_be_revised_while_paused(client):
+    _, model, run_id, proposal_id = pending_collaboration(client)
+    model = command(
+        client,
+        model,
+        f"proposals/{proposal_id}/decision",
+        action="challenge",
+        reason="Need more observations",
+    )
+    model = command(
+        client,
+        model,
+        f"collaboration/{run_id}/clarify",
+        feedback="Require eight percent duty",
+        minimum_duty=0.08,
+    )
+    for _ in range(5):
+        model = command(client, model, f"collaboration/{run_id}/step")
+    assert model["entities"][run_id]["data"]["status"] == "blocked"
+    assert model["entities"][run_id]["data"]["proposal_id"] is None
+    model = command(client, model, "pause")
+    model = command(
+        client,
+        model,
+        f"collaboration/{run_id}/clarify",
+        feedback="Reduce the minimum to a feasible target",
+        minimum_duty=0.035,
+    )
+    assert model["paused"]
+    assert model["entities"][run_id]["data"]["round"] == 2
+    assert (
+        client.post(
+            f"/api/missions/{model['id']}/collaboration/{run_id}/step",
+            json={"revision": model["revision"]},
+        ).status_code
+        == 409
+    )
+
+
+def test_provider_receives_feedback_and_cannot_submit_below_owner_minimum(client, monkeypatch):
+    _, model, run_id, proposal_id = pending_collaboration(client)
+    model = command(
+        client, model, f"proposals/{proposal_id}/decision", action="challenge", reason="Raise duty"
+    )
+    model = command(
+        client,
+        model,
+        f"collaboration/{run_id}/clarify",
+        feedback="Preserve science observation time",
+        minimum_duty=0.035,
+    )
+
+    def ignore_minimum(role, context, mode):
+        assert context["clarifications"][-1]["text"] == "Preserve science observation time"
+        assert context["previous_proposal"]["duty"] > 0
+        assert context["minimum_duty"] == 0.035
+        return DutyProposal(duty=0.025, rationale="Provider disregards the minimum"), {}
+
+    monkeypatch.setattr("app.services.collaboration.propose", ignore_minimum)
+    for _ in range(5):
+        model = command(client, model, f"collaboration/{run_id}/step")
+    run = model["entities"][run_id]["data"]
+    assert run["status"] == "blocked"
+    assert "below the owner's minimum" in run["events"][-1]["summary"]
+
+
+def test_clarification_rejects_stale_inputs_without_superseding(client):
+    _, model, run_id, proposal_id = pending_collaboration(client)
+    model = command(
+        client, model, f"proposals/{proposal_id}/decision", action="challenge", reason="Raise duty"
+    )
+    store = client.app.state.store
+    old = store.get(model["id"])
+    changed = old.model_copy(deep=True)
+    changed.entities["selective-data-inputs"].data["inputs"]["duty"]["value"] = 0.04
+    changed = store.save(changed, "human", "Concurrent source change", old)
+    result = client.post(
+        f"/api/missions/{model['id']}/collaboration/{run_id}/clarify",
+        json={"revision": changed.revision, "feedback": "Try again", "minimum_duty": 0.035},
+    )
+    assert result.status_code == 409
+    assert store.get(model["id"]).proposals[proposal_id].status == "challenged"
+
+
 def start(client):
     source = to_trade(client)
     model = command(

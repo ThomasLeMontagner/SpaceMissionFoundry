@@ -78,12 +78,32 @@ test("collaboration records negotiation and waits for owner approval", async ({
     .getByRole("button", { name: "Agent collaboration", exact: true })
     .click();
   await expect(view.locator("li.collaboration-event")).toHaveCount(11);
+  await page.getByRole("button", { name: "Challenge", exact: true }).click();
+  const clarification = view.getByRole("form", { name: "Clarify and revise" });
+  await clarification
+    .getByLabel("Revision feedback")
+    .fill("Science needs at least 3.5 percent observation duty.");
+  await clarification
+    .getByLabel("Minimum observation duty fraction")
+    .fill("0.035");
+  await clarification
+    .getByRole("button", { name: "Request revised proposal" })
+    .click();
+  await expect(view.getByText(/Revision round 1/)).toBeVisible();
+  for (let i = 1; i <= 5; i++) {
+    await view.getByRole("button", { name: "Run next task" }).click();
+    await expect(
+      view.getByText(new RegExp(`${i} of 5 execution tasks completed`)),
+    ).toBeVisible();
+  }
+  await expect(view.locator("li.collaboration-event")).toHaveCount(23);
+  await view.screenshot({ path: "test-results/collaboration-revision.png" });
   await page
     .getByRole("button", { name: "Approve design change", exact: true })
     .click();
   await expect(view.getByText(/Design proposal: accepted/)).toBeVisible();
   m = await (await request.get(`/api/missions/${m.id}`)).json();
-  expect(m.entities["selective-data-inputs"].data.inputs.duty.value).not.toBe(
-    original.value,
+  expect(m.entities["selective-data-inputs"].data.inputs.duty.value).toBe(
+    0.035,
   );
 });

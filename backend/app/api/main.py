@@ -14,6 +14,7 @@ from app.domain.requirement_checks import METRICS
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
+from app.services.collaboration import Clarification as CollaborationClarification
 from app.services.collaboration import Collaboration
 from app.services.collaboration import Start as CollaborationStart
 from app.services.design_inputs import EditChanges
@@ -156,6 +157,10 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/collaboration/{run_id}/cancel")
     def cancel_collaboration(id: str, run_id: str, body: Command):
         return collaboration.cancel(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/clarify")
+    def clarify_collaboration(id: str, run_id: str, body: CollaborationClarification):
+        return collaboration.clarify(id, run_id, body)
 
     @app.post("/api/missions", status_code=201)
     def create(body: Create):

@@ -1,5 +1,12 @@
 # Validation record — 2026-09-09
 
+## Collaboration clarification and revision — 2026-09-29
+
+- Full SQLite backend suite: 115 passed, one PostgreSQL-only skip. All 13 collaboration tests passed, including new feasible/infeasible minimum-duty requests, old-proposal supersession, unchanged accepted inputs until approval, fresh tool evidence, historical snapshot preservation, paused revision preparation, stale-source rejection and blocking provider results below the owner minimum.
+- Frontend: 25 unit tests passed; TypeScript/Vite build, Prettier, Ruff lint/format and patch whitespace checks passed. The collaboration browser workflow passed with challenge, clarification, a 3.5% minimum duty request, five new tasks, 23 retained timeline events and approval of the revised value. Existing unrelated browser workflows were not rerun for this change.
+- No paid model calls were made. The app was started and its clarification endpoint verified read-only. No user mission records were edited. No database migration or dependency change was required; PostgreSQL was not rerun.
+- Requirements v0.13, traceability, README and architecture describe up to three human-requested revision rounds. Simulation applies numeric constraints but does not interpret free-text feedback; general task replanning, independent Systems model review and cumulative cost accounting remain deferred.
+
 ## Recorded collaboration interaction graph — 2026-09-22
 
 - Frontend unit suite: 25 passed, including recorded-edge navigation, historical tool-recipient normalization, new-event filtering and paused/terminal status checks. TypeScript/Vite build, Prettier and patch whitespace checks passed.

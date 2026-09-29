@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.12.1
+**Version:** 0.13
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-09-22
+**Date:** 2026-09-29
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -347,7 +347,7 @@ Baseline comparison scope for version 0.3: comparisons use immutable, mission-sc
 
 The user shall be able to understand who is doing what, why agents are interacting, what evidence supports their proposals, and where human intervention is needed. This capability accompanies a genuine design-agent loop: agents interpret the brief, request missing information, generate structured proposals beyond the fixed reference template, invoke validated engineering tools, review one another's proposals, and revise them in response to constraints and findings. Human approval remains required for accepted design changes and baselines.
 
-Implementation boundary (2026-09-22): the original reference workflow remains scripted, with optional LLM rationale refinement. A separate, human-stepped collaboration slice now supports Payload and Bus & Ground duty-cycle proposals, deterministic data/link evaluation, Systems submission and human approval. Its live mode uses structured model-generated values; simulation is explicitly labeled and uses no model calls. Durable events, task progress, filters, a recorded-exchange interaction graph, cancellation and stale-source rejection support this bounded loop. The graph links roles and directed exchanges to timeline evidence; broader dependency and unresolved-disagreement modeling remain incomplete. General mission design, independent LLM Systems review, background scheduling and clarification/replanning remain incomplete; MF-COL requirements retain partial/planned status in traceability.
+Implementation boundary (2026-09-22): the original reference workflow remains scripted, with optional LLM rationale refinement. A separate, human-stepped collaboration slice now supports Payload and Bus & Ground duty-cycle proposals, deterministic data/link evaluation, Systems submission and human approval. Its live mode uses structured model-generated values; simulation is explicitly labeled and uses no model calls. Durable events, task progress, filters, a recorded-exchange interaction graph, cancellation and stale-source rejection support this bounded loop. The graph links roles and directed exchanges to timeline evidence; broader dependency and unresolved-disagreement modeling remain incomplete. Challenged proposals and blocked negotiations support up to three human-requested revision rounds with recorded feedback, optional minimum duty constraints, fresh tool evaluation and superseded prior proposals. Free-text feedback is sent to live models; simulation only applies the numeric constraint. General mission design, independent LLM Systems review, background scheduling and broader clarification/replanning remain incomplete; MF-COL requirements retain partial/planned status in traceability.
 
 | ID | Requirement | Priority | Verification |
 |---|---|---:|---|

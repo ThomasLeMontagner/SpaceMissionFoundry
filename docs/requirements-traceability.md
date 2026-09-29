@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.12.1. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.13. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has a bounded duty-cycle negotiation slice with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -155,9 +155,9 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-COL-004 | Partial | SSE-refreshed timeline with agent/task/type filters and object-ID text search for this slice. |
 | MF-COL-005 | Partial | Concise summaries, expandable proposal/tool evidence and object inspection; broader source/assumption navigation incomplete. |
 | MF-COL-006 | Partial | Explicit simulation/live labels, real deterministic calculations and human-gated design proposals; HTTP live contract mock-tested only. |
-| MF-COL-007 | Partial | Recorded failing Payload budget and revised Bus proposal; failed revised checks block submission. General competing alternatives/objections remain future work. |
+| MF-COL-007 | Partial | Recorded failing Payload budget and revised Bus proposal; failed revised checks block submission. Infeasible owner minimums block submission and can receive further clarification. General competing alternatives/objections remain future work. |
 | MF-COL-008 | Partial | Ordered task dependencies and actionable failure/stale/blocker messages; no generalized dependency solver. |
-| MF-COL-009 | Partial | Pause, cancel, normal challenge/accept/reject controls and decision events; no clarification exchange or replanning. |
+| MF-COL-009 | Partial | Pause, cancel, challenge/accept/reject and bounded clarification/revision rounds. Feedback and prior responses reach both discipline agents; optional minimum duty is checked before submission. Old proposals are superseded, accepted inputs remain unchanged until fresh approval. Broad task replanning remains deferred. |
 | MF-COL-010 | Partial | Events persist in revision snapshots and survive browser refresh without duplicates; existing replay exposes historical records, dedicated timeline playback deferred. |
 | MF-COL-011 | Partial | Source fingerprint and revision guards discard outdated responses and preserve concurrent cancellation/edits; automatic replanning deferred. |
 | MF-COL-012 | Partial | Task durations and provider token reports in evidence, simulation zero usage and unknown live cost; aggregate accounting deferred. |

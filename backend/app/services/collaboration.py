@@ -29,6 +29,12 @@ class Start(Strict):
     mode: Literal["simulation", "live"] = "simulation"
 
 
+class Clarification(Strict):
+    revision: int = Field(ge=0)
+    feedback: str = Field(min_length=3, max_length=2000)
+    minimum_duty: float | None = Field(default=None, ge=0, le=1)
+
+
 def fingerprint(model):
     values = {
         k: e.model_dump(mode="json") for k, e in model.entities.items() if e.kind in IMPACT_KINDS
@@ -53,6 +59,7 @@ def record(run, kind, sender, recipient, summary, evidence=None):
             evidence=evidence,
             source_revision=run.data["source_revision"],
             mode=run.data["mode"],
+            round=run.data.get("round", 0),
         )
     )
 
@@ -137,6 +144,99 @@ class Collaboration:
             "Future work cancelled; any in-flight response will be discarded.",
         )
         return self.store.save(m, "human", "Cancelled collaboration", old)
+
+    def clarify(self, mission_id, run_id, request):
+        old = self.store.get(mission_id)
+        self.workflow.guard(old, request.revision)
+        original = get_run(old, run_id)
+        proposal_id = original.data.get("proposal_id")
+        proposal = old.proposals.get(proposal_id)
+        if not (
+            original.data["status"] == "blocked"
+            or (
+                original.data["status"] == "awaiting_approval"
+                and proposal
+                and proposal.status == "challenged"
+            )
+        ):
+            raise ValueError(
+                "Challenge the pending proposal before requesting revision, or revise a blocked negotiation"
+            )
+        if any(
+            p.status in ["submitted", "challenged"] and p.id != proposal_id
+            for p in old.proposals.values()
+        ):
+            raise ValueError("Resolve other pending proposals before requesting revision")
+        if any(
+            e.id != run_id
+            and e.data.get("workflow") == "duty-collaboration"
+            and e.data.get("status") in ACTIVE
+            for e in old.entities.values()
+        ):
+            raise ValueError("Finish or cancel the other active collaboration first")
+        if fingerprint(old) != original.data["fingerprint"]:
+            raise ValueError("Design inputs changed; start a new collaboration from current inputs")
+        if original.data.get("round", 0) >= 3:
+            raise ValueError(
+                "Three revision rounds reached; start a new collaboration after resolving this proposal"
+            )
+        if len(request.feedback.strip()) < 3:
+            raise ValueError("Describe the clarification in at least three characters")
+        m = old.model_copy(deep=True)
+        run = get_run(m, run_id)
+        data = run.data
+        history = {
+            key: deepcopy(data.get(key))
+            for key in [
+                "round",
+                "proposal_id",
+                "payload",
+                "bus",
+                "evaluate_payload",
+                "evaluate_bus",
+                "minimum_duty",
+            ]
+        }
+        data.setdefault("round_history", []).append(history)
+        if proposal:
+            m.proposals[proposal_id].status = "superseded"
+        feedback = dict(
+            text=request.feedback.strip(),
+            challenge=next(
+                (
+                    e["summary"]
+                    for e in reversed(data["events"])
+                    if e["type"] == "challenge"
+                    and (e.get("evidence") or {}).get("proposal_id") == proposal_id
+                ),
+                None,
+            ),
+            previous_proposal=proposal_id,
+            source_revision=old.revision,
+        )
+        data.setdefault("clarifications", []).append(feedback)
+        data["minimum_duty"] = (
+            request.minimum_duty if request.minimum_duty is not None else data.get("minimum_duty")
+        )
+        for key in ["payload", "bus", "evaluate_payload", "evaluate_bus"]:
+            data.pop(key, None)
+        data.update(
+            round=data.get("round", 0) + 1,
+            stage="payload",
+            status="ready",
+            completed=[],
+            attempts=0,
+            proposal_id=None,
+        )
+        record(
+            run,
+            "clarification",
+            "human",
+            "payload",
+            request.feedback.strip(),
+            {"previous_proposal": proposal_id, "minimum_duty": data["minimum_duty"]},
+        )
+        return self.store.save(m, "human", "Requested collaboration revision", old)
 
     def step(self, mission_id, run_id, revision):
         old = self.store.get(mission_id)
@@ -247,6 +347,9 @@ class Collaboration:
                 goal=data["goal"],
                 candidate=data["candidate"],
                 inputs=data["inputs"],
+                clarifications=data.get("clarifications", []),
+                previous_proposal=data.get("round_history", [{}])[-1].get("bus"),
+                minimum_duty=data.get("minimum_duty"),
             )
             if stage == "bus":
                 context.update(
@@ -305,6 +408,18 @@ class Collaboration:
             )
         else:
             evidence = data["evaluate_bus"]
+            minimum = data.get("minimum_duty")
+            if minimum is not None and data["bus"]["duty"] < minimum:
+                data["status"] = "blocked"
+                record(
+                    run,
+                    "blocked",
+                    "systems",
+                    "human",
+                    "Proposed duty is below the owner's minimum. Clarify the goal or request another revision; no change submitted.",
+                    {"minimum_duty": minimum, "proposed_duty": data["bus"]["duty"]},
+                )
+                return
             if not all(evidence[t]["outputs"]["compliant"] for t in ["data", "link"]):
                 data["status"] = "blocked"
                 record(
