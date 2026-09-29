@@ -130,6 +130,23 @@ class Workflow:
             context=p.rationale,
         )
         m.entities[d.id] = d
+        for run in m.entities.values():
+            if (
+                run.kind == "AgentRun"
+                and run.data.get("workflow") == "duty-collaboration"
+                and run.data.get("proposal_id") == p.id
+            ):
+                from app.services.collaboration import record
+
+                run.data["status"] = "awaiting_approval" if action == "challenge" else p.status
+                record(
+                    run,
+                    action,
+                    "human",
+                    "systems",
+                    reason,
+                    {"proposal_id": p.id, "decision_id": d.id},
+                )
         return self.store.save(m, "human", reason, old)
 
     def submit(self, id, p):
@@ -409,6 +426,12 @@ class Workflow:
         self.guard(old, revision)
         if not confirm or old.phase != "Ready for baseline":
             raise ValueError("Explicit human confirmation after independent review is required")
+        if any(
+            e.data.get("workflow") == "duty-collaboration"
+            and e.data.get("status") in ["ready", "working", "failed"]
+            for e in old.entities.values()
+        ):
+            raise ValueError("Finish or cancel active collaboration before baseline approval")
         if any(
             e.state == "stale"
             or (

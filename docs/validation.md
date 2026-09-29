@@ -1,5 +1,18 @@
 # Validation record — 2026-09-09
 
+## Recorded collaboration interaction graph — 2026-09-22
+
+- Frontend unit suite: 25 passed, including recorded-edge navigation, historical tool-recipient normalization, new-event filtering and paused/terminal status checks. TypeScript/Vite build, Prettier and patch whitespace checks passed.
+- The collaboration Playwright workflow passed with graph connection selection, exact timeline filtering, clearing selection, refresh recovery and human approval. The updated graph screenshot was visually inspected. No live model calls or user mission changes were needed.
+- Requirements version 0.12.1 and MF-COL-013 traceability describe the partial delivery: recorded exchanges and current attention are visible, while general dependency and unresolved-disagreement semantics remain deferred. Backend code is unchanged from the initial slice, so backend tests were not repeated for this UI addition.
+
+## Initial agent collaboration slice — 2026-09-22
+
+- Full SQLite backend suite: 109 passed, one PostgreSQL-only skip. Two further baseline/scoping and generated-value/rejection cases were subsequently added; all nine collaboration cases passed. Tests cover durable proposal evidence, unchanged inputs before approval, immutable source revisions, retry, pause, cancellation, concurrent source changes and strict mocked provider responses. No paid model calls were made.
+- Frontend: 22 unit tests passed; TypeScript/Vite build and Prettier passed. All seven existing Playwright workflows passed. The new collaboration workflow passed after correcting a test locator and explicitly reopening the saved mission after refresh; it exercises five tasks, pause/resume, timeline filtering, refresh without duplicate events and human approval. The resulting collaboration screenshot was visually inspected.
+- Ruff lint/format and patch whitespace checks passed. No database schema changes or dependencies were introduced. PostgreSQL was not rerun for this slice; existing revision-snapshot persistence is reused.
+- Requirements version 0.12, traceability, README and collaboration architecture document the bounded duty-cycle scope. General mission design, independent Systems LLM review, background scheduling, clarification/replanning and interaction graphs remain incomplete. The live provider HTTP contract is mock-tested only.
+
 ## PostgreSQL saved-study reload test correction — 2026-09-20
 
 - Reproduced the pipeline failure against an isolated PostgreSQL 16 database on localhost port 55447, migrated to head and configured with SCRAM password authentication. The original saved-study reload test failed because `str(engine.url)` substituted a masked password when constructing its second Store.

@@ -14,6 +14,8 @@ from app.domain.requirement_checks import METRICS
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
+from app.services.collaboration import Collaboration
+from app.services.collaboration import Start as CollaborationStart
 from app.services.design_inputs import EditChanges
 from app.services.sensitivity import Study, study
 from app.services.workflow import Workflow
@@ -89,6 +91,7 @@ class Restore(Command):
 def create_app(store=None):
     store = store or Store()
     service = Workflow(store)
+    collaboration = Collaboration(store)
     app = FastAPI(title="Mission Foundry", version="0.1.0", dependencies=[Depends(authorize)])
     app.state.store = store
 
@@ -141,6 +144,18 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/archive")
     def archive(id: str, body: Archive):
         return service.archive(id, body.revision, body.archived)
+
+    @app.post("/api/missions/{id}/collaboration")
+    def start_collaboration(id: str, body: CollaborationStart):
+        return collaboration.start(id, body)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/step")
+    def collaboration_step(id: str, run_id: str, body: Command):
+        return collaboration.step(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/cancel")
+    def cancel_collaboration(id: str, run_id: str, body: Command):
+        return collaboration.cancel(id, run_id, body.revision)
 
     @app.post("/api/missions", status_code=201)
     def create(body: Create):

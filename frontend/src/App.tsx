@@ -6,6 +6,7 @@ import CoverageView from "./CoverageView";
 import DeliveryView from "./DeliveryView";
 import InterfaceChecks from "./InterfaceChecks";
 import SensitivityView from "./SensitivityView";
+import CollaborationView from "./CollaborationView";
 import type { Entity, Model, Proposal } from "./types";
 
 type MissionSummary = {
@@ -30,6 +31,7 @@ const tabs: Record<string, string[]> = {
   "Claims & evidence": ["Claim", "Evidence"],
   "Conflicts & review": ["ReviewFinding", "Risk", "VerificationItem"],
   "Agent activity": ["AgentRun", "AgentDefinition"],
+  "Agent collaboration": [],
   Decisions: ["Decision"],
   "Baselines & replay": ["Baseline"],
 };
@@ -878,6 +880,15 @@ export default function App() {
                 }
               />
             )}
+            {tab === "Agent collaboration" && (
+              <CollaborationView
+                key={model.id}
+                model={model}
+                busy={busy}
+                act={act}
+                onInspect={(id) => show(model.entities[id])}
+              />
+            )}
             {tab === "Design inputs" && (
               <section className="panel">
                 <h2>Accepted calculation inputs</h2>
@@ -1263,6 +1274,7 @@ export default function App() {
               </>
             )}
             {tab !== "Overview" &&
+              tab !== "Agent collaboration" &&
               tab !== "Coverage & access" &&
               tab !== "Data delivery" &&
               tab !== "Sensitivity analysis" && (
