@@ -84,10 +84,12 @@ export default function CollaborationView({
         independent LLM review are not implemented in this slice.
       </p>
       <p>
-        Each click executes one task. Events persist and update during
-        execution. Pause prevents subsequent tasks; an in-flight call may
-        finish. Cancel discards its response. Interrupted work can be cancelled
-        and restarted.
+        Execute one task at a time or choose Run until review. Automatic
+        progression stops for approval, clarification or failure and never
+        approves a change. Pause prevents subsequent tasks; an in-flight call
+        may finish. Resume does not restart automatic progression. Cancel
+        discards an in-flight response. Interrupted work can be cancelled and
+        restarted.
       </p>
       {model.baseline && (
         <p className="notice">
@@ -227,6 +229,21 @@ export default function CollaborationView({
                 !editable ||
                 model.paused ||
                 pending ||
+                data.status !== "ready" ||
+                data.attempts >= 10 ||
+                data.execution?.status === "running"
+              }
+              onClick={() => act(`/collaboration/${run!.id}/run`)}
+            >
+              Run until review
+            </button>
+            <button
+              disabled={
+                busy ||
+                data.execution?.status === "running" ||
+                !editable ||
+                model.paused ||
+                pending ||
                 !["ready", "failed"].includes(data.status) ||
                 data.attempts >= 10
               }
@@ -249,6 +266,14 @@ export default function CollaborationView({
               Inspect recorded run
             </button>
           </div>
+          {data.execution && (
+            <p role="status">
+              Automatic progression: {data.execution.status}.{" "}
+              {data.execution.status === "running"
+                ? "Tasks continue on the server while this page is open or closed. If interrupted by a server restart, cancel and start a new run."
+                : data.execution.reason}
+            </p>
+          )}
           {proposal && (
             <p className="notice">
               Design proposal: {proposal.status}. Use the proposal approval

@@ -71,6 +71,23 @@ def get_run(model, run_id):
     return run
 
 
+def stop_execution(run, reason):
+    execution = run.data.get("execution", {})
+    if execution.get("status") == "running":
+        execution.update(status="stopped", finished_at=now(), reason=reason)
+        record(run, "execution_stopped", "orchestrator", "human", reason)
+
+
+def advance_pending_metadata(model):
+    # Agent activity alone does not change the design a pending proposal targets.
+    for proposal in model.proposals.values():
+        if (
+            proposal.status in ["submitted", "challenged"]
+            and proposal.target_revision == model.revision
+        ):
+            proposal.target_revision += 1
+
+
 class Collaboration:
     def __init__(self, store):
         self.store = store
@@ -136,6 +153,7 @@ class Collaboration:
         m = old.model_copy(deep=True)
         run = get_run(m, run_id)
         run.data["status"] = "cancelled"
+        stop_execution(run, "Cancelled by mission owner; in-flight response will be discarded")
         record(
             run,
             "cancelled",
@@ -185,6 +203,10 @@ class Collaboration:
         m = old.model_copy(deep=True)
         run = get_run(m, run_id)
         data = run.data
+        stop_execution(
+            run,
+            "Revision requested; automatic progression must be started explicitly for the new round",
+        )
         history = {
             key: deepcopy(data.get(key))
             for key in [
@@ -238,11 +260,93 @@ class Collaboration:
         )
         return self.store.save(m, "human", "Requested collaboration revision", old)
 
-    def step(self, mission_id, run_id, revision):
+    def begin_execution(self, mission_id, run_id, revision):
         old = self.store.get(mission_id)
         self.workflow.guard(old, revision)
         self.workflow.no_pending(old)
         run = get_run(old, run_id)
+        if old.paused or run.data["status"] != "ready" or run.data["attempts"] >= 10:
+            raise ValueError(
+                "Automatic progression requires a resumed, ready task; retry failures explicitly"
+            )
+        if run.data.get("execution", {}).get("status") == "running":
+            raise ValueError(
+                "Automatic progression already claimed; cancel interrupted work before restarting"
+            )
+        if fingerprint(old) != run.data["fingerprint"]:
+            raise ValueError("Design changed; start a new collaboration")
+        m = old.model_copy(deep=True)
+        run = get_run(m, run_id)
+        run.data["execution"] = dict(id=str(uuid4()), status="running", started_at=now())
+        record(
+            run,
+            "execution_started",
+            "human",
+            "orchestrator",
+            "Run remaining tasks until review, pause, cancellation or failure. No automatic approval or retry.",
+        )
+        return self.store.save(m, "human", "Requested automatic collaboration progression", old)
+
+    def execute_remaining(self, mission_id, run_id, execution_id):
+        # The durable claim fences competing requests. The worker is deliberately bounded
+        # to one round, with no retries, auto-approval or restart after a server crash.
+        reason = "Round requires review"
+        try:
+            for _ in range(len(STAGES)):
+                current = self.store.get(mission_id)
+                run = get_run(current, run_id)
+                execution = run.data.get("execution", {})
+                if execution.get("id") != execution_id or execution.get("status") != "running":
+                    return
+                if current.archived or current.baseline:
+                    return
+                if current.paused:
+                    reason = "Mission paused; resume and explicitly run again to continue"
+                    break
+                if run.data["status"] != "ready":
+                    reason = f"Stopped for {run.data['status']}; human action required"
+                    break
+                if any(p.status in ["submitted", "challenged"] for p in current.proposals.values()):
+                    reason = "Resolve pending proposals before continuing"
+                    break
+                self.step(mission_id, run_id, current.revision, execution_id)
+        except Exception:
+            reason = "Execution interrupted; reload and inspect the run. Retry explicitly or cancel; no task was automatically retried."
+        # A concurrent mutation can win this bookkeeping write. Never overwrite it;
+        # an uncleared claim remains visibly interrupted and can be cancelled.
+        try:
+            current = self.store.get(mission_id)
+            run = get_run(current, run_id)
+            execution = run.data.get("execution", {})
+            if (
+                current.archived
+                or current.baseline
+                or execution.get("id") != execution_id
+                or execution.get("status") != "running"
+            ):
+                return
+            updated = current.model_copy(deep=True)
+            run = get_run(updated, run_id)
+            run.data["execution"].update(status="stopped", finished_at=now(), reason=reason)
+            record(run, "execution_stopped", "orchestrator", "human", reason)
+            advance_pending_metadata(updated)
+            self.store.save(updated, "orchestrator", "Automatic progression stopped", current)
+        except Exception:
+            return
+
+    def step(self, mission_id, run_id, revision, execution_id=None):
+        old = self.store.get(mission_id)
+        self.workflow.guard(old, revision)
+        self.workflow.no_pending(old)
+        run = get_run(old, run_id)
+        execution = run.data.get("execution", {})
+        if execution_id is not None:
+            if execution.get("id") != execution_id or execution.get("status") != "running":
+                raise ValueError("Execution claim is no longer active")
+        elif execution.get("status") == "running":
+            raise ValueError(
+                "Automatic progression owns this run; pause or cancel before manual work"
+            )
         if old.paused:
             raise ValueError("Workflow paused; resume before the next collaboration step")
         if run.data["status"] not in ["ready", "failed"] or run.data["attempts"] >= 10:
@@ -333,7 +437,12 @@ class Collaboration:
                     "Result could not be validated or submitted; retry explicitly or cancel.",
                 )
         run.data["events"][-1]["elapsed_seconds"] = perf_counter() - timer
+        if run.data["status"] not in ["ready", "working"]:
+            stop_execution(
+                run, f"Stopped for {run.data['status']}: {run.data['events'][-1]['summary']}"
+            )
         # Compare-and-swap preserves concurrent mutations; a losing worker cannot overwrite them.
+        advance_pending_metadata(updated)
         return self.store.save(updated, "orchestrator", "Collaboration task result", current)
 
     def perform(self, model, run):

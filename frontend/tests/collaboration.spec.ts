@@ -47,12 +47,11 @@ test("collaboration records negotiation and waits for owner approval", async ({
     view.getByRole("button", { name: "Run next task" }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "Resume", exact: true }).click();
-  for (let i = 1; i <= 5; i++) {
-    await view.getByRole("button", { name: "Run next task" }).click();
-    await expect(
-      view.getByText(new RegExp(`${i} of 5 execution tasks completed`)),
-    ).toBeVisible();
-  }
+  await view.getByRole("button", { name: "Run until review" }).click();
+  await expect(
+    view.getByText(/5 of 5 execution tasks completed/),
+  ).toBeVisible();
+  await expect(view.getByText(/Automatic progression: stopped/)).toBeVisible();
   m = await (await request.get(`/api/missions/${m.id}`)).json();
   expect(m.entities["selective-data-inputs"].data.inputs.duty).toEqual(
     original,
@@ -66,7 +65,7 @@ test("collaboration records negotiation and waits for owner approval", async ({
     "Data or downlink constraint fails",
   );
   await view.getByRole("button", { name: "Clear graph selection" }).click();
-  await expect(view.locator("li.collaboration-event")).toHaveCount(11);
+  await expect(view.locator("li.collaboration-event")).toHaveCount(13);
   await view
     .getByRole("combobox", { name: "Event filter", exact: true })
     .selectOption("tool_result");
@@ -77,7 +76,7 @@ test("collaboration records negotiation and waits for owner approval", async ({
   await page
     .getByRole("button", { name: "Agent collaboration", exact: true })
     .click();
-  await expect(view.locator("li.collaboration-event")).toHaveCount(11);
+  await expect(view.locator("li.collaboration-event")).toHaveCount(13);
   await page.getByRole("button", { name: "Challenge", exact: true }).click();
   const clarification = view.getByRole("form", { name: "Clarify and revise" });
   await clarification
@@ -96,7 +95,7 @@ test("collaboration records negotiation and waits for owner approval", async ({
       view.getByText(new RegExp(`${i} of 5 execution tasks completed`)),
     ).toBeVisible();
   }
-  await expect(view.locator("li.collaboration-event")).toHaveCount(23);
+  await expect(view.locator("li.collaboration-event")).toHaveCount(25);
   await view.screenshot({ path: "test-results/collaboration-revision.png" });
   await page
     .getByRole("button", { name: "Approve design change", exact: true })
