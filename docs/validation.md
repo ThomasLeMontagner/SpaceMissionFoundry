@@ -1,5 +1,12 @@
 # Validation record — 2026-09-09
 
+## Independent Systems review before submission — 2026-10-02
+
+- Complete SQLite regression coverage passed in two disjoint groups after the original all-in-one run was terminated: 69 passed / one PostgreSQL-only skip for core workflow and collaboration; 65 passed for the remaining calculations and persistence tests. Total: 134 passed, one skipped. Thirteen new review cases cover submit/revise/clarify, recorded evidence, prior-review handoff to both disciplines, stale/pause/cancel interruption, failed-tool gating, a separate third mocked provider call and invalid/unactionable review responses. No paid provider calls were made.
+- Frontend: 30 unit tests passed, including findings/evidence display, feedback reuse, legacy labeling and directing blocked-review attention to the owner. TypeScript/Vite build, Prettier, Ruff lint/format and whitespace checks passed. The collaboration browser workflow passed through automatic Systems review, retained review events across refresh/revision and separate human approval. The review-panel screenshot was visually inspected. Unrelated browser workflows and PostgreSQL were not rerun.
+- Requirements v0.15 adds MF-COL-014–015; README, traceability and architecture document separate live review, strict output validation and explicit rules-based simulation. Independent prompting with the configured model is not a guarantee of correctness or independence between providers. Historical pending proposals are preserved and labeled when no independent assessment was recorded.
+- The local app was started and frontend/backend health checked read-only. No user mission data, dependencies or database schemas were changed. Workflow version 1.1 stores review outcomes, evidence context and usage in existing AgentRun snapshots; accepted design inputs still require normal human approval.
+
 ## Bounded automatic collaboration progression — 2026-09-29
 
 - Full SQLite backend suite: 121 passed, one PostgreSQL-only skip. Six execution cases cover completion without approval, duplicate/manual claim rejection, pause followed by quick resume, cancellation, provider failure without retry, and a concurrent human proposal remaining approvable. All six passed again after the final stop-message refinement. No paid model calls were made.

@@ -11,6 +11,7 @@ from uuid import uuid4
 from pydantic import Field
 
 from app.agents.design_provider import propose
+from app.agents.systems_review import SystemsReview, review
 from app.domain.models import Operation, Proposal, Strict, now
 from app.domain.protocol import validate
 from app.engineering_tools.calculations import execute, fraction
@@ -120,7 +121,7 @@ class Collaboration:
             f"{request.candidate} · observation duty collaboration",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.0",
+            version="1.1",
             mode=request.mode,
             provider_model=os.getenv("LLM_MODEL")
             if request.mode == "live"
@@ -217,6 +218,8 @@ class Collaboration:
                 "evaluate_payload",
                 "evaluate_bus",
                 "minimum_duty",
+                "systems_review",
+                "review_usage",
             ]
         }
         data.setdefault("round_history", []).append(history)
@@ -240,7 +243,14 @@ class Collaboration:
         data["minimum_duty"] = (
             request.minimum_duty if request.minimum_duty is not None else data.get("minimum_duty")
         )
-        for key in ["payload", "bus", "evaluate_payload", "evaluate_bus"]:
+        for key in [
+            "payload",
+            "bus",
+            "evaluate_payload",
+            "evaluate_bus",
+            "systems_review",
+            "review_usage",
+        ]:
             data.pop(key, None)
         data.update(
             round=data.get("round", 0) + 1,
@@ -448,9 +458,13 @@ class Collaboration:
     def perform(self, model, run):
         data = run.data
         stage = data["stage"]
+        if (
+            data["mode"] == "live"
+            and stage in ["payload", "bus", "systems"]
+            and os.getenv("LLM_MODEL") != data["provider_model"]
+        ):
+            raise ValueError("Provider model changed; start a new run")
         if stage in ["payload", "bus"]:
-            if data["mode"] == "live" and os.getenv("LLM_MODEL") != data["provider_model"]:
-                raise ValueError("Provider model changed; start a new run")
             context = dict(
                 brief=model.brief,
                 goal=data["goal"],
@@ -459,6 +473,7 @@ class Collaboration:
                 clarifications=data.get("clarifications", []),
                 previous_proposal=data.get("round_history", [{}])[-1].get("bus"),
                 minimum_duty=data.get("minimum_duty"),
+                previous_review=data.get("round_history", [{}])[-1].get("systems_review"),
             )
             if stage == "bus":
                 context.update(
@@ -477,6 +492,31 @@ class Collaboration:
                 data["source_revision"],
             )
             return dict(data=calculated, link=link)
+        if stage == "systems":
+            # Failing deterministic evidence never incurs a model review or bypasses the gate.
+            minimum = data.get("minimum_duty")
+            if (minimum is not None and data["bus"]["duty"] < minimum) or not all(
+                data["evaluate_bus"][t]["outputs"].get("compliant") is True
+                for t in ["data", "link"]
+            ):
+                return None
+            context = dict(
+                mission_goal={
+                    "brief": model.brief,
+                    "goal": data["goal"],
+                    "candidate": data["candidate"],
+                },
+                owner_feedback={
+                    "clarifications": data.get("clarifications", []),
+                    "minimum_duty": minimum,
+                },
+                payload_proposal=data["payload"],
+                bus_proposal=data["bus"],
+                data_analysis=data["evaluate_bus"]["data"],
+                link_analysis=data["evaluate_bus"]["link"],
+            )
+            assessment, usage = review(context, data["mode"])
+            return {"review": assessment.model_dump(), "usage": usage, "context": context}
         return None
 
     def finish(self, model, run, stage, result):
@@ -539,6 +579,30 @@ class Collaboration:
                     "Bus proposal still fails data/link constraints. Inspect evidence and start a revised study; no change submitted.",
                 )
                 return
+            assessment = SystemsReview.model_validate(result["review"])
+            data["systems_review"] = assessment.model_dump()
+            data["review_usage"] = result["usage"]
+            record(
+                run,
+                "systems_review",
+                "systems",
+                "human" if assessment.recommendation != "revise" else "bus",
+                assessment.rationale,
+                result,
+            )
+            if assessment.recommendation != "submit":
+                data["status"] = "blocked"
+                record(
+                    run,
+                    "revision_requested"
+                    if assessment.recommendation == "revise"
+                    else "clarification_requested",
+                    "systems",
+                    "human",
+                    assessment.follow_up,
+                    {"recommendation": assessment.recommendation},
+                )
+                return
             prior = model.entities[data["input_id"]]
             duty = data["bus"]["duty"]
             if fraction(prior.data["inputs"]["duty"]) == duty:
@@ -560,7 +624,9 @@ class Collaboration:
                     agent="systems",
                     target_revision=model.revision,
                     operations=[Operation(action="replace", entity=edited)],
-                    rationale=data["bus"]["rationale"],
+                    rationale=data["bus"]["rationale"]
+                    + "\nSystems review: "
+                    + assessment.rationale,
                     evidence_references=[run.id],
                     expected_consequences="Change observation duty only; all dependent calculations and selection require review. Science adequacy and operational delivery are not certified.",
                     confidence=0.5,

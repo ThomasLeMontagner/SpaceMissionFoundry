@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.14
+**Version:** 0.15
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-09-29
+**Date:** 2026-10-02
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -347,7 +347,7 @@ Baseline comparison scope for version 0.3: comparisons use immutable, mission-sc
 
 The user shall be able to understand who is doing what, why agents are interacting, what evidence supports their proposals, and where human intervention is needed. This capability accompanies a genuine design-agent loop: agents interpret the brief, request missing information, generate structured proposals beyond the fixed reference template, invoke validated engineering tools, review one another's proposals, and revise them in response to constraints and findings. Human approval remains required for accepted design changes and baselines.
 
-Implementation boundary (2026-09-22): the original reference workflow remains scripted, with optional LLM rationale refinement. A separate collaboration slice with manual tasks or bounded server-side automatic progression now supports Payload and Bus & Ground duty-cycle proposals, deterministic data/link evaluation, Systems submission and human approval. Its live mode uses structured model-generated values; simulation is explicitly labeled and uses no model calls. Durable events, task progress, filters, a recorded-exchange interaction graph, cancellation and stale-source rejection support this bounded loop. The graph links roles and directed exchanges to timeline evidence; broader dependency and unresolved-disagreement modeling remain incomplete. Challenged proposals and blocked negotiations support up to three human-requested revision rounds with recorded feedback, optional minimum duty constraints, fresh tool evaluation and superseded prior proposals. Free-text feedback is sent to live models; simulation only applies the numeric constraint. An explicitly started background runner completes one round and stops at review, pause, cancellation or failure. General mission design, independent LLM Systems review, durable job scheduling/recovery and broader clarification/replanning remain incomplete; MF-COL requirements retain partial/planned status in traceability.
+Implementation boundary (2026-10-02): the original reference workflow remains scripted, with optional LLM rationale refinement. A separate collaboration slice with manual tasks or bounded server-side automatic progression now supports Payload and Bus & Ground duty-cycle proposals, deterministic data/link evaluation, separate Systems assessment, gated submission and human approval. Its live mode uses structured model-generated values; simulation is explicitly labeled and uses no model calls. Durable events, task progress, filters, a recorded-exchange interaction graph, cancellation and stale-source rejection support this bounded loop. The graph links roles and directed exchanges to timeline evidence; broader dependency and unresolved-disagreement modeling remain incomplete. Challenged proposals and blocked negotiations support up to three human-requested revision rounds with recorded feedback, optional minimum duty constraints, fresh tool evaluation and superseded prior proposals. Free-text feedback is sent to live models; simulation only applies the numeric constraint. An explicitly started background runner completes one round and stops at review, pause, cancellation or failure. Systems review now records a structured submit/revise/clarify recommendation and evidence-linked findings, with a separate model call in live mode and explicit rules-based simulation. General mission design, durable job scheduling/recovery and broader clarification/replanning remain incomplete; broader MF-COL requirements retain partial status in traceability.
 
 | ID | Requirement | Priority | Verification |
 |---|---|---:|---|
@@ -364,6 +364,8 @@ Implementation boundary (2026-09-22): the original reference workflow remains sc
 | MF-COL-011 | The system shall identify agent work based on outdated mission revisions and prevent stale results from being silently accepted. It shall show when review, replanning or recalculation is required. | Must | Test |
 | MF-COL-012 | The system should display execution duration, token usage, and estimated or provider-reported cost when available, identifying the basis and marking unavailable values as unknown. | Should | Test |
 | MF-COL-013 | The workbench should provide an agent interaction graph showing active dependencies, requests and unresolved disagreements, with navigation to their recorded events and affected design objects. | Should | Demonstration |
+| MF-COL-014 | Before submitting a newly generated duty-cycle collaboration proposal, Systems shall separately assess the mission goal, owner feedback, discipline proposals and recorded calculations, returning a bounded submit/revise/clarify recommendation with evidence-linked advisory or blocking findings. Live mode shall use a separate review call; simulation shall be explicitly identified and shall not claim interpretation of free text. | Must | Test |
+| MF-COL-015 | Review shall not override failed deterministic gates, the owner minimum, stale-source rejection or human approval. Blocking recommendations and malformed reviews shall prevent submission. Review evidence shall persist, and subsequent explicitly requested rounds shall receive the prior assessment. Existing historical proposals shall not be retroactively represented as independently reviewed. | Must | Test |
 
 Progress shall be expressed through engineering milestones, task completion, evidence availability and explicit blockers. A percentage shall only be shown when its denominator and completion rules are defined; activity volume alone shall not imply design maturity or verified feasibility. For example, “three of five input groups approved; link analysis blocked by missing station assumptions” is an acceptable progress explanation.
 

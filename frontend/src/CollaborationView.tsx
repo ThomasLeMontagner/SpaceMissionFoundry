@@ -14,7 +14,7 @@ const labels: Record<string, string> = {
   evaluate_payload: "Evaluate payload proposal",
   bus: "Bus & Ground review",
   evaluate_bus: "Evaluate revised proposal",
-  systems: "Systems approval request",
+  systems: "Systems review & submission",
 };
 export default function CollaborationView({
   model,
@@ -75,13 +75,19 @@ export default function CollaborationView({
           .includes(query.toLowerCase())),
   );
   const proposal = data?.proposal_id ? model.proposals[data.proposal_id] : null;
+  const review = data?.systems_review;
+  const reviewEvidence = [...events]
+    .reverse()
+    .find((e) => e.type === "systems_review")?.evidence?.context;
   return (
     <section className="panel" aria-label="Agent collaboration">
       <h2>Agent collaboration</h2>
       <p>
         A bounded observation-duty negotiation: Payload → tools → Bus &amp;
-        Ground → tools → Systems → you. Other mission design tasks and
-        independent LLM review are not implemented in this slice.
+        Ground → tools → independent Systems review → you. Live mode uses a
+        separate review call with the configured model; Simulation uses a
+        labeled rules-based review. Review recommendations do not verify
+        whole-mission feasibility.
       </p>
       <p>
         Execute one task at a time or choose Run until review. Automatic
@@ -274,6 +280,65 @@ export default function CollaborationView({
                 : data.execution.reason}
             </p>
           )}
+          {review && (
+            <section className="panel" aria-label="Systems review">
+              <h3>
+                Systems review ·{" "}
+                {review.recommendation === "submit"
+                  ? "Ready for human consideration"
+                  : review.recommendation === "revise"
+                    ? "Agent revision requested"
+                    : "Owner clarification needed"}
+              </h3>
+              <p>
+                {data.mode === "simulation"
+                  ? "SIMULATED REVIEW · no model interpretation"
+                  : `SEPARATE MODEL REVIEW · ${data.provider_model}`}
+              </p>
+              <p>{review.rationale}</p>
+              <ul>
+                {review.findings.map((finding: any, i: number) => (
+                  <li key={i}>
+                    <strong>{finding.severity}</strong> · {finding.summary}
+                    <details>
+                      <summary>
+                        Review evidence: {finding.evidence.join(", ")}
+                      </summary>
+                      <pre>
+                        {JSON.stringify(
+                          Object.fromEntries(
+                            finding.evidence.map((key: string) => [
+                              key,
+                              reviewEvidence?.[key] ??
+                                "Recorded evidence unavailable",
+                            ]),
+                          ),
+                          null,
+                          2,
+                        )}
+                      </pre>
+                    </details>
+                  </li>
+                ))}
+              </ul>
+              {review.follow_up && (
+                <p>
+                  <strong>Next action:</strong> {review.follow_up}
+                </p>
+              )}
+              <p className="muted">
+                This assessment cannot override tool failures or the owner
+                minimum. Applying the proposed change still requires your
+                approval.
+              </p>
+            </section>
+          )}
+          {!review && (proposal || data.completed.includes("systems")) && (
+            <p className="notice">
+              Legacy run: no independent Systems assessment was recorded. Its
+              existing proposal and decision history remain unchanged.
+            </p>
+          )}
           {proposal && (
             <p className="notice">
               Design proposal: {proposal.status}. Use the proposal approval
@@ -300,6 +365,15 @@ export default function CollaborationView({
               }}
             >
               <h3>Clarify and revise</h3>
+              {review?.follow_up && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() => setFeedback(review.follow_up)}
+                >
+                  Use Systems feedback
+                </button>
+              )}
               <p>
                 Explain what the agents should change. A new round preserves
                 earlier evidence and supersedes the challenged proposal. Run the
