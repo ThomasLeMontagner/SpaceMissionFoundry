@@ -4,7 +4,7 @@ import json
 import os
 import sqlite3
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request
 from fastapi.responses import Response, StreamingResponse
 from pydantic import Field
 from sqlalchemy.exc import OperationalError
@@ -14,6 +14,9 @@ from app.domain.requirement_checks import METRICS
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
+from app.services.collaboration import Clarification as CollaborationClarification
+from app.services.collaboration import Collaboration, stop_execution
+from app.services.collaboration import Start as CollaborationStart
 from app.services.design_inputs import EditChanges
 from app.services.sensitivity import Study, study
 from app.services.workflow import Workflow
@@ -89,6 +92,7 @@ class Restore(Command):
 def create_app(store=None):
     store = store or Store()
     service = Workflow(store)
+    collaboration = Collaboration(store)
     app = FastAPI(title="Mission Foundry", version="0.1.0", dependencies=[Depends(authorize)])
     app.state.store = store
 
@@ -141,6 +145,33 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/archive")
     def archive(id: str, body: Archive):
         return service.archive(id, body.revision, body.archived)
+
+    @app.post("/api/missions/{id}/collaboration")
+    def start_collaboration(id: str, body: CollaborationStart):
+        return collaboration.start(id, body)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/step")
+    def collaboration_step(id: str, run_id: str, body: Command):
+        return collaboration.step(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/run", status_code=202)
+    def run_collaboration(id: str, run_id: str, body: Command, background: BackgroundTasks):
+        model = collaboration.begin_execution(id, run_id, body.revision)
+        background.add_task(
+            collaboration.execute_remaining,
+            id,
+            run_id,
+            model.entities[run_id].data["execution"]["id"],
+        )
+        return model
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/cancel")
+    def cancel_collaboration(id: str, run_id: str, body: Command):
+        return collaboration.cancel(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/collaboration/{run_id}/clarify")
+    def clarify_collaboration(id: str, run_id: str, body: CollaborationClarification):
+        return collaboration.clarify(id, run_id, body)
 
     @app.post("/api/missions", status_code=201)
     def create(body: Create):
@@ -233,6 +264,12 @@ def create_app(store=None):
         service.guard(old, body.revision)
         m = old.model_copy(deep=True)
         m.paused = not m.paused
+        if m.paused:
+            for run in m.entities.values():
+                if run.kind == "AgentRun" and run.data.get("workflow") == "duty-collaboration":
+                    stop_execution(
+                        run, "Mission paused; resume and explicitly run again to continue"
+                    )
         for p in m.proposals.values():
             if p.status in ["submitted", "challenged"] and p.target_revision == old.revision:
                 p.target_revision = old.revision + 1

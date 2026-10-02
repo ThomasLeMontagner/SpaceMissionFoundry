@@ -1,5 +1,32 @@
 # Validation record — 2026-09-09
 
+## Bounded automatic collaboration progression — 2026-09-29
+
+- Full SQLite backend suite: 121 passed, one PostgreSQL-only skip. Six execution cases cover completion without approval, duplicate/manual claim rejection, pause followed by quick resume, cancellation, provider failure without retry, and a concurrent human proposal remaining approvable. All six passed again after the final stop-message refinement. No paid model calls were made.
+- Frontend unit suite: 25 passed; production build, Prettier, Ruff lint/format and whitespace checks passed. The collaboration browser flow passed with Run until review, automatic stop at approval, recorded graph/timeline evidence, refresh, a manually initiated revision round and final human approval. Other browser workflows and PostgreSQL were not rerun for this change.
+- The local app was restarted and the new run endpoint verified read-only. No user mission data was edited. No dependency or database schema changes were required.
+- Requirements v0.14 and supporting documentation distinguish this bounded in-process worker from durable job scheduling. Browser closure does not stop execution; server-crash recovery remains explicit. Automatic approval, retry and continuation into a new revision round are not implemented. Pause/cancel invalidate the execution claim, with an in-flight call allowed to finish or be discarded respectively.
+
+## Collaboration clarification and revision — 2026-09-29
+
+- Full SQLite backend suite: 115 passed, one PostgreSQL-only skip. All 13 collaboration tests passed, including new feasible/infeasible minimum-duty requests, old-proposal supersession, unchanged accepted inputs until approval, fresh tool evidence, historical snapshot preservation, paused revision preparation, stale-source rejection and blocking provider results below the owner minimum.
+- Frontend: 25 unit tests passed; TypeScript/Vite build, Prettier, Ruff lint/format and patch whitespace checks passed. The collaboration browser workflow passed with challenge, clarification, a 3.5% minimum duty request, five new tasks, 23 retained timeline events and approval of the revised value. Existing unrelated browser workflows were not rerun for this change.
+- No paid model calls were made. The app was started and its clarification endpoint verified read-only. No user mission records were edited. No database migration or dependency change was required; PostgreSQL was not rerun.
+- Requirements v0.13, traceability, README and architecture describe up to three human-requested revision rounds. Simulation applies numeric constraints but does not interpret free-text feedback; general task replanning, independent Systems model review and cumulative cost accounting remain deferred.
+
+## Recorded collaboration interaction graph — 2026-09-22
+
+- Frontend unit suite: 25 passed, including recorded-edge navigation, historical tool-recipient normalization, new-event filtering and paused/terminal status checks. TypeScript/Vite build, Prettier and patch whitespace checks passed.
+- The collaboration Playwright workflow passed with graph connection selection, exact timeline filtering, clearing selection, refresh recovery and human approval. The updated graph screenshot was visually inspected. No live model calls or user mission changes were needed.
+- Requirements version 0.12.1 and MF-COL-013 traceability describe the partial delivery: recorded exchanges and current attention are visible, while general dependency and unresolved-disagreement semantics remain deferred. Backend code is unchanged from the initial slice, so backend tests were not repeated for this UI addition.
+
+## Initial agent collaboration slice — 2026-09-22
+
+- Full SQLite backend suite: 109 passed, one PostgreSQL-only skip. Two further baseline/scoping and generated-value/rejection cases were subsequently added; all nine collaboration cases passed. Tests cover durable proposal evidence, unchanged inputs before approval, immutable source revisions, retry, pause, cancellation, concurrent source changes and strict mocked provider responses. No paid model calls were made.
+- Frontend: 22 unit tests passed; TypeScript/Vite build and Prettier passed. All seven existing Playwright workflows passed. The new collaboration workflow passed after correcting a test locator and explicitly reopening the saved mission after refresh; it exercises five tasks, pause/resume, timeline filtering, refresh without duplicate events and human approval. The resulting collaboration screenshot was visually inspected.
+- Ruff lint/format and patch whitespace checks passed. No database schema changes or dependencies were introduced. PostgreSQL was not rerun for this slice; existing revision-snapshot persistence is reused.
+- Requirements version 0.12, traceability, README and collaboration architecture document the bounded duty-cycle scope. General mission design, independent Systems LLM review, background scheduling, clarification/replanning and interaction graphs remain incomplete. The live provider HTTP contract is mock-tested only.
+
 ## PostgreSQL saved-study reload test correction — 2026-09-20
 
 - Reproduced the pipeline failure against an isolated PostgreSQL 16 database on localhost port 55447, migrated to head and configured with SCRAM password authentication. The original saved-study reload test failed because `str(engine.url)` substituted a masked password when constructing its second Store.

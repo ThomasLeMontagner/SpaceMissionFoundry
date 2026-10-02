@@ -1,8 +1,8 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.11. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.14. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
-Agent collaboration and progress monitoring (specification section 7.14) is planned alongside the first genuine design-agent loop. Existing scripted agent runs, model revision events, approval controls and replay are reusable foundations, not evidence that live LLM collaboration is implemented. The current optional LLM adapter only refines proposal rationale.
+Agent collaboration and progress monitoring (section 7.14) now has a bounded duty-cycle negotiation slice with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -19,21 +19,21 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MIS-009 | Deferred | Fixed reference scope confirmation; general extraction and clarification editing incomplete. |
 | MF-MIS-010 | Implemented | Archive actions in saved-mission list and workspace, archived list and restore action; browser regression. Permanent deletion is not provided. |
 | MF-MIS-011 | Implemented | Revision-checked audit events, archived edit guards, preserved baseline/revision exports and resumable pending approvals; test_archive.py. |
-| MF-AGT-001 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-002 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-003 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
+| MF-AGT-001 | Implemented | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-002 | Implemented | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-003 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
 | MF-AGT-004 | Implemented | Structured proposal validation, stage phase/role/content guards at submission and acceptance, and interface endpoint shape validation; test_workflow_sanity.py. Fully discriminated payload schemas remain deferred. |
-| MF-AGT-005 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-006 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-007 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-008 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-009 | Implemented | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-010 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
+| MF-AGT-005 | Implemented | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-006 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-007 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-008 | Implemented | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-009 | Implemented | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-010 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
 | MF-AGT-011 | Partial | Human edit proposals, before/after inspection, acceptance/rejection/challenge; general agent counter-proposals deferred. |
-| MF-AGT-012 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-013 | Deferred | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-014 | Deferred | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
-| MF-AGT-015 | Partial | Dependency-ordered mock roles; real adapter rationale-only; no durable jobs or general agent negotiation. |
+| MF-AGT-012 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-013 | Deferred | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-014 | Deferred | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
+| MF-AGT-015 | Partial | Reference workflow uses scripted roles and optional rationale refinement; separate durable duty negotiation supports structured model values. A bounded background runner executes an explicitly requested round; no general agent negotiation or durable job scheduler. |
 | MF-MDL-001 | Implemented | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-002 | Partial | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-003 | Partial | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
@@ -149,19 +149,19 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-UI-012 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-013 | Partial | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
 | MF-UI-014 | Deferred | Workbench and object inspector; browser-tested primary flow; no formal accessibility certification. |
-| MF-COL-001 | Planned | Agent team view with task, status and source revision; existing AgentRun records are only a foundation. |
-| MF-COL-002 | Planned | Structured task and collaboration events with durable identifiers and correlation. |
-| MF-COL-003 | Planned | Sender/recipient, purpose, affected objects and request/reply links. |
-| MF-COL-004 | Planned | Live collaboration timeline with agent/task/event/object filters. |
-| MF-COL-005 | Planned | Recorded action explanations linked to evidence and proposals; existing object inspection is reusable. |
-| MF-COL-006 | Planned | Explicit distinction between simulation, live execution, proposed data and accepted data across collaboration views. |
-| MF-COL-007 | Planned | Disagreements, competing alternatives and unresolved questions linked to progress and review readiness. |
-| MF-COL-008 | Planned | Waiting/blocked task dependencies with reasons and responsible roles. |
-| MF-COL-009 | Planned | Existing approval/pause controls extended to genuine agent tasks and clarification exchanges. |
-| MF-COL-010 | Planned | Durable collaboration event recovery and historical replay; current model replay does not yet cover these exchanges. |
-| MF-COL-011 | Planned | Source-revision tracking and stale-work handling for active agent tasks, building on current proposal revision guards. |
-| MF-COL-012 | Planned | Duration, tokens and cost with explicit measurement basis and unknown values; aggregate provider accounting is not implemented. |
-| MF-COL-013 | Planned | Interactive agent dependency/request/disagreement graph; Should priority after core views. |
+| MF-COL-001 | Partial | Five task cards with statuses and source revision; limited to Payload/tools/Bus & Ground/Systems duty negotiation. |
+| MF-COL-002 | Partial | Durable UUID events for bounded task starts, results, failures and approval decisions; bounded background execution start/stop events; no durable scheduler or general objection lifecycle. |
+| MF-COL-003 | Partial | Run-scoped tasks, sender/recipient, affected input, purpose and preceding-event links; generalized exchange threads remain future work. |
+| MF-COL-004 | Partial | SSE-refreshed timeline with agent/task/type filters and object-ID text search for this slice. |
+| MF-COL-005 | Partial | Concise summaries, expandable proposal/tool evidence and object inspection; broader source/assumption navigation incomplete. |
+| MF-COL-006 | Partial | Explicit simulation/live labels, real deterministic calculations and human-gated design proposals; HTTP live contract mock-tested only. |
+| MF-COL-007 | Partial | Recorded failing Payload budget and revised Bus proposal; failed revised checks block submission. Infeasible owner minimums block submission and can receive further clarification. General competing alternatives/objections remain future work. |
+| MF-COL-008 | Partial | Ordered task dependencies and actionable failure/stale/blocker messages; no generalized dependency solver. |
+| MF-COL-009 | Partial | Pause, cancel, challenge/accept/reject, bounded clarification/revision rounds and explicit Run until review. Automatic execution stops at human review or failure, never auto-approves, and cannot bypass pause through a quick resume. Feedback and prior responses reach both discipline agents; optional minimum duty is checked before submission. Old proposals are superseded, accepted inputs remain unchanged until fresh approval. Broad task replanning remains deferred. |
+| MF-COL-010 | Partial | Events persist in revision snapshots and survive browser refresh without duplicates; existing replay exposes historical records, dedicated timeline playback deferred. |
+| MF-COL-011 | Partial | Source fingerprint and revision guards discard outdated responses and preserve concurrent cancellation/edits; automatic replanning deferred. |
+| MF-COL-012 | Partial | Task durations and provider token reports in evidence, simulation zero usage and unknown live cost; aggregate accounting deferred. |
+| MF-COL-013 | Partial | Interactive recorded-exchange graph with event counts, current attention, keyboard navigation and role/connection timeline filters. Normalizes historical tool task recipients; live updates retain the selected exchange filter. Graph and browser regressions cover evidence navigation. General dependency and unresolved-disagreement modeling remain deferred. |
 | MF-IO-001 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-002 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-003 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
