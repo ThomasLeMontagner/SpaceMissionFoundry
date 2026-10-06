@@ -1,6 +1,6 @@
 # Mission Foundry
 
-> **Research and evaluation project**
+> **Disclaimer**
 >
 > This application is developed primarily using AI-generated code, with human direction and review. Its purpose is to assess the capabilities and limitations of AI agents in collaborative space-mission design.
 >
