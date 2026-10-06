@@ -101,3 +101,18 @@ test("paused and terminal runs do not claim active execution", () => {
     screen.getByText(/cancelled. Recorded activity; no task is running/),
   ).toBeInTheDocument();
 });
+
+test("blocked Systems review directs attention to the mission owner", () => {
+  render(
+    <CollaborationGraph
+      events={events}
+      stage="systems"
+      status="blocked"
+      paused={false}
+      mode="simulation"
+      selection=""
+      onSelect={vi.fn()}
+    />,
+  );
+  expect(screen.getByText(/Next attention: Mission Owner/)).toBeInTheDocument();
+});
