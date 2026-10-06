@@ -1,5 +1,11 @@
 # Mission Foundry
 
+> **Research and evaluation project**
+>
+> This application is developed primarily using AI-generated code, with human direction and review. Its purpose is to assess the capabilities and limitations of AI agents in collaborative space-mission design.
+>
+> The software and its outputs are experimental. Automated tests and internal checks do not establish engineering validity or mission readiness. Any design, calculation, or recommendation requires independent validation by qualified engineers before operational use.
+
 A local, model-centered conceptual mission engineering workbench. Six versioned discipline roles propose a wildfire-monitoring CubeSat concept, deterministic tools analyze approved inputs, and a human approves an immutable concept baseline.
 
 The reference workflow supports resource budgets, preliminary coverage and ground access, conditional data delivery, quantitative requirement checks, declared data-interface checks, saved sensitivity studies, baseline comparison and reversible mission archiving. See [setup](#run-without-docker), the [workflow walkthrough](#demonstrate-the-vertical-workflow), and [scope and limitations](#scope-and-limitations).
