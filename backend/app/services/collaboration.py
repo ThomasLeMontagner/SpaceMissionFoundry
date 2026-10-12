@@ -14,6 +14,7 @@ from app.domain.models import Operation, Proposal, Strict, now
 from app.domain.protocol import validate
 from app.engineering_tools.calculations import execute, fraction
 from app.orchestration.scenario import entity
+from app.services import run_budget
 from app.services.design_inputs import IMPACT_KINDS, EditChanges, edited_entity, read_inputs
 from app.services.execution_recovery import (
     STAGES,
@@ -24,7 +25,7 @@ from app.services.execution_recovery import (
 )
 from app.services.workflow import Workflow
 
-ACTIVE = {"ready", "working", "failed", "interrupted"}
+ACTIVE = {"ready", "working", "failed", "interrupted", "budget_blocked"}
 
 
 class Start(Strict):
@@ -32,6 +33,7 @@ class Start(Strict):
     candidate: Literal["wide", "selective"]
     goal: str = Field(min_length=3, max_length=1000)
     mode: Literal["simulation", "live"] = "simulation"
+    limits: run_budget.Limits = Field(default_factory=run_budget.Limits)
 
 
 class Clarification(Strict):
@@ -123,7 +125,8 @@ class Collaboration:
             f"{request.candidate} · observation duty collaboration",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.2",
+            version="1.3",
+            budget=run_budget.create(request.limits, request.mode),
             mode=request.mode,
             provider_model=os.getenv("LLM_MODEL")
             if request.mode == "live"
@@ -425,8 +428,15 @@ class Collaboration:
                 "Design changed. Start a new collaboration from current inputs.",
             )
             return self.store.save(m, "orchestrator", "Collaboration source became stale", old)
+        blocked = run_budget.reason(run.data, before=True)
+        if blocked:
+            run.data["status"] = "budget_blocked"
+            record(run, "budget_blocked", "orchestrator", "human", blocked)
+            stop_execution(run, blocked)
+            return self.store.save(m, "orchestrator", "Collaboration budget blocked task", old)
         stage = run.data["stage"]
         attempt = str(uuid4())
+        run_budget.reserve(run.data, attempt)
         run.data.update(
             status="working",
             attempt=attempt,
@@ -459,7 +469,13 @@ class Collaboration:
             return current  # Recover after expiry and restoring/reopening, or cancel.
         updated = current.model_copy(deep=True)
         run = get_run(updated, run_id)
-        if lease_expired(run.data.get("task_lease")):
+        elapsed = perf_counter() - timer
+        run_budget.settle(run.data, attempt, result, elapsed)
+        blocked = run_budget.reason(run.data)
+        if blocked:
+            run.data["status"] = "budget_blocked"
+            record(run, "budget_blocked", "orchestrator", "human", blocked)
+        elif lease_expired(run.data.get("task_lease")):
             run.data["status"] = "interrupted"
             record(
                 run,
@@ -504,6 +520,7 @@ class Collaboration:
             except Exception:
                 updated = current.model_copy(deep=True)
                 run = get_run(updated, run_id)
+                run_budget.settle(run.data, attempt, result, elapsed)
                 run.data["status"] = "failed"
                 record(
                     run,

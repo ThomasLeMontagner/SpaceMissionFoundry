@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RunBudget from "./RunBudget";
 import RecoveryControls from "./RecoveryControls";
 import type { Model } from "./types";
 import CollaborationGraph, { selectedEventIds } from "./CollaborationGraph";
@@ -32,6 +33,9 @@ export default function CollaborationView({
   const [goal, setGoal] = useState(
     "Increase observation time while respecting storage and downlink capacity.",
   );
+  const [costLimit, setCostLimit] = useState("1");
+  const [tokenLimit, setTokenLimit] = useState("100000");
+  const [timeLimit, setTimeLimit] = useState("3600");
   const [mode, setMode] = useState("simulation");
   const [selected, setSelected] = useState("");
   const [agent, setAgent] = useState("");
@@ -56,7 +60,9 @@ export default function CollaborationView({
     ["submitted", "challenged"].includes(p.status),
   );
   const active = runs.some((r) =>
-    ["ready", "working", "failed", "interrupted"].includes(r.data.status),
+    ["ready", "working", "failed", "interrupted", "budget_blocked"].includes(
+      r.data.status,
+    ),
   );
   const editable = !model.baseline && !model.archived;
   const events: any[] = data?.events || [];
@@ -108,7 +114,16 @@ export default function CollaborationView({
         onSubmit={(e) => {
           e.preventDefault();
           setSelected("");
-          act("/collaboration", { candidate, goal, mode });
+          act("/collaboration", {
+            candidate,
+            goal,
+            mode,
+            limits: {
+              cost_eur: Number(costLimit),
+              tokens: Number(tokenLimit),
+              elapsed_seconds: Number(timeLimit),
+            },
+          });
         }}
       >
         <div className="row">
@@ -140,6 +155,52 @@ export default function CollaborationView({
             onChange={(e) => setGoal(e.target.value)}
           />
         </label>
+        <fieldset>
+          <legend>Limits for the entire collaboration</legend>
+          <div className="row">
+            <label>
+              Estimated cost limit (EUR)
+              <input
+                type="number"
+                required
+                min="0"
+                max="10000"
+                step="any"
+                value={costLimit}
+                onChange={(e) => setCostLimit(e.target.value)}
+              />
+            </label>
+            <label>
+              Token limit
+              <input
+                type="number"
+                required
+                min="0"
+                max="10000000"
+                step="1"
+                value={tokenLimit}
+                onChange={(e) => setTokenLimit(e.target.value)}
+              />
+            </label>
+            <label>
+              Execution window (seconds, including pauses)
+              <input
+                type="number"
+                required
+                min="1"
+                max="86400"
+                step="1"
+                value={timeLimit}
+                onChange={(e) => setTimeLimit(e.target.value)}
+              />
+            </label>
+          </div>
+          <p className="muted">
+            Live calls need room for a conservative reservation of 29,120 tokens
+            each. Limits and usage persist across retries, recovery and revision
+            rounds.
+          </p>
+        </fieldset>
         <button
           disabled={
             busy ||
@@ -196,6 +257,7 @@ export default function CollaborationView({
             feasibility. Recorded results describe their source inputs;
             subsequent design changes require a new run.
           </p>
+          <RunBudget budget={data.budget} />
           {model.paused && (
             <p className="notice">
               Paused — resume the mission to execute another task.
@@ -207,9 +269,9 @@ export default function CollaborationView({
               lease below if progress has stopped.
             </p>
           )}
-          {["failed", "stale", "blocked"].includes(data.status) && (
-            <p className="notice">{events.at(-1)?.summary}</p>
-          )}
+          {["failed", "stale", "blocked", "budget_blocked"].includes(
+            data.status,
+          ) && <p className="notice">{events.at(-1)?.summary}</p>}
           {(["working", "interrupted"].includes(data.status) ||
             data.execution?.status === "running") && (
             <RecoveryControls
@@ -274,9 +336,13 @@ export default function CollaborationView({
               disabled={
                 busy ||
                 !editable ||
-                !["ready", "working", "failed", "interrupted"].includes(
-                  data.status,
-                )
+                ![
+                  "ready",
+                  "working",
+                  "failed",
+                  "interrupted",
+                  "budget_blocked",
+                ].includes(data.status)
               }
               onClick={() => act(`/collaboration/${run!.id}/cancel`)}
             >

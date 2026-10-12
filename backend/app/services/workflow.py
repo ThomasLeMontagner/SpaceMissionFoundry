@@ -428,7 +428,8 @@ class Workflow:
             raise ValueError("Explicit human confirmation after independent review is required")
         if any(
             e.data.get("workflow") == "duty-collaboration"
-            and e.data.get("status") in ["ready", "working", "failed", "interrupted"]
+            and e.data.get("status")
+            in ["ready", "working", "failed", "interrupted", "budget_blocked"]
             for e in old.entities.values()
         ):
             raise ValueError("Finish or cancel active collaboration before baseline approval")

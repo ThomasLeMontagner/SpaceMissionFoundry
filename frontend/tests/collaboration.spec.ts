@@ -38,6 +38,8 @@ test("collaboration records negotiation and waits for owner approval", async ({
     name: "Agent collaboration",
     exact: true,
   });
+  await view.getByLabel("Estimated cost limit (EUR)").fill("0");
+  await view.getByLabel("Token limit", { exact: true }).fill("0");
   await view
     .getByRole("button", { name: "Start collaboration", exact: true })
     .click();
@@ -52,6 +54,10 @@ test("collaboration records negotiation and waits for owner approval", async ({
     view.getByText(/5 of 5 execution tasks completed/),
   ).toBeVisible();
   await expect(view.getByText(/Automatic progression: stopped/)).toBeVisible();
+  const budget = view.getByRole("region", { name: "Run budget and usage" });
+  await expect(budget.getByText(/Accounted tokens: 0 \/ 0/)).toBeVisible();
+  await expect(budget.getByRole("row")).toHaveCount(6);
+  await budget.screenshot({ path: "test-results/run-budget.png" });
   const review = view.getByRole("region", {
     name: "Systems review",
     exact: true,

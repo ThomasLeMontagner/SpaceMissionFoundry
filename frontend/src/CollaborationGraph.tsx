@@ -84,6 +84,7 @@ export default function CollaborationGraph({
     "blocked",
     "failed",
     "interrupted",
+    "budget_blocked",
   ].includes(status)
     ? "human"
     : executor(stage);
@@ -91,6 +92,7 @@ export default function CollaborationGraph({
     "ready",
     "working",
     "interrupted",
+    "budget_blocked",
     "failed",
     "blocked",
     "awaiting_approval",

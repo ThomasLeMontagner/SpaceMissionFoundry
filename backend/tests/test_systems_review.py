@@ -191,6 +191,13 @@ def test_live_review_is_separate_structured_call_and_fails_closed(client, monkey
     run = model["entities"][run_id]["data"]
     assert run["status"] == ("failed" if invalid else "awaiting_approval")
     assert (run["proposal_id"] is None) == invalid
+    live_attempts = [entry for entry in run["budget"]["attempts"] if entry["live"]]
+    assert len(live_attempts) == 3
+    assert [entry["reported_tokens"] for entry in live_attempts] == [
+        55,
+        55,
+        None if invalid else 55,
+    ]
 
 
 @pytest.mark.parametrize(
