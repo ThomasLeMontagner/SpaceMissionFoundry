@@ -1,7 +1,5 @@
-"""Revision-safe, human-stepped design collaboration with durable event evidence."""
+"""Bounded design collaboration with revision-safe checkpoints and event evidence."""
 
-import hashlib
-import json
 import os
 from copy import deepcopy
 from time import perf_counter
@@ -17,10 +15,16 @@ from app.domain.protocol import validate
 from app.engineering_tools.calculations import execute, fraction
 from app.orchestration.scenario import entity
 from app.services.design_inputs import IMPACT_KINDS, EditChanges, edited_entity, read_inputs
+from app.services.execution_recovery import (
+    STAGES,
+    fingerprint,
+    lease_deadline,
+    lease_expired,
+    recovery_details,
+)
 from app.services.workflow import Workflow
 
-STAGES = ["payload", "evaluate_payload", "bus", "evaluate_bus", "systems"]
-ACTIVE = {"ready", "working", "failed"}
+ACTIVE = {"ready", "working", "failed", "interrupted"}
 
 
 class Start(Strict):
@@ -36,11 +40,9 @@ class Clarification(Strict):
     minimum_duty: float | None = Field(default=None, ge=0, le=1)
 
 
-def fingerprint(model):
-    values = {
-        k: e.model_dump(mode="json") for k, e in model.entities.items() if e.kind in IMPACT_KINDS
-    }
-    return hashlib.sha256(json.dumps(values, sort_keys=True).encode()).hexdigest()
+class Recovery(Strict):
+    revision: int = Field(ge=0)
+    retry_uncertain: bool = Field(default=False, strict=True)
 
 
 def record(run, kind, sender, recipient, summary, evidence=None):
@@ -121,7 +123,7 @@ class Collaboration:
             f"{request.candidate} · observation duty collaboration",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.1",
+            version="1.2",
             mode=request.mode,
             provider_model=os.getenv("LLM_MODEL")
             if request.mode == "live"
@@ -281,13 +283,15 @@ class Collaboration:
             )
         if run.data.get("execution", {}).get("status") == "running":
             raise ValueError(
-                "Automatic progression already claimed; cancel interrupted work before restarting"
+                "Automatic progression already claimed; recover an expired checkpoint or cancel"
             )
         if fingerprint(old) != run.data["fingerprint"]:
             raise ValueError("Design changed; start a new collaboration")
         m = old.model_copy(deep=True)
         run = get_run(m, run_id)
-        run.data["execution"] = dict(id=str(uuid4()), status="running", started_at=now())
+        run.data["execution"] = dict(
+            id=str(uuid4()), status="running", started_at=now(), lease_expires_at=lease_deadline()
+        )
         record(
             run,
             "execution_started",
@@ -296,6 +300,48 @@ class Collaboration:
             "Run remaining tasks until review, pause, cancellation or failure. No automatic approval or retry.",
         )
         return self.store.save(m, "human", "Requested automatic collaboration progression", old)
+
+    def recovery(self, mission_id, run_id):
+        model = self.store.get(mission_id)
+        return recovery_details(model, get_run(model, run_id))
+
+    def recover(self, mission_id, run_id, request):
+        old = self.store.get(mission_id)
+        self.workflow.guard(old, request.revision)
+        run = get_run(old, run_id)
+        details = recovery_details(old, run)
+        if not details["available"]:
+            raise ValueError(details["reason"])
+        if details["requires_confirmation"] and not request.retry_uncertain:
+            raise ValueError(
+                "The previous model call has an unknown outcome and may already have incurred a charge. Explicitly confirm retry before recovering."
+            )
+        if any(
+            e.id != run_id
+            and e.data.get("workflow") == "duty-collaboration"
+            and e.data.get("status") in ACTIVE
+            for e in old.entities.values()
+        ):
+            raise ValueError("Finish or cancel the other active collaboration first")
+        m = old.model_copy(deep=True)
+        run = get_run(m, run_id)
+        previous_attempt = run.data.get("attempt")
+        stop_execution(run, "Expired execution superseded by explicit checkpoint recovery")
+        run.data.update(status="ready", attempt=str(uuid4()), task_lease=None)
+        record(
+            run,
+            "recovered",
+            "human",
+            "orchestrator",
+            "Checkpoint recovered without executing work. Completed tasks and evidence are preserved; explicitly run the next task or run until review.",
+            {
+                "previous_attempt": previous_attempt,
+                "completed": list(run.data["completed"]),
+                "unknown_model_outcome": details["requires_confirmation"],
+                "retry_confirmed": request.retry_uncertain,
+            },
+        )
+        return self.store.save(m, "human", "Recovered interrupted collaboration checkpoint", old)
 
     def execute_remaining(self, mission_id, run_id, execution_id):
         # The durable claim fences competing requests. The worker is deliberately bounded
@@ -308,6 +354,8 @@ class Collaboration:
                 execution = run.data.get("execution", {})
                 if execution.get("id") != execution_id or execution.get("status") != "running":
                     return
+                if lease_expired(execution.get("lease_expires_at")):
+                    return  # Preserve the expired claim for explicit recovery, never replay work.
                 if current.archived or current.baseline:
                     return
                 if current.paused:
@@ -323,7 +371,7 @@ class Collaboration:
         except Exception:
             reason = "Execution interrupted; reload and inspect the run. Retry explicitly or cancel; no task was automatically retried."
         # A concurrent mutation can win this bookkeeping write. Never overwrite it;
-        # an uncleared claim remains visibly interrupted and can be cancelled.
+        # an uncleared claim can be recovered after expiry or cancelled.
         try:
             current = self.store.get(mission_id)
             run = get_run(current, run_id)
@@ -353,6 +401,8 @@ class Collaboration:
         if execution_id is not None:
             if execution.get("id") != execution_id or execution.get("status") != "running":
                 raise ValueError("Execution claim is no longer active")
+            if lease_expired(execution.get("lease_expires_at")):
+                raise ValueError("Execution lease expired; recover from the saved checkpoint")
         elif execution.get("status") == "running":
             raise ValueError(
                 "Automatic progression owns this run; pause or cancel before manual work"
@@ -361,7 +411,7 @@ class Collaboration:
             raise ValueError("Workflow paused; resume before the next collaboration step")
         if run.data["status"] not in ["ready", "failed"] or run.data["attempts"] >= 10:
             raise ValueError(
-                "Run cannot advance; cancel interrupted work or start a new run after the attempt limit"
+                "Run cannot advance; recover an expired checkpoint, or cancel and start a new run"
             )
         m = old.model_copy(deep=True)
         run = get_run(m, run_id)
@@ -377,7 +427,14 @@ class Collaboration:
             return self.store.save(m, "orchestrator", "Collaboration source became stale", old)
         stage = run.data["stage"]
         attempt = str(uuid4())
-        run.data.update(status="working", attempt=attempt, attempts=run.data["attempts"] + 1)
+        run.data.update(
+            status="working",
+            attempt=attempt,
+            attempts=run.data["attempts"] + 1,
+            task_lease=lease_deadline(),
+        )
+        if run.data.get("execution", {}).get("status") == "running":
+            run.data["execution"]["lease_expires_at"] = run.data["task_lease"]
         record(
             run,
             "started",
@@ -399,10 +456,19 @@ class Collaboration:
         if current_run.data.get("attempt") != attempt or current_run.data["status"] != "working":
             return current
         if current.archived or current.baseline:
-            return current  # Remains visibly interrupted; cancel after restoring/reopening.
+            return current  # Recover after expiry and restoring/reopening, or cancel.
         updated = current.model_copy(deep=True)
         run = get_run(updated, run_id)
-        if fingerprint(current) != run.data["fingerprint"]:
+        if lease_expired(run.data.get("task_lease")):
+            run.data["status"] = "interrupted"
+            record(
+                run,
+                "interrupted",
+                "orchestrator",
+                "human",
+                "Task lease expired; late response discarded. Recover the checkpoint explicitly before retrying.",
+            )
+        elif fingerprint(current) != run.data["fingerprint"]:
             run.data["status"] = "stale"
             record(
                 run,
@@ -452,6 +518,10 @@ class Collaboration:
                 run, f"Stopped for {run.data['status']}: {run.data['events'][-1]['summary']}"
             )
         # Compare-and-swap preserves concurrent mutations; a losing worker cannot overwrite them.
+        if run.data["status"] != "interrupted":
+            run.data["task_lease"] = None
+        if run.data.get("execution", {}).get("status") == "running":
+            run.data["execution"]["lease_expires_at"] = lease_deadline()
         advance_pending_metadata(updated)
         return self.store.save(updated, "orchestrator", "Collaboration task result", current)
 

@@ -79,12 +79,18 @@ export default function CollaborationGraph({
     if (!edges.has(key)) edges.set(key, { from, to, ids: [] });
     edges.get(key)!.ids.push(event.id);
   }
-  const current = ["awaiting_approval", "blocked", "failed"].includes(status)
+  const current = [
+    "awaiting_approval",
+    "blocked",
+    "failed",
+    "interrupted",
+  ].includes(status)
     ? "human"
     : executor(stage);
   const active = [
     "ready",
     "working",
+    "interrupted",
     "failed",
     "blocked",
     "awaiting_approval",
