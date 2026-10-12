@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RecoveryControls from "./RecoveryControls";
 import type { Model } from "./types";
 import CollaborationGraph, { selectedEventIds } from "./CollaborationGraph";
 
@@ -55,7 +56,7 @@ export default function CollaborationView({
     ["submitted", "challenged"].includes(p.status),
   );
   const active = runs.some((r) =>
-    ["ready", "working", "failed"].includes(r.data.status),
+    ["ready", "working", "failed", "interrupted"].includes(r.data.status),
   );
   const editable = !model.baseline && !model.archived;
   const events: any[] = data?.events || [];
@@ -94,8 +95,8 @@ export default function CollaborationView({
         progression stops for approval, clarification or failure and never
         approves a change. Pause prevents subsequent tasks; an in-flight call
         may finish. Resume does not restart automatic progression. Cancel
-        discards an in-flight response. Interrupted work can be cancelled and
-        restarted.
+        discards an in-flight response. After a server interruption, wait for
+        the two-minute lease to expire and resume from the saved checkpoint.
       </p>
       {model.baseline && (
         <p className="notice">
@@ -202,12 +203,23 @@ export default function CollaborationView({
           )}
           {data.status === "working" && (
             <p role="status">
-              Working on {labels[data.stage]}. A completed response will be
-              recorded; after an interruption, cancel and start a new run.
+              Last recorded task: {labels[data.stage]}. Check the execution
+              lease below if progress has stopped.
             </p>
           )}
           {["failed", "stale", "blocked"].includes(data.status) && (
             <p className="notice">{events.at(-1)?.summary}</p>
+          )}
+          {(["working", "interrupted"].includes(data.status) ||
+            data.execution?.status === "running") && (
+            <RecoveryControls
+              key={`${run!.id}:${data.attempt || ""}:${model.revision}`}
+              missionId={model.id}
+              runId={run!.id}
+              revision={model.revision}
+              busy={busy}
+              act={act}
+            />
           )}
           <div className="collaboration-tasks">
             {stages.map((s, index) => (
@@ -262,7 +274,9 @@ export default function CollaborationView({
               disabled={
                 busy ||
                 !editable ||
-                !["ready", "working", "failed"].includes(data.status)
+                !["ready", "working", "failed", "interrupted"].includes(
+                  data.status,
+                )
               }
               onClick={() => act(`/collaboration/${run!.id}/cancel`)}
             >
@@ -274,9 +288,9 @@ export default function CollaborationView({
           </div>
           {data.execution && (
             <p role="status">
-              Automatic progression: {data.execution.status}.{" "}
+              Automatic progression: {data.execution.status} (last recorded).{" "}
               {data.execution.status === "running"
-                ? "Tasks continue on the server while this page is open or closed. If interrupted by a server restart, cancel and start a new run."
+                ? "Tasks continue on the server while this page is open or closed. If the server stops, saved work can be recovered after lease expiry."
                 : data.execution.reason}
             </p>
           )}

@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.15. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.16. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has a bounded duty-cycle negotiation slice with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -164,6 +164,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-COL-013 | Partial | Interactive recorded-exchange graph with event counts, current attention, keyboard navigation and role/connection timeline filters. Normalizes historical tool task recipients; live updates retain the selected exchange filter. Graph and browser regressions cover evidence navigation. General dependency and unresolved-disagreement modeling remain deferred. |
 | MF-COL-014 | Implemented | Separate SystemsReview contract and model call for bounded duty proposals; context and typed findings recorded in AgentRun events and displayed with evidence. Rules-based simulation explicitly labeled. Mock HTTP tests prove the third call reviews actual proposal/tool values. |
 | MF-COL-015 | Implemented | Mandatory deterministic gates precede review; invalid/blocked reviews cannot submit. Tests cover submit/revise/clarify, malformed findings, stale/pause/cancel interruptions, unchanged accepted inputs and prior-review handoff. Browser/unit tests cover human approval, evidence display, feedback reuse and legacy labeling. |
+| MF-COL-016 | Implemented | execution_recovery.py and test_execution_recovery.py cover reopened stores, completed-evidence preservation, expired claims, attempt fencing, immutable snapshots, source/authority/attempt guards and legacy timestamps. Playwright resumes a persisted interrupted checkpoint through review without changing accepted inputs. |
+| MF-COL-017 | Implemented | RecoveryControls polls read-only status and requires explicit acknowledgement for unknown live outcomes. Strict recovery API records the choice without executing tools/providers. Backend and UI tests cover confirmation, no-call recovery, stale/blocked controls and lease expiry. |
 | MF-IO-001 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-002 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
 | MF-IO-003 | Implemented | Baseline JSON/Markdown/CSV export; general import deferred. |
@@ -181,7 +183,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-NFR-REL-001 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-REL-002 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-REL-003 | Partial | See architecture and README limitations; local single-owner reference workflow only. |
-| MF-NFR-REL-004 | Partial | See architecture and README limitations; local single-owner reference workflow only. |
+| MF-NFR-REL-004 | Partial | Duty collaboration has persisted task/execution leases, atomic checkpoints and explicit recovery retaining completed evidence. Restarted-store, late-response, unknown-live-outcome, revision/source/authority guards and browser recovery tests cover this slice. Automatic scheduling and generalized workflow recovery remain deferred. |
 | MF-NFR-REL-005 | Implemented | SQLite WAL and bounded busy timeout, atomic revision writes, BEGIN IMMEDIATE saved-study validation, and HTTP 503 contention response; test_sqlite_concurrency.py covers overlapping readers/writers, stale writes, archive/edit races, rollback and retry. |
 | MF-NFR-AUD-001 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
 | MF-NFR-AUD-002 | Implemented | See architecture and README limitations; local single-owner reference workflow only. |
