@@ -1,5 +1,12 @@
 # Validation record — 2026-09-09
 
+## PostgreSQL test connection cleanup — 2026-10-13
+
+- GitHub's PostgreSQL job failed with `FATAL: sorry, too many clients already`. The shared test fixture created a new SQLAlchemy pool per test without disposing it, leaving idle connections open across the suite. The fixture now uses a managed TestClient context and disposes its engine in `finally`, including setup/test failures. Production pooling and database connection limits are unchanged.
+- Two regression cases exercise the actual fixture on normal completion and an injected test failure, asserting that physical connections close and the pool retains no connections. Both passed on SQLite. Targeted SQLite workflow, background-execution and concurrency checks also passed: 24 passed, one PostgreSQL-only skip.
+- Full PostgreSQL verification completed: **171 passed**, no skips, on an isolated UTF-8 PostgreSQL 16 instance with `max_connections=20`, after migrating through Alembic head. Runtime: 339.60 seconds. The temporary server used a private Unix socket and was stopped after testing; user databases were untouched. The earlier interrupted session's final outcome was unavailable, so this complete rerun is the recorded result.
+- Ruff lint/format and patch whitespace checks passed. Frontend code was unchanged and browser tests were not rerun. Existing TestClient dependency deprecation warnings remain unrelated to the connection exhaustion.
+
 ## Collaboration run budgets and usage monitoring — 2026-10-12
 
 - Complete SQLite regression coverage passed in two disjoint groups: 66 collaboration/budget/recovery cases and 102 other backend cases, with one PostgreSQL-only skip. Total: 168 passed, one skipped. Eighteen new budget cases cover pre-call admission, cumulative reported usage across rounds, retained unknown reservations after failure/cancellation/recovery, a reopened Store, deadline checks before/after calls, reported overruns, changed pricing, legacy guards and bounded finite inputs. Existing mocked HTTP Systems review tests now verify three-call token accounting and retained reservations for invalid reviews.
