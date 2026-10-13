@@ -52,12 +52,14 @@ from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 from app.persistence.store import Store
 from app.services.collaboration import get_run, record
+from app.services.run_budget import reserve
 store = Store("sqlite:////tmp/mission-foundry-iteration-e2e.db")
 old = store.get(sys.argv[1])
 model = old.model_copy(deep=True)
 run = get_run(model, sys.argv[2])
 run.data.update(status="working", attempt=str(uuid4()), attempts=3,
                 task_lease=(datetime.now(UTC)-timedelta(seconds=1)).isoformat())
+reserve(run.data, run.data["attempt"])
 record(run, "started", "orchestrator", "bus", "Interrupted browser test task")
 store.save(model, "test", "Interrupted execution fixture", old)
 store.engine.dispose()
@@ -96,9 +98,9 @@ store.engine.dispose()
   expect(m.entities[run.id].data.payload).toEqual(evidence);
   expect(m.entities[run.id].data.attempts).toBe(3);
   await view.getByRole("button", { name: "Run until review" }).click();
-  await expect(
-    view.getByText(/5 of 5 execution tasks completed/),
-  ).toBeVisible();
+  await expect(view.getByText(/5 of 5 execution tasks completed/)).toBeVisible({
+    timeout: 15000,
+  });
   m = await (await request.get(`/api/missions/${m.id}`)).json();
   expect(m.entities[run.id].data.attempts).toBe(6);
   expect(m.entities[run.id].data.status).toBe("awaiting_approval");

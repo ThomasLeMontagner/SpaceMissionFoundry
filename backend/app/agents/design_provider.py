@@ -10,6 +10,9 @@ from pydantic import Field
 from app.domain.models import Strict
 from app.engineering_tools.calculations import q
 
+# Full allowed context, instruction/protocol allowance and bounded output.
+CALL_TOKEN_RESERVATION = 24000 + 4096 + 1024
+
 
 class DutyProposal(Strict):
     duty: float = Field(ge=0, le=1, strict=True)
@@ -61,7 +64,11 @@ def request_json(instructions, context, contract):
         allowance = float(os.environ["MAX_RUN_COST_EUR"])
         if not all(math.isfinite(v) and v > 0 for v in [price, allowance]):
             raise ValueError()
-        if len(content) > 24000 or (len(content) + 4096 + 1024) * price / 1e6 > allowance:
+        if (
+            len(instructions.encode("utf-8")) > 3000
+            or len(content) > 24000
+            or (len(content) + 4096 + 1024) * price / 1e6 > allowance
+        ):
             raise ValueError()
         with httpx.Client(timeout=30) as client:
             response = client.post(
