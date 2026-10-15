@@ -1,5 +1,13 @@
 # Validation record — 2026-09-09
 
+## Bounded data-system alternatives — 2026-10-13
+
+- Full PostgreSQL backend suite: **188 passed**, no skips, after Alembic migration on an isolated UTF-8 PostgreSQL 16 instance with `max_connections=20` (416.65 seconds). The temporary server was stopped after testing; no user databases were touched.
+- Full SQLite backend suite: **187 passed, one PostgreSQL-only skip**. Seventeen new cases cover strict owner bounds/options, deterministic evaluation, three-field human approval, immutable source history, infeasibility, clarification, recovery, concurrent pause/cancel/source changes, separate mocked HTTP selection and token accounting. Invalid selection fails; revise/clarify blocks; no eligible option skips the live review and reservation.
+- All **41 frontend unit tests** passed; TypeScript and production build passed. Ruff lint/format and whitespace checks passed.
+- Both targeted browser workflows passed: existing duty negotiation with clarification and approval, and the new alternatives comparison through approval of duty/compression/storage together. The new test's approval selector was corrected to the existing “Approve design change” label. The existing workflow completion assertion now permits 15 seconds under concurrent load. The comparison screenshot was visually inspected. Browser tests used disposable SQLite data; no user missions were changed.
+- Requirements v0.18 adds MF-COL-020–021, with README, architecture and traceability updates. Workflow version 1.4 reuses existing persistence, recovery and whole-run budgets; no database migration or dependency was added. Tests use simulation and mocked provider HTTP; no paid model validation is claimed. Compression quality, science adequacy and storage hardware impacts remain unverified.
+
 ## PostgreSQL test connection cleanup — 2026-10-13
 
 - GitHub's PostgreSQL job failed with `FATAL: sorry, too many clients already`. The shared test fixture created a new SQLAlchemy pool per test without disposing it, leaving idle connections open across the suite. The fixture now uses a managed TestClient context and disposes its engine in `finally`, including setup/test failures. Production pooling and database connection limits are unchanged.

@@ -8,6 +8,7 @@ from pydantic import Field
 
 from app.agents.design_provider import CALL_TOKEN_RESERVATION
 from app.domain.models import Strict
+from app.services import data_alternatives
 from app.services import execution_recovery as clock
 
 
@@ -52,6 +53,8 @@ def live_task(data):
     if data["mode"] != "live" or data["stage"] not in ["payload", "bus", "systems"]:
         return False
     if data["stage"] == "systems":
+        if data.get("study") == "data-system":
+            return bool(data_alternatives.eligible(data))
         minimum = data.get("minimum_duty")
         return (minimum is None or data["bus"]["duty"] >= minimum) and all(
             data["evaluate_bus"][tool]["outputs"].get("compliant") is True

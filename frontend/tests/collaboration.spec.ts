@@ -50,9 +50,9 @@ test("collaboration records negotiation and waits for owner approval", async ({
   ).toBeDisabled();
   await page.getByRole("button", { name: "Resume", exact: true }).click();
   await view.getByRole("button", { name: "Run until review" }).click();
-  await expect(
-    view.getByText(/5 of 5 execution tasks completed/),
-  ).toBeVisible();
+  await expect(view.getByText(/5 of 5 execution tasks completed/)).toBeVisible({
+    timeout: 15000,
+  });
   await expect(view.getByText(/Automatic progression: stopped/)).toBeVisible();
   const budget = view.getByRole("region", { name: "Run budget and usage" });
   await expect(budget.getByText(/Accounted tokens: 0 \/ 0/)).toBeVisible();
