@@ -1,4 +1,8 @@
 import { useState } from "react";
+import DataAlternatives, {
+  AlternativeBounds,
+  defaultBounds,
+} from "./DataAlternatives";
 import RunBudget from "./RunBudget";
 import RecoveryControls from "./RecoveryControls";
 import type { Model } from "./types";
@@ -29,6 +33,8 @@ export default function CollaborationView({
   act: (path: string, body?: object) => unknown;
   onInspect: (id: string) => void;
 }) {
+  const [study, setStudy] = useState("duty");
+  const [bounds, setBounds] = useState(defaultBounds);
   const [candidate, setCandidate] = useState("selective");
   const [goal, setGoal] = useState(
     "Increase observation time while respecting storage and downlink capacity.",
@@ -90,9 +96,9 @@ export default function CollaborationView({
     <section className="panel" aria-label="Agent collaboration">
       <h2>Agent collaboration</h2>
       <p>
-        A bounded observation-duty negotiation: Payload → tools → Bus &amp;
-        Ground → tools → independent Systems review → you. Live mode uses a
-        separate review call with the configured model; Simulation uses a
+        A bounded observation-duty or data-system trade study: Payload → tools →
+        Bus &amp; Ground → tools → independent Systems review → you. Live mode
+        uses a separate review call with the configured model; Simulation uses a
         labeled rules-based review. Review recommendations do not verify
         whole-mission feasibility.
       </p>
@@ -118,6 +124,8 @@ export default function CollaborationView({
             candidate,
             goal,
             mode,
+            study,
+            ...(study === "data-system" ? { bounds } : {}),
             limits: {
               cost_eur: Number(costLimit),
               tokens: Number(tokenLimit),
@@ -126,6 +134,16 @@ export default function CollaborationView({
           });
         }}
       >
+        <label>
+          Study type
+          <select value={study} onChange={(e) => setStudy(e.target.value)}>
+            <option value="duty">Observation duty only</option>
+            <option value="data-system">Data-system alternatives</option>
+          </select>
+        </label>
+        {study === "data-system" && (
+          <AlternativeBounds bounds={bounds} onChange={setBounds} />
+        )}
         <div className="row">
           <label>
             Candidate
@@ -258,6 +276,7 @@ export default function CollaborationView({
             subsequent design changes require a new run.
           </p>
           <RunBudget budget={data.budget} />
+          {data.study === "data-system" && <DataAlternatives data={data} />}
           {model.paused && (
             <p className="notice">
               Paused — resume the mission to execute another task.

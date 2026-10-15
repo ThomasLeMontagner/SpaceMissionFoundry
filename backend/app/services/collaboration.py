@@ -6,7 +6,7 @@ from time import perf_counter
 from typing import Literal
 from uuid import uuid4
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from app.agents.design_provider import propose
 from app.agents.systems_review import SystemsReview, review
@@ -14,7 +14,7 @@ from app.domain.models import Operation, Proposal, Strict, now
 from app.domain.protocol import validate
 from app.engineering_tools.calculations import execute, fraction
 from app.orchestration.scenario import entity
-from app.services import run_budget
+from app.services import data_alternatives, run_budget
 from app.services.design_inputs import IMPACT_KINDS, EditChanges, edited_entity, read_inputs
 from app.services.execution_recovery import (
     STAGES,
@@ -34,6 +34,14 @@ class Start(Strict):
     goal: str = Field(min_length=3, max_length=1000)
     mode: Literal["simulation", "live"] = "simulation"
     limits: run_budget.Limits = Field(default_factory=run_budget.Limits)
+    study: Literal["duty", "data-system"] = "duty"
+    bounds: data_alternatives.Bounds | None = None
+
+    @model_validator(mode="after")
+    def study_bounds(self):
+        if (self.study == "data-system") != (self.bounds is not None):
+            raise ValueError("Provide explicit bounds only for a data-system study")
+        return self
 
 
 class Clarification(Strict):
@@ -122,10 +130,12 @@ class Collaboration:
         run = entity(
             str(uuid4()),
             "AgentRun",
-            f"{request.candidate} · observation duty collaboration",
+            f"{request.candidate} · {'data-system alternatives' if request.study == 'data-system' else 'observation duty collaboration'}",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.3",
+            version="1.4",
+            study=request.study,
+            bounds=request.bounds.model_dump() if request.bounds else None,
             budget=run_budget.create(request.limits, request.mode),
             mode=request.mode,
             provider_model=os.getenv("LLM_MODEL")
@@ -204,6 +214,14 @@ class Collaboration:
             raise ValueError(
                 "Three revision rounds reached; start a new collaboration after resolving this proposal"
             )
+        if (
+            original.data.get("study") == "data-system"
+            and request.minimum_duty is not None
+            and request.minimum_duty > original.data["bounds"]["duty_max"]
+        ):
+            raise ValueError(
+                "Minimum duty exceeds this study's bounds; start a new study to change bounds"
+            )
         if len(request.feedback.strip()) < 3:
             raise ValueError("Describe the clarification in at least three characters")
         m = old.model_copy(deep=True)
@@ -225,6 +243,7 @@ class Collaboration:
                 "minimum_duty",
                 "systems_review",
                 "review_usage",
+                "selected_alternative",
             ]
         }
         data.setdefault("round_history", []).append(history)
@@ -255,6 +274,7 @@ class Collaboration:
             "evaluate_bus",
             "systems_review",
             "review_usage",
+            "selected_alternative",
         ]:
             data.pop(key, None)
         data.update(
@@ -551,6 +571,8 @@ class Collaboration:
             and os.getenv("LLM_MODEL") != data["provider_model"]
         ):
             raise ValueError("Provider model changed; start a new run")
+        if data.get("study") == "data-system":
+            return data_alternatives.perform(data, model.brief)
         if stage in ["payload", "bus"]:
             context = dict(
                 brief=model.brief,
@@ -608,6 +630,12 @@ class Collaboration:
 
     def finish(self, model, run, stage, result):
         data = run.data
+        if data.get("study") == "data-system":
+            if data_alternatives.finish(model, run, stage, result, record):
+                data["completed"].append(stage)
+                if stage != "systems":
+                    data.update(stage=STAGES[STAGES.index(stage) + 1], status="ready")
+            return
         if stage in ["payload", "bus"]:
             data[stage] = result["proposal"]
             record(
