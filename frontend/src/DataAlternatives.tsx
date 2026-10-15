@@ -53,6 +53,8 @@ export function AlternativeBounds({
 }
 
 export default function DataAlternatives({ data }: { data: any }) {
+  const margin = (value: any) =>
+    Number.isFinite(value?.value) ? value.value.toFixed(3) : "Unverified";
   const quantity = (value: any) =>
     value ? `${value.value} ${value.unit}` : "Unknown";
   const gigabits = (value: any) =>
@@ -61,7 +63,11 @@ export default function DataAlternatives({ data }: { data: any }) {
       : "Unknown";
   return (
     <section className="panel" aria-label="Data-system alternatives">
-      <h3>Data-system alternatives</h3>
+      <h3>
+        {data.study === "cross-discipline"
+          ? "Cross-discipline alternatives"
+          : "Data-system alternatives"}
+      </h3>
       <p>
         Source inputs: duty {quantity(data.inputs.data.duty)}, compression{" "}
         {quantity(data.inputs.data.compression)}, storage{" "}
@@ -79,6 +85,46 @@ export default function DataAlternatives({ data }: { data: any }) {
         science adequacy, or storage mass, power, cost and qualification. Review
         these trade-offs before approving.
       </p>
+      {data.study === "cross-discipline" && (
+        <div>
+          <h4>Mass and power impact model</h4>
+          {data.impact_assumptions ? (
+            <>
+              <p>
+                Incremental estimates relative to source inputs; no savings
+                credit for reductions. Eclipse assumes full coincidence of added
+                active loads. These estimates do not qualify hardware.
+              </p>
+              <dl>
+                {Object.entries(data.impact_assumptions).map(([key, value]) => (
+                  <div key={key}>
+                    <dt>
+                      {
+                        (
+                          {
+                            storage_kg_per_gbit: "Storage kg/Gbit",
+                            storage_w_per_gbit: "Storage W/Gbit",
+                            observation_w: "Observation active W",
+                            processing_w_per_ratio:
+                              "Processing W per ratio increment",
+                            basis: "Basis",
+                          } as Record<string, string>
+                        )[key]
+                      }
+                    </dt>
+                    <dd>{String(value)}</dd>
+                  </div>
+                ))}
+              </dl>
+            </>
+          ) : (
+            <p role="alert">
+              Missing impact assumptions. Mass and power remain unverified;
+              start a new study with explicit coefficients and their basis.
+            </p>
+          )}
+        </div>
+      )}
       {data.selected_alternative && (
         <p>
           <strong>
@@ -107,6 +153,13 @@ export default function DataAlternatives({ data }: { data: any }) {
                       <th>Daily data (Gbit)</th>
                       <th>Storage margin (Gbit)</th>
                       <th>Downlink capacity (Gbit/day)</th>
+                      {data.study === "cross-discipline" && (
+                        <>
+                          <th>Mass margin (kg)</th>
+                          <th>Energy margin (Wh/orbit)</th>
+                          <th>Battery margin (Wh)</th>
+                        </>
+                      )}
                       <th>Checks</th>
                     </tr>
                   </thead>
@@ -130,12 +183,24 @@ export default function DataAlternatives({ data }: { data: any }) {
                           <td>{gigabits(row?.data.outputs.daily)}</td>
                           <td>{gigabits(row?.data.outputs.margin)}</td>
                           <td>{gigabits(row?.link.outputs.capacity)}</td>
+                          {data.study === "cross-discipline" && (
+                            <>
+                              <td>{margin(row?.mass?.outputs.margin)}</td>
+                              <td>{margin(row?.power?.outputs.margin)}</td>
+                              <td>
+                                {margin(row?.power?.outputs.battery_margin)}
+                              </td>
+                            </>
+                          )}
                           <td>
                             {!row
                               ? "Not evaluated"
                               : row.eligible
                                 ? "Pass declared checks"
                                 : "Not eligible"}
+                            {row?.blockers?.map((reason: string) => (
+                              <div key={reason}>{reason}</div>
+                            ))}
                           </td>
                         </tr>
                       );

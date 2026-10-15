@@ -53,7 +53,7 @@ def live_task(data):
     if data["mode"] != "live" or data["stage"] not in ["payload", "bus", "systems"]:
         return False
     if data["stage"] == "systems":
-        if data.get("study") == "data-system":
+        if data.get("study") in ["data-system", "cross-discipline"]:
             return bool(data_alternatives.eligible(data))
         minimum = data.get("minimum_duty")
         return (minimum is None or data["bus"]["duty"] >= minimum) and all(

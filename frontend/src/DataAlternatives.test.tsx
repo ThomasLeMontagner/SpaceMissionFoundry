@@ -96,3 +96,24 @@ test("bounds editor labels units and sends the changed bound", () => {
   });
   expect(screen.getByText(/Storage uses decimal Gbit, not GB/)).toBeVisible();
 });
+
+test("cross-discipline comparison exposes missing assumptions and failed budgets", () => {
+  const data: any = fixture();
+  data.study = "cross-discipline";
+  delete data.selected_alternative;
+  data.evaluate_bus.alternatives.forEach((row: any) => {
+    row.eligible = false;
+    row.blockers = ["Mass budget failed or invalid"];
+    row.mass = { outputs: { margin: { value: -2.5 } } };
+  });
+  render(<DataAlternatives data={data} />);
+  expect(screen.getByRole("alert")).toHaveTextContent(
+    "Missing impact assumptions",
+  );
+  expect(
+    screen.getByRole("columnheader", { name: "Mass margin (kg)" }),
+  ).toBeVisible();
+  expect(screen.getAllByText("-2.500")).toHaveLength(2);
+  expect(screen.getAllByText("Unverified")).toHaveLength(4);
+  expect(screen.queryByText("Pass declared checks")).not.toBeInTheDocument();
+});

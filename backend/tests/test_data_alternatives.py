@@ -200,9 +200,10 @@ def options():
     )
 
 
+@pytest.mark.parametrize("study", ["data-system", "cross-discipline"])
 @pytest.mark.parametrize("invalid_selection", [False, True])
 def test_live_http_alternatives_and_separate_review_have_strict_selection_and_usage(
-    client, monkeypatch, invalid_selection
+    client, monkeypatch, invalid_selection, study
 ):
     source = to_trade(client)
     for key, value in dict(
@@ -220,7 +221,20 @@ def test_live_http_alternatives_and_separate_review_have_strict_selection_and_us
         "collaboration",
         candidate="selective",
         goal="Compare configurations",
-        study="data-system",
+        study=study,
+        **(
+            {
+                "impact_assumptions": dict(
+                    storage_kg_per_gbit=0.01,
+                    storage_w_per_gbit=0.001,
+                    observation_w=1.0,
+                    processing_w_per_ratio=0.01,
+                    basis="Illustrative test coefficients",
+                )
+            }
+            if study == "cross-discipline"
+            else {}
+        ),
         bounds=BOUNDS,
         mode="live",
     )
@@ -238,6 +252,9 @@ def test_live_http_alternatives_and_separate_review_have_strict_selection_and_us
             context = json.loads(content["messages"][1]["content"])
             assert "B" in context["eligible_ids"] and "A" not in context["eligible_ids"]
             assert len(context["data_analysis"]) == 3
+            if study == "cross-discipline":
+                assert len(context["mass_analysis"]) == len(context["power_analysis"]) == 3
+                assert context["impact_assumptions"]["basis"] == "Illustrative test coefficients"
             payload = dict(
                 recommendation="submit",
                 selected_id="A" if invalid_selection else "B",

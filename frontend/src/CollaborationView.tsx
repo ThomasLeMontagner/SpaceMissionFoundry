@@ -3,6 +3,10 @@ import DataAlternatives, {
   AlternativeBounds,
   defaultBounds,
 } from "./DataAlternatives";
+import ImpactAssumptions, {
+  emptyImpact,
+  impactPayload,
+} from "./ImpactAssumptions";
 import RunBudget from "./RunBudget";
 import RecoveryControls from "./RecoveryControls";
 import type { Model } from "./types";
@@ -34,6 +38,7 @@ export default function CollaborationView({
   onInspect: (id: string) => void;
 }) {
   const [study, setStudy] = useState("duty");
+  const [impact, setImpact] = useState(emptyImpact);
   const [bounds, setBounds] = useState(defaultBounds);
   const [candidate, setCandidate] = useState("selective");
   const [goal, setGoal] = useState(
@@ -125,7 +130,10 @@ export default function CollaborationView({
             goal,
             mode,
             study,
-            ...(study === "data-system" ? { bounds } : {}),
+            ...(study !== "duty" ? { bounds } : {}),
+            ...(study === "cross-discipline"
+              ? { impact_assumptions: impactPayload(impact) }
+              : {}),
             limits: {
               cost_eur: Number(costLimit),
               tokens: Number(tokenLimit),
@@ -139,10 +147,16 @@ export default function CollaborationView({
           <select value={study} onChange={(e) => setStudy(e.target.value)}>
             <option value="duty">Observation duty only</option>
             <option value="data-system">Data-system alternatives</option>
+            <option value="cross-discipline">
+              Cross-discipline alternatives
+            </option>
           </select>
         </label>
-        {study === "data-system" && (
+        {study !== "duty" && (
           <AlternativeBounds bounds={bounds} onChange={setBounds} />
+        )}
+        {study === "cross-discipline" && (
+          <ImpactAssumptions value={impact} onChange={setImpact} />
         )}
         <div className="row">
           <label>
@@ -276,7 +290,9 @@ export default function CollaborationView({
             subsequent design changes require a new run.
           </p>
           <RunBudget budget={data.budget} />
-          {data.study === "data-system" && <DataAlternatives data={data} />}
+          {["data-system", "cross-discipline"].includes(data.study) && (
+            <DataAlternatives data={data} />
+          )}
           {model.paused && (
             <p className="notice">
               Paused — resume the mission to execute another task.
