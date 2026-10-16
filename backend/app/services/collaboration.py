@@ -23,6 +23,7 @@ from app.services.execution_recovery import (
     lease_expired,
     recovery_details,
 )
+from app.services.impact_checks import ImpactAssumptions
 from app.services.workflow import Workflow
 
 ACTIVE = {"ready", "working", "failed", "interrupted", "budget_blocked"}
@@ -34,13 +35,16 @@ class Start(Strict):
     goal: str = Field(min_length=3, max_length=1000)
     mode: Literal["simulation", "live"] = "simulation"
     limits: run_budget.Limits = Field(default_factory=run_budget.Limits)
-    study: Literal["duty", "data-system"] = "duty"
+    study: Literal["duty", "data-system", "cross-discipline"] = "duty"
     bounds: data_alternatives.Bounds | None = None
+    impact_assumptions: ImpactAssumptions | None = None
 
     @model_validator(mode="after")
     def study_bounds(self):
-        if (self.study == "data-system") != (self.bounds is not None):
+        if (self.study != "duty") != (self.bounds is not None):
             raise ValueError("Provide explicit bounds only for a data-system study")
+        if self.impact_assumptions is not None and self.study != "cross-discipline":
+            raise ValueError("Impact assumptions require a cross-discipline study")
         return self
 
 
@@ -126,15 +130,23 @@ class Collaboration:
         inputs = {tool: read_inputs(old, request.candidate, tool) for tool in ["data", "link"]}
         if any(e.state == "stale" for e in old.entities.values() if e.kind in IMPACT_KINDS):
             raise ValueError("Review stale design inputs before starting collaboration")
+        if request.study == "cross-discipline":
+            inputs.update(
+                {tool: read_inputs(old, request.candidate, tool) for tool in ["mass", "power"]}
+            )
+            inputs["orbit"] = read_inputs(old, "mission", "orbit")
         m = old.model_copy(deep=True)
         run = entity(
             str(uuid4()),
             "AgentRun",
-            f"{request.candidate} · {'data-system alternatives' if request.study == 'data-system' else 'observation duty collaboration'}",
+            f"{request.candidate} · {request.study + ' alternatives' if request.study != 'duty' else 'observation duty collaboration'}",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.4",
+            version="1.5",
             study=request.study,
+            impact_assumptions=request.impact_assumptions.model_dump()
+            if request.impact_assumptions
+            else None,
             bounds=request.bounds.model_dump() if request.bounds else None,
             budget=run_budget.create(request.limits, request.mode),
             mode=request.mode,
@@ -215,7 +227,7 @@ class Collaboration:
                 "Three revision rounds reached; start a new collaboration after resolving this proposal"
             )
         if (
-            original.data.get("study") == "data-system"
+            original.data.get("study") in ["data-system", "cross-discipline"]
             and request.minimum_duty is not None
             and request.minimum_duty > original.data["bounds"]["duty_max"]
         ):
@@ -571,7 +583,7 @@ class Collaboration:
             and os.getenv("LLM_MODEL") != data["provider_model"]
         ):
             raise ValueError("Provider model changed; start a new run")
-        if data.get("study") == "data-system":
+        if data.get("study") in ["data-system", "cross-discipline"]:
             return data_alternatives.perform(data, model.brief)
         if stage in ["payload", "bus"]:
             context = dict(
@@ -630,7 +642,7 @@ class Collaboration:
 
     def finish(self, model, run, stage, result):
         data = run.data
-        if data.get("study") == "data-system":
+        if data.get("study") in ["data-system", "cross-discipline"]:
             if data_alternatives.finish(model, run, stage, result, record):
                 data["completed"].append(stage)
                 if stage != "systems":

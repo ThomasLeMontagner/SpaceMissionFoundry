@@ -1,5 +1,14 @@
 # Validation record — 2026-09-09
 
+## Cross-discipline impact checks — 2026-10-15
+
+- Full SQLite backend regression: **201 passed, one PostgreSQL-only skip** in 312.82 seconds. Existing duty-only, alternatives, budgets, recovery and workflow behavior remain covered.
+- Targeted PostgreSQL verification: **33 passed** across impact checks, data alternatives and fixture lifecycle, after Alembic migration on isolated UTF-8 PostgreSQL 16 with `max_connections=20`. The first temporary-server run received a fast shutdown signal and was interrupted; the complete retry in a persistent terminal passed in 72.90 seconds. The temporary server was stopped after verification. This is targeted PostgreSQL coverage, not a full-suite PostgreSQL rerun.
+- **43 frontend unit tests passed**, including explicit assumption inputs and missing/failed impact evidence. TypeScript, production build, Prettier, Ruff lint/format and whitespace checks passed.
+- Both targeted browser workflows passed: existing data-only alternatives and cross-discipline alternatives through human approval. The new test verifies that accepted mass/power inputs match the evaluated configuration. The comparison screenshot was visually inspected; numerical margins were subsequently formatted to three decimals and covered by the UI tests. Browser tests used disposable SQLite data.
+- Impact tests verify Gbyte/Gbit conversion, observation/processing workload, conservative eclipse increments, no savings credit, missing assumptions and failed mass/power gates without a review call/reservation, atomic approval and reproduction of calculator outputs, revision history, recovery and stale mass-source rejection. Mock HTTP tests cover the independent review context and selection in both study types. No paid provider calls were made.
+- Requirements v0.19 adds MF-COL-022–023; README, traceability and architecture document workflow 1.5 and the incremental model. No schema migration or dependency was added. Estimates depend on owner-provided coefficients and an adequate accepted baseline; hardware qualification, thermal effects, science adequacy and general mission feasibility remain unverified.
+
 ## Bounded data-system alternatives — 2026-10-13
 
 - Full PostgreSQL backend suite: **188 passed**, no skips, after Alembic migration on an isolated UTF-8 PostgreSQL 16 instance with `max_connections=20` (416.65 seconds). The temporary server was stopped after testing; no user databases were touched.
