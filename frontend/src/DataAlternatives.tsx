@@ -125,6 +125,20 @@ export default function DataAlternatives({ data }: { data: any }) {
           )}
         </div>
       )}
+      {!data.check_requirements && (
+        <p className="muted">
+          Mission requirement checks were not enabled for this study.
+        </p>
+      )}
+      {data.check_requirements && (
+        <p className="notice">
+          Mission requirement checks enabled. Results describe proposed
+          alternatives under finite-horizon assumptions; accepted verification
+          records remain unchanged until approval and recalculation. Every
+          mandatory requirement must pass. Incomplete evidence is unverified,
+          not success.
+        </p>
+      )}
       {data.selected_alternative && (
         <p>
           <strong>
@@ -198,9 +212,29 @@ export default function DataAlternatives({ data }: { data: any }) {
                               : row.eligible
                                 ? "Pass declared checks"
                                 : "Not eligible"}
-                            {row?.blockers?.map((reason: string) => (
-                              <div key={reason}>{reason}</div>
-                            ))}
+                            {row?.blockers
+                              ?.filter(
+                                (reason: string) =>
+                                  !data.check_requirements ||
+                                  !reason.startsWith("Requirement "),
+                              )
+                              .map((reason: string) => (
+                                <div key={reason}>{reason}</div>
+                              ))}
+                            {data.check_requirements &&
+                              row?.requirement_checks && (
+                                <div>
+                                  {
+                                    row.requirement_checks.filter(
+                                      (check: any) =>
+                                        check.priority === "must" &&
+                                        check.status !== "pass",
+                                    ).length
+                                  }{" "}
+                                  mandatory checks not passed. See rationale and
+                                  evidence.
+                                </div>
+                              )}
                           </td>
                         </tr>
                       );
@@ -215,19 +249,68 @@ export default function DataAlternatives({ data }: { data: any }) {
                     rationale and evidence
                   </summary>
                   <p>{option.rationale}</p>
-                  <pre>
-                    {JSON.stringify(
-                      data[`evaluate_${author}`]?.alternatives.find(
-                        (r: any) => r.id === option.id,
-                      ) ?? "Not evaluated",
-                      null,
-                      2,
-                    )}
-                  </pre>
+                  {data.check_requirements && (
+                    <div
+                      aria-label={`${author} ${option.id} requirement checks`}
+                    >
+                      <h5>Mission requirement checks</h5>
+                      {data[`evaluate_${author}`]?.alternatives
+                        .find((r: any) => r.id === option.id)
+                        ?.requirement_checks?.map((check: any) => (
+                          <div key={check.requirement}>
+                            <strong>
+                              {check.title} ({check.priority}):{" "}
+                              {check.status === "pass"
+                                ? "Passed"
+                                : check.status === "fail"
+                                  ? "Failed"
+                                  : "Unverified"}
+                            </strong>
+                            <p>{check.reason}</p>
+                            <p>
+                              {check.criterion
+                                ? `${check.criterion.metric} ${check.criterion.operator} ${quantity(check.criterion.threshold)}`
+                                : "No supported quantitative criterion"}{" "}
+                              · Actual: {quantity(check.actual)} · Source
+                              revision:{" "}
+                              {check.analysis_source_revision ??
+                                data.source_revision}
+                            </p>
+                          </div>
+                        )) ?? <p>Not evaluated</p>}
+                      <p>
+                        Inspect recorded access/delivery evidence below.
+                        Finite-horizon results do not establish global coverage
+                        or operational delivery guarantees.
+                      </p>
+                    </div>
+                  )}
+                  <details>
+                    <summary>Recorded calculation JSON</summary>
+                    <pre>
+                      {JSON.stringify(
+                        data[`evaluate_${author}`]?.alternatives.find(
+                          (r: any) => r.id === option.id,
+                        ) ?? "Not evaluated",
+                        null,
+                        2,
+                      )}
+                    </pre>
+                  </details>
                 </details>
               ))}
             </div>
           ),
+      )}
+      {data.check_requirements && data.evaluate_bus?.mission_evidence && (
+        <details>
+          <summary>
+            Shared orbit and access evidence for Bus alternatives
+          </summary>
+          <pre>
+            {JSON.stringify(data.evaluate_bus.mission_evidence, null, 2)}
+          </pre>
+        </details>
       )}
       {!data.payload && (
         <p>Run the tasks to generate and evaluate alternatives.</p>

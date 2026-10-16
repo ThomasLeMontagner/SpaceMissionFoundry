@@ -38,6 +38,7 @@ class Start(Strict):
     study: Literal["duty", "data-system", "cross-discipline"] = "duty"
     bounds: data_alternatives.Bounds | None = None
     impact_assumptions: ImpactAssumptions | None = None
+    check_requirements: bool = Field(default=False, strict=True)
 
     @model_validator(mode="after")
     def study_bounds(self):
@@ -45,6 +46,8 @@ class Start(Strict):
             raise ValueError("Provide explicit bounds only for a data-system study")
         if self.impact_assumptions is not None and self.study != "cross-discipline":
             raise ValueError("Impact assumptions require a cross-discipline study")
+        if self.check_requirements and self.study != "cross-discipline":
+            raise ValueError("Mission requirement checks require a cross-discipline study")
         return self
 
 
@@ -135,6 +138,13 @@ class Collaboration:
                 {tool: read_inputs(old, request.candidate, tool) for tool in ["mass", "power"]}
             )
             inputs["orbit"] = read_inputs(old, "mission", "orbit")
+        requirement_input_blockers = []
+        if request.check_requirements:
+            for scope, tool in [("mission", "access"), (request.candidate, "delivery")]:
+                try:
+                    inputs[tool] = read_inputs(old, scope, tool)
+                except ValueError as exc:
+                    requirement_input_blockers.append(str(exc))
         m = old.model_copy(deep=True)
         run = entity(
             str(uuid4()),
@@ -142,8 +152,17 @@ class Collaboration:
             f"{request.candidate} · {request.study + ' alternatives' if request.study != 'duty' else 'observation duty collaboration'}",
             "orchestrator",
             workflow="duty-collaboration",
-            version="1.5",
+            version="1.6",
             study=request.study,
+            check_requirements=request.check_requirements,
+            requirements=[
+                e.model_dump(mode="json")
+                for e in old.entities.values()
+                if e.kind == "Requirement" and e.state in ["accepted", "stale"]
+            ]
+            if request.check_requirements
+            else [],
+            requirement_input_blockers=requirement_input_blockers,
             impact_assumptions=request.impact_assumptions.model_dump()
             if request.impact_assumptions
             else None,

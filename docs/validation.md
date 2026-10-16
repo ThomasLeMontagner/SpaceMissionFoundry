@@ -1,5 +1,14 @@
 # Validation record — 2026-09-09
 
+## Mission-requirement checks for alternatives — 2026-10-16
+
+- Full SQLite backend regression: **214 passed, one PostgreSQL-only skip**, in 462.24 seconds.
+- Targeted PostgreSQL verification: **46 passed** in 182.20 seconds across mission requirement studies, cross-discipline impacts, data alternatives and fixture lifecycle. The isolated UTF-8 PostgreSQL 16 instance was migrated to Alembic head and used `max_connections=20`; it was stopped after testing. User databases were untouched. This is targeted coverage, not a full PostgreSQL suite rerun.
+- **44 frontend unit tests passed**, with TypeScript, production build, Prettier, Ruff lint/format and whitespace checks passing. The new comparison test distinguishes passed, failed and unverified proposed evidence, criteria and actual values.
+- Both targeted browser workflows passed: existing cross-discipline approval and mission-check blocking for the reference scenario's unsupported narrative Must requirements. The new test confirms unchanged accepted inputs and no approval proposal. A locator was scoped to the expanded option's evidence after initially finding a hidden copy. The comparison screenshot was visually inspected; repeated blocker text was condensed and calculation JSON moved into a separate expandable section, then browser-tested again. Test data was disposable.
+- New backend coverage includes fresh option-local evidence, unchanged accepted verification, source revisions, missing criteria/access/delivery inputs, failed mandatory criteria, deadline pass/fail/unverified including no observations, changed-requirement rejection, recovery and the product-workload bound. A mocked three-call live round verifies Bus and Systems receive recorded requirement comparisons. Duplicate model context was reduced after the first live-contract test exposed the transport size limit; full evidence remains persisted. No paid provider validation is claimed.
+- Requirements v0.20 adds MF-COL-024–025. README, traceability and architecture document optional strict mission checking, workflow 1.6, the 3,000-product-case stage bound and unchanged legacy behavior. No dependency or schema migration was added. Main CI at the branch base `ebdb9d0` completed successfully; this does not claim CI validation of unpushed changes.
+
 ## Cross-discipline impact checks — 2026-10-15
 
 - Full SQLite backend regression: **201 passed, one PostgreSQL-only skip** in 312.82 seconds. Existing duty-only, alternatives, budgets, recovery and workflow behavior remain covered.
