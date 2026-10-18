@@ -117,3 +117,53 @@ test("cross-discipline comparison exposes missing assumptions and failed budgets
   expect(screen.getAllByText("Unverified")).toHaveLength(4);
   expect(screen.queryByText("Pass declared checks")).not.toBeInTheDocument();
 });
+
+test("mission checks distinguish passed failed and unverified proposed evidence", () => {
+  const data: any = fixture();
+  data.study = "cross-discipline";
+  data.check_requirements = true;
+  data.source_revision = 7;
+  data.evaluate_bus.alternatives[0].requirement_checks = [
+    {
+      requirement: "mass",
+      title: "Mass limit",
+      priority: "must",
+      status: "pass",
+      reason: "Within bound",
+      actual: { value: 12, unit: "kg" },
+      criterion: {
+        metric: "mass.total",
+        operator: "<=",
+        threshold: { value: 20, unit: "kg" },
+      },
+    },
+    {
+      requirement: "latency",
+      title: "Delivery deadline",
+      priority: "must",
+      status: "fail",
+      reason: "Late product",
+    },
+    {
+      requirement: "science",
+      title: "Image quality",
+      priority: "must",
+      status: "unverified",
+      reason: "No supported quantitative criterion",
+    },
+  ];
+  render(<DataAlternatives data={data} />);
+  fireEvent.click(screen.getByText("Bus A: rationale and evidence"));
+  const checks = screen.getByLabelText("bus A requirement checks");
+  expect(within(checks).getByText("Mass limit (must): Passed")).toBeVisible();
+  expect(
+    within(checks).getByText("Delivery deadline (must): Failed"),
+  ).toBeVisible();
+  expect(
+    within(checks).getByText("Image quality (must): Unverified"),
+  ).toBeVisible();
+  expect(within(checks).getByText(/Actual: 12 kg/)).toBeVisible();
+  expect(
+    screen.getByText(/accepted verification records remain unchanged/),
+  ).toBeVisible();
+});

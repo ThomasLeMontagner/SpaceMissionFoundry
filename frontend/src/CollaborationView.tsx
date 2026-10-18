@@ -38,6 +38,7 @@ export default function CollaborationView({
   onInspect: (id: string) => void;
 }) {
   const [study, setStudy] = useState("duty");
+  const [checkRequirements, setCheckRequirements] = useState(false);
   const [impact, setImpact] = useState(emptyImpact);
   const [bounds, setBounds] = useState(defaultBounds);
   const [candidate, setCandidate] = useState("selective");
@@ -134,6 +135,8 @@ export default function CollaborationView({
             ...(study === "cross-discipline"
               ? { impact_assumptions: impactPayload(impact) }
               : {}),
+            check_requirements:
+              study === "cross-discipline" && checkRequirements,
             limits: {
               cost_eur: Number(costLimit),
               tokens: Number(tokenLimit),
@@ -154,6 +157,22 @@ export default function CollaborationView({
         </label>
         {study !== "duty" && (
           <AlternativeBounds bounds={bounds} onChange={setBounds} />
+        )}
+        {study === "cross-discipline" && (
+          <label>
+            <input
+              type="checkbox"
+              checked={checkRequirements}
+              onChange={(e) => setCheckRequirements(e.target.checked)}
+            />
+            Check mission requirements (access and delivery)
+            <span className="muted">
+              {" "}
+              Uses accepted mission criteria and fresh proposed-configuration
+              evidence. Every mandatory requirement must pass; missing criteria
+              or incomplete evidence blocks recommendation.
+            </span>
+          </label>
         )}
         {study === "cross-discipline" && (
           <ImpactAssumptions value={impact} onChange={setImpact} />
