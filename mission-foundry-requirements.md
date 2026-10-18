@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.20
+**Version:** 0.21
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-10-16
+**Date:** 2026-10-18
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -188,6 +188,11 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-013 | Requirement check status shall be separate from requirement approval and shall be pass, fail, stale, or unverified. Missing, failed, or incompatible evidence shall be unverified. Changes to a requirement or its dependent calculation inputs shall invalidate existing evidence; recalculation shall refresh the check. | Must | Test |
 | MF-REQ-014 | A failing or stale must-priority criterion shall block candidate selection and baseline approval. Conceptual approval may retain unverified requirements and failed lower-priority criteria only as explicitly recorded outstanding obligations, without asserting mission feasibility. | Must | Test |
 | MF-REQ-015 | Users shall be able to add, revise, or remove a quantitative criterion through the reviewed requirement-edit workflow, inspect per-candidate results and evidence, and retain prior checks in immutable baseline exports. Removing a criterion shall leave the requirement unverified. | Must | Demonstration |
+| MF-REQ-016 | Owners shall be able to inspect requirement readiness, record immutable clarification questions and replies, and propose supported measurable criteria with explicit scope and justification through separate human approval. Suggestions shall identify their source and shall not invent thresholds. | Must | Test |
+| MF-REQ-017 | Formalized requirements shall distinguish partial from owner-assessed full criterion coverage. Unanswered current clarification questions shall prevent full coverage; partial coverage shall not verify a whole requirement merely because a numeric check passes. Statement or criterion changes shall invalidate the scope assessment. | Must | Test |
+
+Initial formalization scope (v0.21): owner-guided clarification and existing metric registry only; no model calls or general requirement derivation. Literal acquisition-to-delivery deadlines can be suggested with their source phrase. Up to ten clarification threads per requirement revision are retained as immutable notes and replies. Full coverage is an explicit owner assessment of the complete statement, not independent semantic verification or certification. Existing criteria without scope metadata retain legacy checking behavior and are labeled unassessed. Unsupported obligations remain unresolved.
+
 
 Quantitative verification scope for version 0.2: the initial metric registry covers allocated mass, average power load, orbit energy margin, eclipse battery margin, daily data generation, daily downlink capacity, orbital period, and eclipse duration. A criterion applies to both reference candidates. The owner must ensure that the chosen metric actually verifies the requirement statement; requirement prose is not automatically interpreted or rewritten. Daily capacity does not verify acquisition-to-user latency, mass does not verify a deployer envelope, and preliminary calculations do not establish flight qualification. Existing requirements receive no inferred numerical criteria. Signed calculated margins are permitted; the supported requirement thresholds are nonnegative. The registry can grow as validated calculators become available.
 

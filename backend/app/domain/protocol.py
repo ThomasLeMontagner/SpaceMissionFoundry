@@ -1,5 +1,6 @@
 from app.agents.definitions import AGENTS
 from app.domain.engineering_inputs import validate_inputs
+from app.domain.formalization import Formalization
 from app.domain.interfaces import DataContract, validate_endpoints
 from app.domain.models import Classification, Proposal, now
 from app.domain.requirement_checks import Criterion
@@ -71,6 +72,8 @@ def validate(model, proposal: Proposal):
             raise ValueError("Requirement must trace to an objective or parent requirement")
         if e.kind == "Requirement" and e.data.get("criterion") is not None:
             Criterion.model_validate(e.data["criterion"])
+        if e.kind == "Requirement" and e.data.get("formalization") is not None:
+            Formalization.model_validate(e.data["formalization"])
         if e.kind == "Interface":
             validate_endpoints(e.data.get("endpoints"))
             if e.data.get("data_contract") is not None:
