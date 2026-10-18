@@ -177,3 +177,9 @@ This is a working **reference-scenario vertical MVP**, not completion of every M
 See [the validation record](docs/validation.md) for executed checks and explicit limits, and [the JSON schema](docs/architecture/mission-model.schema.json) for the versioned export format.
 
 GitHub Actions is configured to run lint/format checks, SQLite and migrated PostgreSQL regression suites, the frontend build/tests, and the full Playwright suite on pushes and pull requests. The workflow has read-only repository permissions and uses no paid model credentials. Local validation does not establish the status of a hosted Actions run.
+
+### Requirement clarification and formalization
+
+Open **Requirements → Requirement readiness** to record questions and answers, choose a supported metric, and propose a criterion with its basis and applicability. Explicit acquisition-to-delivery deadlines can be suggested from the statement; suggestions are optional and never change accepted requirements automatically. Review the proposal in **Conflicts & review** before approval and recalculation.
+
+This is an owner-guided workflow with no model calls. Partial coverage remains unverified even when the numeric check passes. Full coverage requires explicit owner confirmation and no unanswered current clarification questions. Later statement or criterion edits require reassessing scope. Existing criteria without formalization metadata retain their previous checking behavior and are labeled unassessed. General AI requirement derivation and unsupported engineering obligations remain future work.

@@ -1,5 +1,16 @@
 # Validation record — 2026-09-09
 
+## Requirement clarification and formalization — 2026-10-18
+
+- Full SQLite regression: **219 passed, one PostgreSQL-only skip** in 263.37 seconds. Two additional guard cases added during that run were subsequently included in the seven-test formalization run and the 15-test PostgreSQL run.
+
+- Targeted SQLite requirement/formalization tests: 13 passed initially; all seven final formalization tests passed after adding confirmation, stale revision, pending proposal, thread limit and immutable reply coverage.
+- Targeted PostgreSQL requirement/formalization regression: **15 passed** after migration on an isolated UTF-8 PostgreSQL 16 instance with `max_connections=20`. The temporary server was stopped after testing. User databases were untouched.
+- **45 frontend unit tests passed**. The production build, TypeScript, Prettier, Ruff lint/format and whitespace checks passed.
+- Browser workflow passed through recording a question, preserving its reply history, extracting the literal deadline, submitting a partial-coverage proposal and approving it. Initial browser validation exposed a global `aside` style collision; changing the suggestion container fixed navigation. The completed readiness screen was visually inspected.
+- Requirements v0.21 adds MF-REQ-016–017; README, traceability and architecture describe owner-guided scope and legacy unassessed criteria. No schema migration, dependency or model call was added. Full coverage remains owner judgment; arbitrary AI requirement derivation and independent semantic validation remain outside this slice.
+
+
 ## Mission-requirement checks for alternatives — 2026-10-16
 
 - Full SQLite backend regression: **214 passed, one PostgreSQL-only skip**, in 462.24 seconds.

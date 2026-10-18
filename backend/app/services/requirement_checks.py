@@ -2,6 +2,7 @@
 
 import math
 
+from app.domain.formalization import apply_scope
 from app.domain.models import Relation
 from app.domain.requirement_checks import METRICS, Criterion
 from app.engineering_tools.calculations import U, q
@@ -67,6 +68,7 @@ def evaluate(model, requirement, candidate):
 
 
 def make_check(requirement, candidate, data, refs):
+    apply_scope(requirement, data)
     check = entity(
         f"check-{requirement.id}-{candidate}",
         "VerificationItem",

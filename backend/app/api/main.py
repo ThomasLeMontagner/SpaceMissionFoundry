@@ -19,6 +19,7 @@ from app.services.collaboration import Collaboration, stop_execution
 from app.services.collaboration import Recovery as CollaborationRecovery
 from app.services.collaboration import Start as CollaborationStart
 from app.services.design_inputs import EditChanges
+from app.services.formalization import Formalizer, Note, Submit, overview
 from app.services.sensitivity import Study, study
 from app.services.workflow import Workflow
 
@@ -134,6 +135,18 @@ def create_app(store=None):
     @app.get("/api/scenario")
     def scenario():
         return {"name": "Pyra · Southern Europe Wildfire Monitor", "brief": BRIEF, "version": "1.0"}
+
+    @app.get("/api/missions/{id}/requirement-formalization")
+    def formalization_overview(id: str):
+        return overview(store.get(id))
+
+    @app.post("/api/missions/{id}/requirements/{requirement_id}/clarify")
+    def clarify_requirement(id: str, requirement_id: str, body: Note):
+        return Formalizer(store).note(id, requirement_id, body)
+
+    @app.post("/api/missions/{id}/requirements/{requirement_id}/formalize")
+    def formalize_requirement(id: str, requirement_id: str, body: Submit):
+        return Formalizer(store).propose(id, requirement_id, body)
 
     @app.get("/api/requirement-metrics")
     def requirement_metrics():

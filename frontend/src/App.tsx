@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { request, download, setToken, subscribe } from "./api";
+import RequirementFormalization from "./RequirementFormalization";
 import DesignEditor from "./DesignEditor";
 import BaselineComparison from "./BaselineComparison";
 import CoverageView from "./CoverageView";
@@ -887,6 +888,13 @@ export default function App() {
                 busy={busy}
                 act={act}
                 onInspect={(id) => show(model.entities[id])}
+              />
+            )}
+            {tab === "Requirements" && (
+              <RequirementFormalization
+                model={model}
+                busy={busy || pending.length > 0}
+                act={act}
               />
             )}
             {tab === "Design inputs" && (

@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.20. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.21. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -60,6 +60,9 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-013 | Implemented | Pass/fail/stale/unverified checks; transitive invalidation and recalculation regression tests. |
 | MF-REQ-014 | Implemented | Must-priority failures/stale checks block selection and baseline; outstanding obligations recorded in approval. |
 | MF-REQ-015 | Implemented | Reviewed criterion editor, per-candidate evidence navigation, immutable export and criterion-removal tests. |
+| MF-REQ-016 | Implemented | Bounded owner-guided readiness, immutable clarification replies, literal deadline suggestions and separately approved criterion proposals; backend/tests/test_formalization.py, frontend/src/RequirementFormalization.test.tsx. General AI derivation remains deferred. |
+| MF-REQ-017 | Implemented | Exact statement/criterion scope binding, explicit full-coverage confirmation, automatic linking of unanswered current notes, partial numeric passes remain unverified; same evaluator applies to mission alternatives. Legacy unassessed criteria retain prior semantics. |
+
 | MF-ARC-001 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-002 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-003 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
