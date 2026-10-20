@@ -50,6 +50,8 @@ def totals(budget):
 
 
 def live_task(data):
+    if data.get("workflow") == "requirement-collaboration":
+        return data["mode"] == "live" and data["stage"] in ["mission", "formalize", "review"]
     if data["mode"] != "live" or data["stage"] not in ["payload", "bus", "systems"]:
         return False
     if data["stage"] == "systems":

@@ -1,3 +1,4 @@
+import RequirementCollaboration from "./RequirementCollaboration";
 import { useEffect, useState, useRef } from "react";
 import { request, download, setToken, subscribe } from "./api";
 import RequirementFormalization from "./RequirementFormalization";
@@ -882,13 +883,21 @@ export default function App() {
               />
             )}
             {tab === "Agent collaboration" && (
-              <CollaborationView
-                key={model.id}
-                model={model}
-                busy={busy}
-                act={act}
-                onInspect={(id) => show(model.entities[id])}
-              />
+              <>
+                <RequirementCollaboration
+                  key={model.id}
+                  model={model}
+                  busy={busy}
+                  act={act}
+                />
+                <CollaborationView
+                  key={model.id}
+                  model={model}
+                  busy={busy}
+                  act={act}
+                  onInspect={(id) => show(model.entities[id])}
+                />
+              </>
             )}
             {tab === "Requirements" && (
               <RequirementFormalization

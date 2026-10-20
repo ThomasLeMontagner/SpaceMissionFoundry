@@ -1,8 +1,10 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.21. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.22. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
+
+Requirement assistance (MF-REQ-018–019) now adds a separate single-requirement workflow with Mission clarification, Systems criterion selection and independent review. It supports simulated or structured live-provider calls, explicit owner answers, usage limits and partial-coverage proposals. Arbitrary requirement derivation and semantic completeness remain outside the delivered scope.
 
 Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `frontend/src/App.test.tsx`, `frontend/tests/workflow.spec.ts`, versioned scenario exports, source inspection. Execution results are recorded separately in `docs/validation.md`.
 
@@ -60,8 +62,11 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-013 | Implemented | Pass/fail/stale/unverified checks; transitive invalidation and recalculation regression tests. |
 | MF-REQ-014 | Implemented | Must-priority failures/stale checks block selection and baseline; outstanding obligations recorded in approval. |
 | MF-REQ-015 | Implemented | Reviewed criterion editor, per-candidate evidence navigation, immutable export and criterion-removal tests. |
-| MF-REQ-016 | Implemented | Bounded owner-guided readiness, immutable clarification replies, literal deadline suggestions and separately approved criterion proposals; backend/tests/test_formalization.py, frontend/src/RequirementFormalization.test.tsx. General AI derivation remains deferred. |
+| MF-REQ-016 | Implemented | Bounded owner-guided readiness, immutable clarification replies, literal deadline suggestions and separately approved criterion proposals; backend/tests/test_formalization.py, frontend/src/RequirementFormalization.test.tsx. General AI derivation remains deferred; bounded AI assistance is tracked separately by MF-REQ-018–019. |
 | MF-REQ-017 | Implemented | Exact statement/criterion scope binding, explicit full-coverage confirmation, automatic linking of unanswered current notes, partial numeric passes remain unverified; same evaluator applies to mission alternatives. Legacy unassessed criteria retain prior semantics. |
+| MF-REQ-018 | Implemented | Bounded single-requirement Mission questions, Systems sourced-criterion selection and separate reviewer, live or explicitly simulated; backend/tests/test_requirement_collaboration.py and frontend/tests/requirement-agents.spec.ts. General derivation remains incomplete. |
+| MF-REQ-019 | Implemented | Persisted exchanges, source snapshot, owner answers, call reservations, leases and explicit retry; reviewer/source gates and atomic partial proposal submission through human approval. Concurrent edits/pause/cancel, unknown outcomes and explicit owner thresholds covered by regression tests. |
+
 
 | MF-ARC-001 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
 | MF-ARC-002 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |
