@@ -20,6 +20,10 @@ from app.services.collaboration import Recovery as CollaborationRecovery
 from app.services.collaboration import Start as CollaborationStart
 from app.services.design_inputs import EditChanges
 from app.services.formalization import Formalizer, Note, Submit, overview
+from app.services.requirement_collaboration import Answers as RequirementAnswers
+from app.services.requirement_collaboration import RequirementCollaboration
+from app.services.requirement_collaboration import Retry as RequirementRetry
+from app.services.requirement_collaboration import Start as RequirementStart
 from app.services.sensitivity import Study, study
 from app.services.workflow import Workflow
 
@@ -159,6 +163,30 @@ def create_app(store=None):
     @app.post("/api/missions/{id}/archive")
     def archive(id: str, body: Archive):
         return service.archive(id, body.revision, body.archived)
+
+    @app.post("/api/missions/{id}/requirement-collaboration")
+    def start_requirement_collaboration(id: str, body: RequirementStart):
+        return RequirementCollaboration(store).start(id, body)
+
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/step")
+    def requirement_step(id: str, run_id: str, body: Command):
+        return RequirementCollaboration(store).step(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/answers")
+    def requirement_answers(id: str, run_id: str, body: RequirementAnswers):
+        return RequirementCollaboration(store).answer(id, run_id, body)
+
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/submit")
+    def requirement_submit(id: str, run_id: str, body: Command):
+        return RequirementCollaboration(store).submit(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/cancel")
+    def requirement_cancel(id: str, run_id: str, body: Command):
+        return RequirementCollaboration(store).cancel(id, run_id, body.revision)
+
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/retry")
+    def requirement_retry(id: str, run_id: str, body: RequirementRetry):
+        return RequirementCollaboration(store).retry(id, run_id, body)
 
     @app.post("/api/missions/{id}/collaboration")
     def start_collaboration(id: str, body: CollaborationStart):

@@ -1,5 +1,17 @@
 # Validation record — 2026-09-09
 
+## AI-assisted requirement clarification — 2026-10-20
+
+- Full SQLite backend regression: **235 passed, one PostgreSQL-only skip** in 450.64 seconds. The interrupted earlier run had no retained completion result, so the full suite was rerun before delivery.
+
+- **48 frontend unit tests passed**, along with TypeScript, production build, Prettier, Ruff lint/format and whitespace checks. The final display tolerates a run without a criterion and reflects an accepted or rejected proposal.
+- Both browser workflows passed: owner-guided formalization and agent-assisted clarification through separate human approval. The final screen was visually inspected; criterion values use readable text and approved proposals no longer invite duplicate approval.
+
+- Targeted PostgreSQL verification completed during implementation: **39 passed** across requirement collaboration, owner formalization and run budgets, after migration on an isolated UTF-8 PostgreSQL 16 instance with `max_connections=20`. The instance was stopped after testing; user databases were untouched. This is targeted coverage, not a full PostgreSQL-suite rerun.
+- Tests cover three separate mocked live-provider calls and their shared context, source-backed criterion selection, owner thresholds, mandatory clarification pauses, reviewer blocking, immutable accepted requirements until approval, partial coverage, source-note changes, concurrent pause/cancel/edits, conservative unknown-call reservations, budget preflight, explicit recovery and round bounds. No paid provider calls were made.
+- Requirements v0.22 adds MF-REQ-018–019. README, traceability and architecture describe the bounded manually advanced workflow and its limits. No migration or dependency was added. Separate review does not imply a different model or prove semantic completeness. Simulation is explicitly labeled and does not interpret free-text answers.
+
+
 ## Requirement clarification and formalization — 2026-10-18
 
 - Full SQLite regression: **219 passed, one PostgreSQL-only skip** in 263.37 seconds. Two additional guard cases added during that run were subsequently included in the seven-test formalization run and the 15-test PostgreSQL run.

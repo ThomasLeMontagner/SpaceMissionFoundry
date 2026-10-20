@@ -175,9 +175,14 @@ class Formalizer:
             model,
         )
 
-    def propose(self, mission_id, requirement_id, request):
+    def propose(self, mission_id, requirement_id, request, source_run_id=None):
         model, requirement = self.source(mission_id, requirement_id, request.revision)
         questions = list(request.open_questions)
+        answered = (
+            {a["question"] for a in model.entities[source_run_id].data["answers"]}
+            if source_run_id
+            else set()
+        )
         current_notes = [
             e
             for e in model.entities.values()
@@ -207,7 +212,7 @@ class Formalizer:
                 raise ValueError(
                     "Clarification refers to an earlier requirement; record a new clarification"
                 )
-            if not note.data["answer"]:
+            if not note.data["answer"] and note.data["question"] not in answered:
                 questions.append(note.data["question"])
         if request.coverage == "full" and not request.confirm_full_coverage:
             raise ValueError("Explicitly confirm that the criterion covers the entire requirement")
@@ -233,7 +238,7 @@ class Formalizer:
             target_revision=model.revision,
             operations=[Operation(action="replace", entity=proposed)],
             rationale=request.basis,
-            evidence_references=identifiers,
+            evidence_references=[*identifiers, *([source_run_id] if source_run_id else [])],
             expected_consequences="Human approval updates criterion and owner-assessed scope, invalidates dependent evidence and requires recalculation. Partial coverage cannot verify the full requirement.",
             confidence=1,
         )
@@ -241,6 +246,18 @@ class Formalizer:
         updated = model.model_copy(deep=True)
         proposal.target_revision += 1
         updated.proposals[proposal.id] = proposal
+        if source_run_id:
+            from app.services.collaboration import record
+
+            record(
+                updated.entities[source_run_id],
+                "submitted",
+                "human",
+                "human",
+                "Submitted partial criterion for separate human approval",
+                {"proposal_id": proposal.id},
+            )
+            updated.entities[source_run_id].data.update(status="submitted", proposal_id=proposal.id)
         return self.store.save(
             updated,
             "human",
