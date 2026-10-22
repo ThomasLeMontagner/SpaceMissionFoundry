@@ -2,7 +2,7 @@
 
 ## System Requirements Specification
 
-**Version:** 0.22
+**Version:** 0.23
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
@@ -192,11 +192,16 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-017 | Formalized requirements shall distinguish partial from owner-assessed full criterion coverage. Unanswered current clarification questions shall prevent full coverage; partial coverage shall not verify a whole requirement merely because a numeric check passes. Statement or criterion changes shall invalidate the scope assessment. | Must | Test |
 | MF-REQ-018 | Users shall be able to request bounded AI-assisted clarification of one accepted requirement: a Mission task identifies questions, a Systems task selects a source-backed criterion, and a separate reviewer recommends submission or further clarification. Unanswered questions shall pause progression; no agent shall invent quantitative targets or claim full coverage. | Must | Test |
 | MF-REQ-019 | Requirement assistance shall preserve source statements, owner answers, criterion provenance, agent exchanges, checkpoints and cumulative usage reservations. Submission shall require unchanged sources and a favorable separate review, create only a partial-coverage proposal, and require separate human approval. Interrupted or failed calls shall not retry automatically. | Must | Test |
+| MF-REQ-020 | Users shall be able to explicitly run remaining requirement-agent tasks until owner clarification or independent review is required. Execution shall be exclusively claimed, bounded to one task sequence, and stop on pause, cancellation, failure, changed sources or exhausted budgets. No automatic retry, submission or approval shall occur. Expired checkpoints shall support explicit recovery without repeating completed work; potential live-call charges shall require acknowledgement only when a task outcome is uncertain. | Must | Test |
+
 
 
 Owner-guided formalization scope (v0.21): owner-guided clarification and existing metric registry only; no model calls or general requirement derivation. Literal acquisition-to-delivery deadlines can be suggested with their source phrase. Up to ten clarification threads per requirement revision are retained as immutable notes and replies. Full coverage is an explicit owner assessment of the complete statement, not independent semantic verification or certification. Existing criteria without scope metadata retain legacy checking behavior and are labeled unassessed. Unsupported obligations remain unresolved.
 
 AI-assisted scope (v0.22): a separate manually advanced workflow supports one requirement per run, using simulation or three separate OpenAI-compatible provider calls (Mission, Systems and independent reviewer). Criteria are selected from an existing accepted criterion, a literal delivery deadline or an explicit structured owner input. Free-text answers are context, never automatically converted into targets. Owner answers and reviewer findings are retained in the run. Up to three answer/revision rounds and ten task attempts share explicit cost/token/time limits. Two-minute task leases fence late responses and permit explicit recovery; unknown live-call outcomes retain reservations and require acknowledgement before retry. Submission always proposes partial coverage. Semantic adequacy, full requirement derivation and automatic multi-requirement orchestration remain outside this slice.
+
+Progression scope (v0.23): “Run until owner action” executes at most three remaining role tasks in one explicitly requested background sequence. It stops before collecting answers or submitting a proposal. Manual task execution remains available when no automatic claim exists. Pause and cancellation stop scheduling and fence automatic in-flight responses, including a rapid pause/resume; resume and owner answers never restart progression. A two-minute execution lease is renewed when each task starts. Explicit recovery preserves a completed question/review checkpoint and does not require a charge acknowledgement if no call was in flight. Server restarts do not automatically restart work; general job scheduling remains deferred.
+
 
 
 

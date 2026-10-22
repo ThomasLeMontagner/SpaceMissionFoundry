@@ -1,5 +1,15 @@
 # Validation record — 2026-09-09
 
+## Automatic requirement-agent progression — 2026-10-20
+
+- Full SQLite backend regression: **247 passed, one PostgreSQL-only skip** in 369.98 seconds. Ruff lint/format, Prettier and whitespace checks passed.
+
+- Targeted PostgreSQL verification: **44 passed** across automatic progression, requirement collaboration and run budgets. An isolated UTF-8 PostgreSQL 16 instance was migrated to Alembic head with `max_connections=20` and stopped after testing; user databases were untouched.
+- **50 frontend unit tests passed**; production build and TypeScript passed. Three browser workflows passed: owner-guided formalization, manual agent tasks and automatic progression through separate human approval. The automatic workflow screen was visually inspected.
+- New tests exercise exclusive claims, manual/duplicate execution exclusion, stopping at questions and review, no automatic submission, three-task bounds, failed calls without retry, source changes, pause/resume and cancellation during calls, expired idle and working recovery, budget preflight, and preserving an unrelated pending proposal's approvable revision.
+- Requirements v0.23 adds MF-REQ-020. README, traceability and architecture describe explicit progression and recovery boundaries. No dependency, migration, paid model call or restart scheduler was added; historical manual runs remain supported.
+
+
 ## AI-assisted requirement clarification — 2026-10-20
 
 - Full SQLite backend regression: **235 passed, one PostgreSQL-only skip** in 450.64 seconds. The interrupted earlier run had no retained completion result, so the full suite was rerun before delivery.

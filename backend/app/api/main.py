@@ -172,6 +172,17 @@ def create_app(store=None):
     def requirement_step(id: str, run_id: str, body: Command):
         return RequirementCollaboration(store).step(id, run_id, body.revision)
 
+    @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/run", status_code=202)
+    def run_requirement_collaboration(
+        id: str, run_id: str, body: Command, background: BackgroundTasks
+    ):
+        runner = RequirementCollaboration(store)
+        model = runner.begin_execution(id, run_id, body.revision)
+        background.add_task(
+            runner.execute_remaining, id, run_id, model.entities[run_id].data["execution"]["id"]
+        )
+        return model
+
     @app.post("/api/missions/{id}/requirement-collaboration/{run_id}/answers")
     def requirement_answers(id: str, run_id: str, body: RequirementAnswers):
         return RequirementCollaboration(store).answer(id, run_id, body)
@@ -316,7 +327,10 @@ def create_app(store=None):
         m.paused = not m.paused
         if m.paused:
             for run in m.entities.values():
-                if run.kind == "AgentRun" and run.data.get("workflow") == "duty-collaboration":
+                if run.kind == "AgentRun" and run.data.get("workflow") in [
+                    "duty-collaboration",
+                    "requirement-collaboration",
+                ]:
                     stop_execution(
                         run, "Mission paused; resume and explicitly run again to continue"
                     )
