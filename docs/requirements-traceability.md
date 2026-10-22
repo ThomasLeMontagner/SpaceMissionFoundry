@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.22. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.23. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -66,6 +66,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-017 | Implemented | Exact statement/criterion scope binding, explicit full-coverage confirmation, automatic linking of unanswered current notes, partial numeric passes remain unverified; same evaluator applies to mission alternatives. Legacy unassessed criteria retain prior semantics. |
 | MF-REQ-018 | Implemented | Bounded single-requirement Mission questions, Systems sourced-criterion selection and separate reviewer, live or explicitly simulated; backend/tests/test_requirement_collaboration.py and frontend/tests/requirement-agents.spec.ts. General derivation remains incomplete. |
 | MF-REQ-019 | Implemented | Persisted exchanges, source snapshot, owner answers, call reservations, leases and explicit retry; reviewer/source gates and atomic partial proposal submission through human approval. Concurrent edits/pause/cancel, unknown outcomes and explicit owner thresholds covered by regression tests. |
+| MF-REQ-020 | Implemented | Explicit bounded background progression, exclusive persisted ownership, manual-step exclusion, questions/review stops, pause/cancel fencing, idle/working checkpoint recovery and preserved approval revision. backend/tests/test_requirement_progression.py; frontend unit and browser tests cover manual and automatic controls. No automatic submission, approval, retries or restart scheduler. |
+
 
 
 | MF-ARC-001 | Partial | Reference functional/physical records and interface drilldown; no general compatibility engine. |

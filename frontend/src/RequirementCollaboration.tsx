@@ -50,6 +50,10 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
     busy || !!model.baseline || !!model.archived || model.paused || pending;
   const active = runs.some((r) => activeStates.includes(r.data.status));
   const d = run?.data;
+  const claimed = d?.execution?.status === "running";
+  const expiredClaim =
+    claimed && Date.parse(d.execution.lease_expires_at) <= now;
+  const recoveringCall = d?.status === "working" || d?.status === "failed";
   const proposedCriterion = d?.criteria?.[d?.proposal?.criterion_id]?.criterion;
   const proposalStatus = d?.proposal_id
     ? model.proposals[d.proposal_id]?.status
@@ -61,8 +65,9 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
       <p>
         Mission asks questions → Systems selects a source-backed criterion → an
         independent reviewer checks the proposal → you approve. Agents cannot
-        invent thresholds or claim full coverage. Run each task explicitly;
-        unanswered questions pause progress.
+        invent thresholds or claim full coverage. Choose a single task or run
+        until owner action is needed. Unanswered questions and completed review
+        stop progression; submission and approval remain separate actions.
       </p>
       <form
         onSubmit={(e) => {
@@ -176,9 +181,30 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
             ))}
           </ol>
           {d.status === "ready" && (
-            <button disabled={disabled} onClick={() => act(prefix + "/step")}>
-              Run {labels[d.stage]}
-            </button>
+            <div>
+              <button
+                disabled={disabled || claimed}
+                onClick={() => act(prefix + "/run")}
+              >
+                Run until owner action
+              </button>
+              <button
+                disabled={disabled || claimed}
+                onClick={() => act(prefix + "/step")}
+              >
+                Run {labels[d.stage]}
+              </button>
+            </div>
+          )}
+          {claimed && (
+            <p className="notice">
+              {expiredClaim
+                ? "Execution checkpoint expired. Prepare recovery before continuing."
+                : "Automatic progression is running. Pause stops further work; resuming requires an explicit run action."}
+            </p>
+          )}
+          {!claimed && d.execution?.reason && (
+            <p className="notice">{d.execution.reason}</p>
           )}
           {d.status === "working" && (
             <p>
@@ -187,12 +213,14 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
               preparing a retry.
             </p>
           )}
-          {(d.status === "failed" ||
-            (d.status === "working" && Date.parse(d.task_lease) <= now)) && (
+          {((!claimed &&
+            (d.status === "failed" ||
+              (d.status === "working" && Date.parse(d.task_lease) <= now))) ||
+            expiredClaim) && (
             <Retry
-              key={`${run.id}:${d.attempt}`}
-              live={d.mode === "live"}
-              disabled={disabled || d.attempts >= 10}
+              key={`${run.id}:${d.execution?.id}:${d.attempt}`}
+              live={d.mode === "live" && recoveringCall}
+              disabled={disabled || (recoveringCall && d.attempts >= 10)}
               action={(body) => act(prefix + "/retry", body)}
             />
           )}
@@ -200,7 +228,7 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
             <Answers
               key={`${run.id}:${d.round}`}
               questions={d.pending_questions}
-              disabled={disabled || d.round >= 3}
+              disabled={disabled || claimed || d.round >= 3}
               action={(body) => act(prefix + "/answers", body)}
             />
           )}

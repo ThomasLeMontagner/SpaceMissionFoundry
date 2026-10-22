@@ -94,3 +94,55 @@ test("unknown live call requires acknowledgement before explicit retry", () => {
     acknowledge_unknown: true,
   });
 });
+
+test("automatic progression is explicitly requested and excludes manual work", () => {
+  const act = vi.fn();
+  const { rerender } = render(
+    <RequirementCollaboration
+      model={model({ status: "ready" })}
+      busy={false}
+      act={act}
+    />,
+  );
+  expect(act).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByText("Run until owner action"));
+  expect(act).toHaveBeenCalledWith("/requirement-collaboration/run/run");
+  rerender(
+    <RequirementCollaboration
+      model={model({
+        status: "ready",
+        execution: {
+          status: "running",
+          lease_expires_at: "2999-01-01T00:00:00Z",
+        },
+      })}
+      busy={false}
+      act={act}
+    />,
+  );
+  expect(screen.getByText("Run until owner action")).toBeDisabled();
+  expect(screen.getByText("Run Mission clarification")).toBeDisabled();
+});
+
+test("expired idle execution can recover without acknowledging a model call", () => {
+  const act = vi.fn();
+  render(
+    <RequirementCollaboration
+      model={model({
+        status: "ready",
+        mode: "live",
+        execution: {
+          status: "running",
+          lease_expires_at: "2000-01-01T00:00:00Z",
+        },
+      })}
+      busy={false}
+      act={act}
+    />,
+  );
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByText("Prepare explicit retry"));
+  expect(act).toHaveBeenCalledWith("/requirement-collaboration/run/retry", {
+    acknowledge_unknown: false,
+  });
+});

@@ -1,4 +1,4 @@
-"""Manually advanced, durable requirement collaboration with sourced criterion choices."""
+"""Durable requirement collaboration with bounded, explicitly requested progression."""
 
 import os
 from time import perf_counter
@@ -8,11 +8,11 @@ from uuid import uuid4
 from pydantic import Field
 
 from app.agents.requirement_provider import perform
-from app.domain.models import Strict
+from app.domain.models import Strict, now
 from app.domain.requirement_checks import Criterion
 from app.orchestration.scenario import entity
 from app.services import run_budget
-from app.services.collaboration import record
+from app.services.collaboration import advance_pending_metadata, record, stop_execution
 from app.services.execution_recovery import lease_deadline, lease_expired
 from app.services.formalization import Formalizer, Submit, inspect
 from app.services.workflow import Workflow
@@ -107,7 +107,7 @@ class RequirementCollaboration:
             "Requirement clarification collaboration",
             "orchestrator",
             workflow=WORKFLOW,
-            version="1.0",
+            version="1.1",
             status="ready",
             stage="mission",
             mode=request.mode,
@@ -142,7 +142,7 @@ class RequirementCollaboration:
             "created",
             "human",
             "mission",
-            "Started bounded requirement clarification; each task requires an explicit action. No automatic approval.",
+            "Started bounded requirement clarification; choose a task or explicitly run until owner action. No automatic approval.",
         )
         m.entities[run.id] = run
         return self.store.save(m, "human", "Started requirement collaboration", model)
@@ -150,6 +150,7 @@ class RequirementCollaboration:
     def answer(self, mission_id, ident, request):
         model, old = self.load(mission_id, ident, request.revision)
         d = old.data
+        self.unclaimed(d)
         if d["status"] != "awaiting_answers" or d["round"] >= 3:
             raise ValueError(
                 "Answers require a waiting run with fewer than three clarification rounds"
@@ -194,6 +195,7 @@ class RequirementCollaboration:
             raise ValueError("Only active requirement runs can be cancelled")
         m = model.model_copy(deep=True)
         run = get_run(m, ident)
+        stop_execution(run, "Requirement collaboration cancelled")
         run.data.update(status="cancelled", attempt=None)
         record(
             run,
@@ -203,27 +205,46 @@ class RequirementCollaboration:
             "Cancelled; late responses cannot change this run.",
         )
         # Cancellation during unrelated pending approval must not invalidate it.
-        from app.services.collaboration import advance_pending_metadata
-
         advance_pending_metadata(m)
         return self.store.save(m, "human", "Cancelled requirement collaboration", model)
 
     def retry(self, mission_id, ident, request):
         model, old = self.load(mission_id, ident, request.revision)
         d = old.data
-        if d["status"] != "failed" and not (
-            d["status"] == "working" and lease_expired(d["task_lease"])
+        execution = d.get("execution", {})
+        claimed = execution.get("status") == "running"
+        expired_execution = claimed and lease_expired(execution.get("lease_expires_at"))
+        if claimed and not expired_execution:
+            raise ValueError(
+                "Automatic progression still owns this run; wait for completion or lease expiry"
+            )
+        idle_recovery = expired_execution and d["status"] in [
+            "ready",
+            "awaiting_answers",
+            "review_ready",
+        ]
+        if (
+            d["status"] != "failed"
+            and not (d["status"] == "working" and lease_expired(d["task_lease"]))
+            and not idle_recovery
         ):
             raise ValueError("Retry requires a failed task or expired checkpoint")
-        if d["mode"] == "live" and not request.acknowledge_unknown:
+        if (
+            d["mode"] == "live"
+            and d["status"] in ["working", "failed"]
+            and not request.acknowledge_unknown
+        ):
             raise ValueError(
                 "A previous call may have incurred a charge; acknowledge its unknown outcome before retrying"
             )
-        if d["attempts"] >= 10:
+        if d["attempts"] >= 10 and not idle_recovery:
             raise ValueError("Attempt limit reached; cancel this run")
         m = model.model_copy(deep=True)
         run = get_run(m, ident)
-        run.data.update(status="ready", attempt=None, task_lease=None)
+        stop_execution(run, "Expired execution superseded by explicit recovery")
+        run.data.update(
+            status=d["status"] if idle_recovery else "ready", attempt=None, task_lease=None
+        )
         record(
             run,
             "recovered",
@@ -233,9 +254,94 @@ class RequirementCollaboration:
         )
         return self.store.save(m, "human", "Prepared requirement task retry", model)
 
-    def step(self, mission_id, ident, revision):
+    @staticmethod
+    def unclaimed(data):
+        if data.get("execution", {}).get("status") == "running":
+            raise ValueError(
+                "Automatic progression owns this run; wait for completion or recover an expired checkpoint"
+            )
+
+    def begin_execution(self, mission_id, ident, revision):
         model, old = self.load(mission_id, ident, revision)
         d = old.data
+        self.unclaimed(d)
+        if d["status"] != "ready" or d["attempts"] >= 10:
+            raise ValueError("Automatic progression requires a ready task with attempts remaining")
+        reason = run_budget.reason(d, before=True)
+        if reason:
+            raise ValueError(reason)
+        if d["mode"] == "live" and os.getenv("LLM_MODEL") != d["provider_model"]:
+            raise ValueError("Provider model changed; restore it or start a new run")
+        m = model.model_copy(deep=True)
+        run = get_run(m, ident)
+        run.data["execution"] = dict(
+            id=str(uuid4()), status="running", started_at=now(), lease_expires_at=lease_deadline()
+        )
+        record(
+            run,
+            "execution_started",
+            "human",
+            "orchestrator",
+            "Run remaining tasks until clarification, independent review, pause, cancellation or failure. No automatic submission, approval or retry.",
+        )
+        return self.store.save(m, "human", "Requested requirement agent progression", model)
+
+    def execute_remaining(self, mission_id, ident, execution_id):
+        reason = "Stopped for owner action"
+        try:
+            # At most the three role tasks; never loop across clarification rounds.
+            for _ in range(3):
+                model = self.store.get(mission_id)
+                run = get_run(model, ident)
+                execution = run.data.get("execution", {})
+                if execution.get("id") != execution_id or execution.get("status") != "running":
+                    return
+                if lease_expired(execution.get("lease_expires_at")):
+                    return  # Preserve expired ownership for explicit recovery.
+                if model.archived or model.baseline:
+                    return
+                if model.paused:
+                    reason = "Mission paused; resume and explicitly run again"
+                    break
+                if run.data["status"] != "ready":
+                    reason = "Stopped for " + run.data["status"].replace("_", " ")
+                    break
+                self.step(mission_id, ident, model.revision, execution_id)
+            else:
+                reason = "Bounded task sequence completed; inspect results before submission"
+        except Exception:
+            reason = "Progression stopped; inspect source changes, budgets and the task checkpoint. No task was automatically retried."
+        try:
+            model = self.store.get(mission_id)
+            run = get_run(model, ident)
+            execution = run.data.get("execution", {})
+            if (
+                model.archived
+                or model.baseline
+                or execution.get("id") != execution_id
+                or execution.get("status") != "running"
+            ):
+                return
+            m = model.model_copy(deep=True)
+            stop_execution(get_run(m, ident), reason)
+            advance_pending_metadata(m)
+            self.store.save(m, "orchestrator", "Requirement agent progression stopped", model)
+        except Exception:
+            # A competing write wins. An uncleared claim expires for recovery.
+            return
+
+    def step(self, mission_id, ident, revision, execution_id=None):
+        model, old = self.load(mission_id, ident, revision)
+        d = old.data
+        execution = d.get("execution", {})
+        if execution_id is None:
+            self.unclaimed(d)
+        elif (
+            execution.get("id") != execution_id
+            or execution.get("status") != "running"
+            or lease_expired(execution.get("lease_expires_at"))
+        ):
+            raise ValueError("Execution claim is no longer active; recover an expired checkpoint")
         if d["status"] != "ready" or d["attempts"] >= 10:
             raise ValueError(
                 "Run the next task only from a ready checkpoint with attempts remaining"
@@ -254,6 +360,8 @@ class RequirementCollaboration:
             task_lease=lease_deadline(),
             attempts=d["attempts"] + 1,
         )
+        if execution_id is not None:
+            run.data["execution"]["lease_expires_at"] = lease_deadline()
         run_budget.reserve(run.data, attempt)
         record(run, "started", "orchestrator", d["stage"], "Started " + d["stage"] + " task")
         self.store.save(m, "orchestrator", "Claimed requirement task", model)
@@ -289,6 +397,14 @@ class RequirementCollaboration:
         latest_run = get_run(latest, ident)
         if latest_run.data["attempt"] != attempt or latest_run.data["status"] != "working":
             return latest
+        if execution_id is not None:
+            execution = latest_run.data.get("execution", {})
+            if (
+                execution.get("id") != execution_id
+                or execution.get("status") != "running"
+                or lease_expired(execution.get("lease_expires_at"))
+            ):
+                return latest
         # Pause, edits, pending approvals and expired leases fence completion. The
         # reserved checkpoint remains recoverable; no late result is applied.
         if (
@@ -347,6 +463,7 @@ class RequirementCollaboration:
     def submit(self, mission_id, ident, revision):
         model, run = self.load(mission_id, ident, revision)
         d = run.data
+        self.unclaimed(d)
         if (
             d["status"] != "review_ready"
             or d["review"]["recommendation"] != "submit"
