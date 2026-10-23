@@ -40,6 +40,17 @@ def validate(model, proposal: Proposal):
         for op in proposal.operations
     ):
         raise ValueError("Calculation input proposals may only add calculator input groups")
+    if (
+        any(
+            op.action == "add" and op.entity.data.get("decomposition") for op in proposal.operations
+        )
+        and proposal.proposal_type != "requirement decomposition"
+    ):
+        raise ValueError("Derived children must use the reviewed decomposition workflow")
+    if proposal.proposal_type == "requirement decomposition":
+        from app.domain.decomposition import validate_submission
+
+        validate_submission(model, proposal)
     ids = [op.entity.id for op in proposal.operations]
     if len(set(ids)) != len(ids):
         raise ValueError("Duplicate or conflicting operations")

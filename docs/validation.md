@@ -1,5 +1,14 @@
 # Validation record — 2026-09-09
 
+## Requirement decomposition — 2026-10-22
+
+- Full SQLite backend regression: **260 passed, one PostgreSQL-only skip** in 478.00 seconds.
+- Targeted PostgreSQL regression: **39 passed** across decomposition, requirement collaboration and automatic progression. The isolated UTF-8 PostgreSQL 16 instance was migrated to Alembic head with `max_connections=20`, then stopped; user databases were untouched.
+- **51 frontend unit tests passed**; TypeScript, production build, Prettier, Ruff lint/format and whitespace checks passed. Four browser workflows passed across decomposition, owner-guided formalization, manual and automatic agent progression. The decomposition test's threshold assertion was corrected to use a string and an exact field label; the completed hierarchy screen was visually inspected.
+- Coverage includes parent preservation, atomic approval-only child creation, source quotations, owner-answer provenance, unsupported/duplicate children, altered titles/priority/criteria/parent links, changed parent or missing review, rejection/challenge, candidate recalculation, partial child results, historical revisions, duplicate decomposition prevention and a separate mocked three-call live exchange. No paid model calls were made.
+- Specification v0.24 adds MF-REQ-021–022. README, traceability and architecture describe two-to-five extractive children, partial coverage, inherited priority, one approved set per parent and the delivery-only simulation boundary. No dependency or migration was added. Completeness and automatic child-to-parent verification are not claimed.
+
+
 ## Automatic requirement-agent progression — 2026-10-20
 
 - Full SQLite backend regression: **247 passed, one PostgreSQL-only skip** in 369.98 seconds. Ruff lint/format, Prettier and whitespace checks passed.

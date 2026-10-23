@@ -23,6 +23,7 @@ const labels: Record<string, string> = {
 export default function RequirementCollaboration({ model, busy, act }: Props) {
   const [selected, setSelected] = useState("");
   const [requirement, setRequirement] = useState("");
+  const [study, setStudy] = useState("formalization");
   const [mode, setMode] = useState("simulation");
   const [cost, setCost] = useState("1");
   const [tokens, setTokens] = useState("100000");
@@ -76,6 +77,7 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
           act("/requirement-collaboration", {
             requirement_id: requirement || requirements[0]?.id,
             mode,
+            study,
             limits: {
               cost_eur: Number(cost),
               tokens: Number(tokens),
@@ -86,6 +88,24 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
       >
         <fieldset disabled={disabled || active || !requirements.length}>
           <legend>Start requirement assistance</legend>
+          <label>
+            Requirement assistance type
+            <select value={study} onChange={(e) => setStudy(e.target.value)}>
+              <option value="formalization">Clarify one criterion</option>
+              <option value="decomposition">
+                Decompose into child requirements
+              </option>
+            </select>
+          </label>
+          {study === "decomposition" && (
+            <p>
+              Propose two to five children quoted from the parent or owner
+              answers. The parent stays unchanged. Missing targets stay
+              unresolved; no child or parent is automatically verified.
+              Simulation separates an explicit delivery deadline from its
+              preceding obligation; other statements need live mode.
+            </p>
+          )}
           <label>
             Requirement for agents
             <select
@@ -240,16 +260,54 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
           )}
           {d.proposal && (
             <div className="notice">
-              <h3>Proposed partial criterion</h3>
+              <h3>
+                {d.study === "decomposition"
+                  ? "Proposed child requirements"
+                  : "Proposed partial criterion"}
+              </h3>
               <p>{d.proposal.basis}</p>
-              <p>
-                {proposedCriterion
-                  ? `${proposedCriterion.metric.replaceAll(".", " / ").replaceAll("_", " ")} ${proposedCriterion.operator === "<=" ? "≤" : "≥"} ${proposedCriterion.threshold.value} ${proposedCriterion.threshold.unit}`
-                  : "No supported criterion selected"}
-              </p>
-              <p>
-                Source: {d.criteria[d.proposal.criterion_id]?.source || "None"}
-              </p>
+              {d.study === "decomposition" ? (
+                <ol>
+                  {d.proposal.children.map((child: any, i: number) => {
+                    const criterion = d.criteria[child.criterion_id]?.criterion;
+                    return (
+                      <li key={i}>
+                        <strong>{child.source_quote}</strong>
+                        <p>
+                          Quoted from{" "}
+                          {child.source_ref === "parent"
+                            ? "parent requirement"
+                            : "owner " + child.source_ref}
+                          . {child.rationale}
+                        </p>
+                        <p>
+                          {criterion
+                            ? `${criterion.metric} ${criterion.operator} ${criterion.threshold.value} ${criterion.threshold.unit}`
+                            : "No supported criterion — unresolved"}{" "}
+                          · Partial coverage
+                        </p>
+                        <ul>
+                          {child.unresolved.map((q: string, j: number) => (
+                            <li key={j}>{q}</li>
+                          ))}
+                        </ul>
+                      </li>
+                    );
+                  })}
+                </ol>
+              ) : (
+                <>
+                  <p>
+                    {proposedCriterion
+                      ? `${proposedCriterion.metric.replaceAll(".", " / ").replaceAll("_", " ")} ${proposedCriterion.operator === "<=" ? "≤" : "≥"} ${proposedCriterion.threshold.value} ${proposedCriterion.threshold.unit}`
+                      : "No supported criterion selected"}
+                  </p>
+                  <p>
+                    Source:{" "}
+                    {d.criteria[d.proposal.criterion_id]?.source || "None"}
+                  </p>
+                </>
+              )}
               <ul>
                 {d.proposal.limitations.map((l: string, i: number) => (
                   <li key={i}>{l}</li>
@@ -269,14 +327,21 @@ export default function RequirementCollaboration({ model, busy, act }: Props) {
             </div>
           )}
           {d.status === "review_ready" && (
-            <button disabled={disabled} onClick={() => act(prefix + "/submit")}>
-              Submit partial criterion for human approval
+            <button
+              disabled={disabled || claimed}
+              onClick={() => act(prefix + "/submit")}
+            >
+              {d.study === "decomposition"
+                ? "Submit child requirements for human approval"
+                : "Submit partial criterion for human approval"}
             </button>
           )}
           {d.status === "submitted" && (
             <p>
               {proposalStatus === "accepted"
-                ? "Proposal accepted by the owner. The recorded criterion has partial coverage; complete requirement verification remains unresolved."
+                ? d.study === "decomposition"
+                  ? "Child requirements accepted. The parent is unchanged; child results do not roll up into parent verification."
+                  : "Proposal accepted by the owner. The recorded criterion has partial coverage; complete requirement verification remains unresolved."
                 : proposalStatus === "rejected"
                   ? "Proposal rejected by the owner. The accepted requirement was not changed by this proposal."
                   : "Proposal submitted. Open Conflicts & review to inspect and approve, reject or resolve a challenge. The accepted requirement changes only after approval."}

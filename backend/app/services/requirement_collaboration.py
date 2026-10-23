@@ -8,7 +8,9 @@ from uuid import uuid4
 from pydantic import Field
 
 from app.agents.requirement_provider import perform
-from app.domain.models import Strict, now
+from app.domain.decomposition import children_exist, make_child, validate_plan
+from app.domain.models import Operation, Proposal, Strict, now
+from app.domain.protocol import validate
 from app.domain.requirement_checks import Criterion
 from app.orchestration.scenario import entity
 from app.services import run_budget
@@ -24,6 +26,7 @@ ACTIVE = {"ready", "working", "awaiting_answers", "review_ready", "failed"}
 class Start(Strict):
     revision: int = Field(ge=0)
     requirement_id: str
+    study: Literal["formalization", "decomposition"] = "formalization"
     mode: Literal["simulation", "live"] = "simulation"
     limits: run_budget.Limits = Field(default_factory=run_budget.Limits)
 
@@ -79,6 +82,10 @@ class RequirementCollaboration:
             raise ValueError("Finish or cancel the active requirement collaboration first")
         if request.mode == "live" and os.getenv("LLM_PROVIDER", "mock") != "openai-compatible":
             raise ValueError("Configure an openai-compatible provider before live execution")
+        if request.study == "decomposition" and children_exist(model, requirement.id):
+            raise ValueError(
+                "This parent already has a decomposition; review its existing children"
+            )
         criteria = {}
         if requirement.data.get("criterion"):
             criteria["accepted-criterion"] = dict(
@@ -89,6 +96,12 @@ class RequirementCollaboration:
         if suggestion:
             criteria["literal-deadline"] = dict(
                 criterion=suggestion["criterion"], source=suggestion["source_quote"]
+            )
+        if request.study == "decomposition" and request.mode == "simulation":
+            from app.agents.decomposition_provider import simulation_children
+
+            simulation_children(
+                dict(criteria=criteria, source_requirement=requirement.model_dump(mode="json"))
             )
         notes = [
             e
@@ -107,7 +120,8 @@ class RequirementCollaboration:
             "Requirement clarification collaboration",
             "orchestrator",
             workflow=WORKFLOW,
-            version="1.1",
+            version="1.2",
+            study=request.study,
             status="ready",
             stage="mission",
             mode=request.mode,
@@ -368,6 +382,7 @@ class RequirementCollaboration:
         context = {
             k: run.data.get(k)
             for k in [
+                "study",
                 "source_requirement",
                 "criteria",
                 "notes",
@@ -382,10 +397,13 @@ class RequirementCollaboration:
             result, usage = perform(d["stage"], context, d["mode"])
             if (
                 d["stage"] == "formalize"
+                and d.get("study") != "decomposition"
                 and result.criterion_id is not None
                 and result.criterion_id not in d["criteria"]
             ):
                 raise ValueError("Agent selected an unsourced criterion")
+            if d["stage"] == "formalize" and d.get("study") == "decomposition":
+                validate_plan(d, result.model_dump())
             failure = None
         except Exception:
             result, usage, failure = (
@@ -445,7 +463,11 @@ class RequirementCollaboration:
             elif stage == "formalize":
                 run.data.update(proposal=payload, stage="review", status="ready")
             else:
-                has_criterion = bool(run.data["proposal"]["criterion_id"])
+                has_criterion = (
+                    bool(run.data["proposal"].get("children"))
+                    if d.get("study") == "decomposition"
+                    else bool(run.data["proposal"]["criterion_id"])
+                )
                 questions = result.questions or (
                     []
                     if has_criterion
@@ -485,6 +507,36 @@ class RequirementCollaboration:
         answered = {a["question"] for a in d["answers"]}
         if any(q not in answered for q in d["source_questions"]):
             raise ValueError("Answer all source clarification questions before submission")
+        if d.get("study") == "decomposition":
+            plan = validate_plan(d, d["proposal"])
+            proposal = Proposal(
+                agent="systems",
+                proposal_type="requirement decomposition",
+                target_revision=model.revision,
+                operations=[
+                    Operation(action="add", entity=make_child(d, ident, child, i))
+                    for i, child in enumerate(plan.children)
+                ],
+                rationale=plan.basis,
+                evidence_references=[ident, d["input_id"]],
+                expected_consequences="Adds partial child requirements only after human approval. Parent is unchanged; unresolved obligations and parent verification remain outstanding. Recalculate existing candidates.",
+                confidence=1,
+            )
+            validate(model, proposal)
+            updated = model.model_copy(deep=True)
+            proposal.target_revision += 1
+            updated.proposals[proposal.id] = proposal
+            result_run = get_run(updated, ident)
+            result_run.data.update(status="submitted", proposal_id=proposal.id)
+            record(
+                result_run,
+                "submitted",
+                "systems",
+                "human",
+                "Submitted child requirements for separate human approval; parent unchanged",
+                {"proposal_id": proposal.id},
+            )
+            return self.store.save(updated, "human", "Proposed requirement decomposition", model)
         choice = d["criteria"][d["proposal"]["criterion_id"]]["criterion"]
         return Formalizer(self.store).propose(
             mission_id,

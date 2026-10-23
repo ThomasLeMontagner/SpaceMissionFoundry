@@ -46,6 +46,50 @@ export default function RequirementFormalization(props: Props) {
       </p>
       {row ? (
         <>
+          {(model.entities[row.id].relations || [])
+            .filter(
+              (r) =>
+                r.type === "derives_from" &&
+                model.entities[r.target]?.kind === "Requirement",
+            )
+            .map((r) => (
+              <p key={r.target}>
+                Parent requirement:{" "}
+                <button onClick={() => setSelected(r.target)}>
+                  {model.entities[r.target].title}
+                </button>
+              </p>
+            ))}
+          {Object.values(model.entities).some(
+            (e) =>
+              e.kind === "Requirement" &&
+              (e.relations || []).some(
+                (r) => r.type === "derives_from" && r.target === row.id,
+              ),
+          ) && (
+            <div>
+              <h3>Derived requirements</h3>
+              <p>Child checks do not automatically verify this parent.</p>
+              <ul>
+                {Object.values(model.entities)
+                  .filter(
+                    (e) =>
+                      e.kind === "Requirement" &&
+                      (e.relations || []).some(
+                        (r) => r.type === "derives_from" && r.target === row.id,
+                      ),
+                  )
+                  .map((e) => (
+                    <li key={e.id}>
+                      <button onClick={() => setSelected(e.id)}>
+                        {e.title}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+
           <label>
             Requirement to clarify
             <select
