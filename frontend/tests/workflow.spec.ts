@@ -33,7 +33,12 @@ test("mission brief to approved concept, export and replay", async ({
   await expect(
     page.getByRole("button", { name: "Approve immutable baseline" }),
   ).toBeDisabled();
-  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("checkbox", {
+      name: "I approve this conceptual baseline and acknowledge the recorded residual risks and verification obligations.",
+      exact: true,
+    })
+    .check();
   await page
     .getByRole("button", { name: "Approve immutable baseline" })
     .click();

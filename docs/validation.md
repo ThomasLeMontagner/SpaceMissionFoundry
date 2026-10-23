@@ -1,5 +1,20 @@
 # Validation record — 2026-09-09
 
+## Browser confirmation selector regression — 2026-10-23
+
+- Full Playwright suite: **19 passed in 3.1 minutes**, including the previously failing iteration workflow.
+- Parent-link checkboxes exposed a pre-existing page-wide unnamed checkbox selector in impact review. The iteration and baseline workflows now select their exact accessible confirmation labels, avoiding dependence on checkbox count or order. No production behavior changed.
+- Prettier formatted the two changed test files; whitespace checks passed.
+
+
+## Reviewed requirement parent links — 2026-10-23
+
+- **51 targeted SQLite backend tests passed** across parent editing, quality reports, decomposition, iteration and workflow sanity. New tests cover approval-only changes, rejection/challenge, missing/wrong-kind/inactive/duplicate/empty/self parents, multi-operation cycles, revalidation after parent changes, immutable historical revisions, provenance preservation and prevention of scope-reassessment bypass.
+- **54 frontend tests passed**, plus TypeScript/production build, Ruff lint/format, Prettier and whitespace checks. New UI coverage verifies separate proposal submission, no mutation before approval and disabled baseline editing.
+- **Three browser workflows passed**: parent-link correction and approval, quality navigation and decomposition. The parent editor screenshot was inspected; checkbox layout was aligned to the existing app style. The updated local application was restarted.
+- Specification v0.26 adds MF-REQ-025–026. README, traceability and architecture describe parent selection, approval, renewed partial scope and preserved provenance. No migration, dependency or model call was added. PostgreSQL and the full backend suite were not rerun; the existing persistence and decision paths are reused. General relationship editing and semantic parent sufficiency remain outside this slice.
+
+
 ## Requirement quality and traceability — 2026-10-23
 
 - Targeted SQLite backend regression: **25 passed** across quality checks, formalization and decomposition. Tests cover invalid/inactive parents, cycles versus downstream nodes, transitive objective support, duplicate normalization, excluded proposed/rejected records, exact statement/criterion scope binding, read-only repeatability and a 1,050-requirement chain without recursive traversal.
