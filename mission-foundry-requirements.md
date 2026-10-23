@@ -2,7 +2,7 @@
 
 ## System Requirements Specification
 
-**Version:** 0.25
+**Version:** 0.26
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
@@ -197,9 +197,13 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-022 | A decomposition shall require independent review and separate human approval before children are created. Approval shall revalidate the source parent and exact reviewed child set, preserve parent identity and content, retain parent-child links and source evidence, and recalculate existing candidate checks. Child checks shall not automatically verify or replace the parent. | Must | Test |
 | MF-REQ-023 | The system shall provide revision-bound advisory requirement quality and traceability findings with affected IDs, exact wording excerpts where applicable and suggested review actions; it shall distinguish heuristic warnings from verification evidence and preserve mission state. | Must | Test |
 | MF-REQ-024 | The workbench shall let owners filter quality findings and navigate affected requirements for clarification or reviewed correction; findings shall refresh with mission revisions and shall not automatically edit, approve or verify requirements. | Must | Demonstration |
+| MF-REQ-025 | Owners shall be able to propose replacement parent requirement/objective links with rationale and before/after inspection through separate human approval; the system shall reject empty, duplicate, missing, inactive, wrong-kind and circular parent links at submission and acceptance, preserving other relationships and history. | Must | Test |
+| MF-REQ-026 | Accepted parent-link changes shall reset criterion scope to partial, retain the criterion and original decomposition provenance, invalidate dependent evidence and use the existing impact-review/recalculation workflow without automatically verifying any parent or child. | Must | Test |
 
 
 
+
+Reviewed parent editing (v0.26) supports one to twenty same-mission parent IDs per requirement, through the existing design-change workflow. Only accepted/stale requirements and objectives can be selected; a proposal's complete resulting graph is validated again on acceptance. New or changed links may not introduce or depend on a cycle. Legacy unchanged links do not block unrelated edits. Original decomposition metadata remains historical provenance, while current `derives_from` links define the edited hierarchy. No allocation, satisfaction or general relationship editor is included.
 
 Requirement quality checks (v0.25) are deterministic and advisory. They inspect active accepted/stale requirements and objectives for missing or invalid derivation links, circular requirement derivations, unsupported objectives, normalized duplicate statements, selected ambiguous terms/conjunctions, unsupported calculator criteria and partial/outdated/unassessed criterion scope. Wording findings are heuristics with possible false positives. General semantic conflicts, solution bias and completeness are not established. Reports do not modify approval, verification or baseline evidence.
 

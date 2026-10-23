@@ -4,6 +4,7 @@ from app.domain.formalization import Formalization
 from app.domain.interfaces import DataContract, validate_endpoints
 from app.domain.models import Classification, Proposal, now
 from app.domain.requirement_checks import Criterion
+from app.domain.requirement_links import validate_links
 from app.engineering_tools.calculations import q
 
 
@@ -51,6 +52,7 @@ def validate(model, proposal: Proposal):
         from app.domain.decomposition import validate_submission
 
         validate_submission(model, proposal)
+    validate_links(model, proposal)
     ids = [op.entity.id for op in proposal.operations]
     if len(set(ids)) != len(ids):
         raise ValueError("Duplicate or conflicting operations")

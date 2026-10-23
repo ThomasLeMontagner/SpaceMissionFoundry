@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.25. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.26. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -71,6 +71,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-022 | Implemented | Exact reviewed child-set validation at submission and approval, inherited priority, derives_from/evidenced_by links, unchanged parent, no child creation on rejection/challenge, candidate recalculation and revision history. Requirements navigation and browser approval flow in frontend/tests/decomposition.spec.ts. No parent verification roll-up. |
 | MF-REQ-023 | Implemented | Read-only revision-bound report in domain/requirement_quality.py; graph, wording, duplicate and criterion/scope tests in test_requirement_quality.py. Findings are advisory and do not change verification. |
 | MF-REQ-024 | Implemented | RequirementQuality filters findings and navigates requirement readiness; mission/revision isolation, UI filtering and browser navigation tests. No automatic corrections or approvals. |
+| MF-REQ-025 | Implemented | RequirementLinks editor submits parent_ids through reviewed design changes; whole-proposal graph validation at submission/acceptance checks types, state and cycles. Backend and browser tests cover unchanged preapproval links, rejection/challenge and accepted hierarchy. |
+| MF-REQ-026 | Implemented | Changed links preserve other relations and decomposition provenance, force partial scope and existing dependency invalidation/recalculation; immutable historical revision and scope-bypass tests in test_requirement_links.py. |
 
 
 
