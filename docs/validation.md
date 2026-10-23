@@ -1,5 +1,13 @@
 # Validation record — 2026-09-09
 
+## Requirement quality and traceability — 2026-10-23
+
+- Targeted SQLite backend regression: **25 passed** across quality checks, formalization and decomposition. Tests cover invalid/inactive parents, cycles versus downstream nodes, transitive objective support, duplicate normalization, excluded proposed/rejected records, exact statement/criterion scope binding, read-only repeatability and a 1,050-requirement chain without recursive traversal.
+- **53 frontend tests passed**, including filter reset when findings change, related-record navigation and late response isolation when switching missions. TypeScript/production build, Ruff lint/format, Prettier and whitespace checks passed.
+- **Three browser workflows passed**: new quality filtering/navigation, existing owner formalization and decomposition approval. The new panel screenshot was visually inspected. Initial test fixture omissions and a test-only TypeScript option were corrected before these results.
+- Specification v0.25 adds MF-REQ-023–024 and retains broader MF-REQ-004/005 as partial. README, traceability and architecture document advisory scope and limitations. No writes, provider calls, migrations or dependencies were added; PostgreSQL and the full backend suite were not rerun for this read-only change. General semantic validation and traceability-link editing remain incomplete.
+
+
 ## Requirement decomposition — 2026-10-22
 
 - Full SQLite backend regression: **260 passed, one PostgreSQL-only skip** in 478.00 seconds.

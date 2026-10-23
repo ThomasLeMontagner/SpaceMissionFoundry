@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.24. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.25. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -50,8 +50,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-001 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-002 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-003 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
-| MF-REQ-004 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
-| MF-REQ-005 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
+| MF-REQ-004 | Partial | Advisory missing/invalid parent, circular derivation and unsupported objective checks over active accepted/stale records; general objective adequacy and semantic coverage remain incomplete. |
+| MF-REQ-005 | Partial | Deterministic selected-word/conjunction warnings, normalized duplicate statements and supported-criterion/scope checks. General ambiguity, solution bias, semantic conflicts and verifiability remain incomplete. |
 | MF-REQ-006 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-007 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-008 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
@@ -69,6 +69,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-020 | Implemented | Explicit bounded background progression, exclusive persisted ownership, manual-step exclusion, questions/review stops, pause/cancel fencing, idle/working checkpoint recovery and preserved approval revision. backend/tests/test_requirement_progression.py; frontend unit and browser tests cover manual and automatic controls. No automatic submission, approval, retries or restart scheduler. |
 | MF-REQ-021 | Implemented | Bounded 2–5 extractive child statements with exact parent/owner-answer provenance, catalogue-only criteria and explicit unresolved obligations. Live mocked three-role exchange and deterministic delivery-only simulation covered by backend/tests/test_decomposition.py. General synthesis remains incomplete. |
 | MF-REQ-022 | Implemented | Exact reviewed child-set validation at submission and approval, inherited priority, derives_from/evidenced_by links, unchanged parent, no child creation on rejection/challenge, candidate recalculation and revision history. Requirements navigation and browser approval flow in frontend/tests/decomposition.spec.ts. No parent verification roll-up. |
+| MF-REQ-023 | Implemented | Read-only revision-bound report in domain/requirement_quality.py; graph, wording, duplicate and criterion/scope tests in test_requirement_quality.py. Findings are advisory and do not change verification. |
+| MF-REQ-024 | Implemented | RequirementQuality filters findings and navigates requirement readiness; mission/revision isolation, UI filtering and browser navigation tests. No automatic corrections or approvals. |
 
 
 

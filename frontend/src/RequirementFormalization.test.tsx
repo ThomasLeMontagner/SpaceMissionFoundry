@@ -66,3 +66,51 @@ test("deadline suggestion stays partial and requires a separate proposal", async
     ),
   );
 });
+
+test("switching missions hides old findings and ignores a late response", async () => {
+  let resolveOld!: (value: any) => void;
+  let resolveNew!: (value: any) => void;
+  vi.mocked(request)
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveOld = resolve;
+        }),
+    )
+    .mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveNew = resolve;
+        }),
+    );
+  const model = { id: "old", revision: 1, entities: {} } as unknown as Model;
+  const { rerender } = render(
+    <RequirementFormalization model={model} busy={false} act={vi.fn()} />,
+  );
+  rerender(
+    <RequirementFormalization
+      model={{ ...model, id: "new" }}
+      busy={false}
+      act={vi.fn()}
+    />,
+  );
+  resolveNew({
+    revision: 1,
+    requirements: [],
+    notes: [],
+    metrics: {},
+    quality: { revision: 1, checked_requirements: 0, findings: [] },
+  });
+  await screen.findByText(/0 advisory findings/);
+  resolveOld({
+    revision: 1,
+    requirements: [],
+    notes: [],
+    metrics: {},
+    quality: { revision: 1, checked_requirements: 99, findings: [] },
+  });
+  await waitFor(() =>
+    expect(screen.queryByText(/99 requirements/)).not.toBeInTheDocument(),
+  );
+  expect(screen.getByText(/0 advisory findings/)).toBeInTheDocument();
+});
