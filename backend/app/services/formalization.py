@@ -10,6 +10,7 @@ from app.domain.formalization import Formalization
 from app.domain.models import Operation, Proposal, Strict
 from app.domain.protocol import validate
 from app.domain.requirement_checks import METRICS, Criterion
+from app.domain.requirement_quality import report
 from app.orchestration.scenario import entity
 from app.services.workflow import Workflow
 
@@ -94,6 +95,7 @@ def overview(model):
     return dict(
         revision=model.revision,
         metrics=METRICS,
+        quality=report(model),
         requirements=[inspect(e) for e in requirements],
         notes=[
             dict(id=e.id, **e.data)

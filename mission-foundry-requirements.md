@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.24
+**Version:** 0.25
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-10-22
+**Date:** 2026-10-23
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -195,9 +195,13 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-020 | Users shall be able to explicitly run remaining requirement-agent tasks until owner clarification or independent review is required. Execution shall be exclusively claimed, bounded to one task sequence, and stop on pause, cancellation, failure, changed sources or exhausted budgets. No automatic retry, submission or approval shall occur. Expired checkpoints shall support explicit recovery without repeating completed work; potential live-call charges shall require acknowledgement only when a task outcome is uncertain. | Must | Test |
 | MF-REQ-021 | Owners shall be able to request a bounded decomposition of one accepted requirement into independently reviewable child requirements. Child statements shall be traceable to the parent or explicit owner answers; quantitative criteria shall use source-backed values. Missing targets, applicability and unresolved obligations shall remain explicit. | Must | Test |
 | MF-REQ-022 | A decomposition shall require independent review and separate human approval before children are created. Approval shall revalidate the source parent and exact reviewed child set, preserve parent identity and content, retain parent-child links and source evidence, and recalculate existing candidate checks. Child checks shall not automatically verify or replace the parent. | Must | Test |
+| MF-REQ-023 | The system shall provide revision-bound advisory requirement quality and traceability findings with affected IDs, exact wording excerpts where applicable and suggested review actions; it shall distinguish heuristic warnings from verification evidence and preserve mission state. | Must | Test |
+| MF-REQ-024 | The workbench shall let owners filter quality findings and navigate affected requirements for clarification or reviewed correction; findings shall refresh with mission revisions and shall not automatically edit, approve or verify requirements. | Must | Demonstration |
 
 
 
+
+Requirement quality checks (v0.25) are deterministic and advisory. They inspect active accepted/stale requirements and objectives for missing or invalid derivation links, circular requirement derivations, unsupported objectives, normalized duplicate statements, selected ambiguous terms/conjunctions, unsupported calculator criteria and partial/outdated/unassessed criterion scope. Wording findings are heuristics with possible false positives. General semantic conflicts, solution bias and completeness are not established. Reports do not modify approval, verification or baseline evidence.
 
 Owner-guided formalization scope (v0.21): owner-guided clarification and existing metric registry only; no model calls or general requirement derivation. Literal acquisition-to-delivery deadlines can be suggested with their source phrase. Up to ten clarification threads per requirement revision are retained as immutable notes and replies. Full coverage is an explicit owner assessment of the complete statement, not independent semantic verification or certification. Existing criteria without scope metadata retain legacy checking behavior and are labeled unassessed. Unsupported obligations remain unresolved.
 

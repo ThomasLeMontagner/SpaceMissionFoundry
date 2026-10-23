@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { request } from "./api";
+import RequirementQuality from "./RequirementQuality";
 import type { Model } from "./types";
 
 type Props = {
@@ -15,9 +16,10 @@ export default function RequirementFormalization(props: Props) {
   useEffect(() => {
     let active = true;
     setError("");
+    setData(null);
     request(`/missions/${model.id}/requirement-formalization`)
       .then((value) => {
-        if (active) setData(value);
+        if (active) setData({ ...value, missionId: model.id });
       })
       .catch((e) => {
         if (active) setError(String(e));
@@ -27,7 +29,7 @@ export default function RequirementFormalization(props: Props) {
     };
   }, [model.id, model.revision]);
   if (error) return <p role="alert">{error}</p>;
-  if (!data || data.revision !== model.revision)
+  if (!data || data.missionId !== model.id || data.revision !== model.revision)
     return <p>Loading requirement readiness…</p>;
   const row =
     data.requirements.find((r: any) => r.id === selected) ||
@@ -44,6 +46,13 @@ export default function RequirementFormalization(props: Props) {
         your assessment of scope, not flight certification. Existing criteria
         without a scope assessment retain their previous checking behavior.
       </p>
+      {data.quality && (
+        <RequirementQuality
+          report={data.quality}
+          onSelect={setSelected}
+          requirementIds={data.requirements.map((r: any) => r.id)}
+        />
+      )}
       {row ? (
         <>
           {(model.entities[row.id].relations || [])

@@ -199,3 +199,9 @@ In **Agent collaboration**, select **Decompose into child requirements** as the 
 Choose **Submit child requirements for human approval**, then inspect **Approve requirement decomposition** in **Conflicts & review**. Children appear only after approval. In **Requirements**, select the parent to navigate its **Derived requirements**, or follow a child's parent link. Existing candidate checks are recalculated after approval.
 
 The parent remains unchanged. Children inherit its priority and start with partial coverage; unsupported targets remain unverified. Child passes never automatically verify the parent. This slice extracts exact statements from the parent or owner answers and supports one approved decomposition per parent; it does not guarantee complete or non-overlapping obligations. Review and edit existing children through the normal owner workflow.
+
+### Review requirement quality
+
+Open **Requirements → Requirement readiness → Requirement quality and traceability**. Filter findings by type, then use **Review** or a related requirement button to inspect its criterion, scope and clarification notes. The panel refreshes at each mission revision and makes no model calls or changes to mission data.
+
+Checks cover active accepted/stale requirements and objectives: missing/invalid parent links, circular derivations, unsupported objectives, normalized duplicate statements, selected ambiguous wording/conjunctions and unresolved calculator criteria or scope. Wording warnings require judgment; lack of calculator support does not mean a requirement cannot be verified by another method. Use the existing reviewed edit/clarification workflows for supported corrections. General traceability-link editing, semantic consistency and completeness assessment remain future work; a report with no findings is not certification.
