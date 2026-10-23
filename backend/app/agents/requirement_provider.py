@@ -51,6 +51,10 @@ class IndependentReview(Strict):
 
 
 def perform(stage, context, mode):
+    if context.get("study") == "decomposition":
+        from app.agents.decomposition_provider import perform as decompose
+
+        return decompose(stage, context, mode)
     if mode == "simulation":
         # Demonstrates the workflow only; does not interpret owner answers.
         if stage == "mission":

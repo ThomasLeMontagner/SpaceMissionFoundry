@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.23
+**Version:** 0.24
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-10-20
+**Date:** 2026-10-22
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -193,6 +193,9 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-018 | Users shall be able to request bounded AI-assisted clarification of one accepted requirement: a Mission task identifies questions, a Systems task selects a source-backed criterion, and a separate reviewer recommends submission or further clarification. Unanswered questions shall pause progression; no agent shall invent quantitative targets or claim full coverage. | Must | Test |
 | MF-REQ-019 | Requirement assistance shall preserve source statements, owner answers, criterion provenance, agent exchanges, checkpoints and cumulative usage reservations. Submission shall require unchanged sources and a favorable separate review, create only a partial-coverage proposal, and require separate human approval. Interrupted or failed calls shall not retry automatically. | Must | Test |
 | MF-REQ-020 | Users shall be able to explicitly run remaining requirement-agent tasks until owner clarification or independent review is required. Execution shall be exclusively claimed, bounded to one task sequence, and stop on pause, cancellation, failure, changed sources or exhausted budgets. No automatic retry, submission or approval shall occur. Expired checkpoints shall support explicit recovery without repeating completed work; potential live-call charges shall require acknowledgement only when a task outcome is uncertain. | Must | Test |
+| MF-REQ-021 | Owners shall be able to request a bounded decomposition of one accepted requirement into independently reviewable child requirements. Child statements shall be traceable to the parent or explicit owner answers; quantitative criteria shall use source-backed values. Missing targets, applicability and unresolved obligations shall remain explicit. | Must | Test |
+| MF-REQ-022 | A decomposition shall require independent review and separate human approval before children are created. Approval shall revalidate the source parent and exact reviewed child set, preserve parent identity and content, retain parent-child links and source evidence, and recalculate existing candidate checks. Child checks shall not automatically verify or replace the parent. | Must | Test |
+
 
 
 
@@ -201,6 +204,9 @@ Owner-guided formalization scope (v0.21): owner-guided clarification and existin
 AI-assisted scope (v0.22): a separate manually advanced workflow supports one requirement per run, using simulation or three separate OpenAI-compatible provider calls (Mission, Systems and independent reviewer). Criteria are selected from an existing accepted criterion, a literal delivery deadline or an explicit structured owner input. Free-text answers are context, never automatically converted into targets. Owner answers and reviewer findings are retained in the run. Up to three answer/revision rounds and ten task attempts share explicit cost/token/time limits. Two-minute task leases fence late responses and permit explicit recovery; unknown live-call outcomes retain reservations and require acknowledgement before retry. Submission always proposes partial coverage. Semantic adequacy, full requirement derivation and automatic multi-requirement orchestration remain outside this slice.
 
 Progression scope (v0.23): “Run until owner action” executes at most three remaining role tasks in one explicitly requested background sequence. It stops before collecting answers or submitting a proposal. Manual task execution remains available when no automatic claim exists. Pause and cancellation stop scheduling and fence automatic in-flight responses, including a rapid pause/resume; resume and owner answers never restart progression. A two-minute execution lease is renewed when each task starts. Explicit recovery preserves a completed question/review checkpoint and does not require a charge acknowledgement if no call was in flight. Server restarts do not automatically restart work; general job scheduling remains deferred.
+
+Decomposition scope (v0.24): the existing requirement-agent workflow can propose two to five children of one accepted/stale parent. Statements are exact quotations from the parent or recorded owner answers, rather than unconstrained generated text. Criteria can only reference the existing source-backed catalogue. Each child inherits parent priority, has partial coverage and explicit unresolved obligations, and links to its parent and run evidence. One approved child set per parent is supported; editing existing children uses the normal owner workflow. Simulation separates a literal acquisition-to-delivery deadline from the preceding obligation; other statements require live mode. Independent review assesses omissions and applicability, but completeness is not guaranteed. No aggregation of child passes, automatic parent verification, replacement of the parent or general hierarchical requirement synthesis is claimed.
+
 
 
 

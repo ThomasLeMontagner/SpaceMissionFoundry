@@ -146,3 +146,48 @@ test("expired idle execution can recover without acknowledging a model call", ()
     acknowledge_unknown: false,
   });
 });
+
+test("decomposition preview shows sourced children and unresolved targets", () => {
+  const act = vi.fn();
+  render(
+    <RequirementCollaboration
+      model={model({
+        status: "review_ready",
+        study: "decomposition",
+        stage: "review",
+        criteria: {},
+        proposal: {
+          basis: "Split source obligations",
+          children: [
+            {
+              source_ref: "parent",
+              source_quote: "Useful imagery",
+              criterion_id: null,
+              rationale: "Keep image quality explicit",
+              unresolved: ["Resolution target missing"],
+            },
+            {
+              source_ref: "answer-0",
+              source_quote: "During nominal operations",
+              criterion_id: null,
+              rationale: "Owner applicability",
+              unresolved: ["Define nominal operations"],
+            },
+          ],
+          limitations: ["Parent completeness not established"],
+        },
+      })}
+      busy={false}
+      act={act}
+    />,
+  );
+  expect(screen.getByText("Useful imagery")).toBeVisible();
+  expect(screen.getByText("Resolution target missing")).toBeVisible();
+  expect(
+    screen.getAllByText(/No supported criterion — unresolved/),
+  ).toHaveLength(2);
+  fireEvent.click(
+    screen.getByText("Submit child requirements for human approval"),
+  );
+  expect(act).toHaveBeenCalledWith("/requirement-collaboration/run/submit");
+});

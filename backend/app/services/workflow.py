@@ -110,6 +110,8 @@ class Workflow:
                 m.phase = "Candidate concepts"
             elif p.proposal_type == "calculation inputs":
                 self.require_recalculation(m)
+            elif p.proposal_type == "requirement decomposition":
+                self.require_recalculation(m)
             elif p.proposal_type == "design change":
                 self.after_change(m)
         elif action in ["reject", "challenge"]:
