@@ -1,5 +1,12 @@
 # Validation record — 2026-09-09
 
+## Browser confirmation selector regression — 2026-10-23
+
+- Full Playwright suite: **19 passed in 3.1 minutes**, including the previously failing iteration workflow.
+- Parent-link checkboxes exposed a pre-existing page-wide unnamed checkbox selector in impact review. The iteration and baseline workflows now select their exact accessible confirmation labels, avoiding dependence on checkbox count or order. No production behavior changed.
+- Prettier formatted the two changed test files; whitespace checks passed.
+
+
 ## Reviewed requirement parent links — 2026-10-23
 
 - **51 targeted SQLite backend tests passed** across parent editing, quality reports, decomposition, iteration and workflow sanity. New tests cover approval-only changes, rejection/challenge, missing/wrong-kind/inactive/duplicate/empty/self parents, multi-operation cycles, revalidation after parent changes, immutable historical revisions, provenance preservation and prevention of scope-reassessment bypass.

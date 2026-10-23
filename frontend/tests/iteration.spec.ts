@@ -116,7 +116,12 @@ test("edit duty cycle, correct downlink conflict, approve a second immutable bas
   await expect(
     page.getByRole("button", { name: "Approve immutable baseline" }),
   ).toBeDisabled();
-  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("checkbox", {
+      name: "I approve this conceptual baseline and acknowledge the recorded residual risks and verification obligations.",
+      exact: true,
+    })
+    .check();
   await page
     .getByRole("button", { name: "Approve immutable baseline" })
     .click();
@@ -230,7 +235,12 @@ test("edit duty cycle, correct downlink conflict, approve a second immutable bas
   await expect(
     page.getByRole("button", { name: "Confirm impact review" }),
   ).toBeDisabled();
-  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("checkbox", {
+      name: "I reviewed the affected assumptions, requirements and design inputs and reaffirm this content.",
+      exact: true,
+    })
+    .check();
   await page.getByRole("button", { name: "Confirm impact review" }).click();
   await expect(
     page.getByRole("heading", { name: "Review affected design content" }),
