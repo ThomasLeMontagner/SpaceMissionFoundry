@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { request } from "./api";
+import RequirementAllocation from "./RequirementAllocation";
 import RequirementLinks from "./RequirementLinks";
 import RequirementQuality from "./RequirementQuality";
 import type { Model } from "./types";
@@ -113,6 +114,14 @@ export default function RequirementFormalization(props: Props) {
               ))}
             </select>
           </label>
+          <RequirementAllocation
+            key={`allocation:${model.id}:${row.id}:${model.revision}`}
+            model={model}
+            requirementId={row.id}
+            busy={props.busy}
+            act={props.act}
+            onSelect={setSelected}
+          />
           <RequirementLinks
             key={`links:${model.id}:${row.id}:${model.revision}`}
             model={model}

@@ -2,7 +2,7 @@
 
 ## System Requirements Specification
 
-**Version:** 0.27
+**Version:** 0.28
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
@@ -201,9 +201,13 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-026 | Accepted parent-link changes shall reset criterion scope to partial, retain the criterion and original decomposition provenance, invalidate dependent evidence and use the existing impact-review/recalculation workflow without automatically verifying any parent or child. | Must | Test |
 | MF-REQ-027 | Owners shall be able to propose a new requirement with a stable generated ID, statement, rationale, declared source, level, priority, planned verification method and one to twenty same-mission parent requirements/objectives. A separate human decision shall be required before the requirement enters the accepted model. | Must | Test |
 | MF-REQ-028 | Manually created requirements shall start without an asserted calculator criterion and with partial, unresolved verification scope. Approval shall invalidate existing concept selection and require recalculation when analyses exist; rejection/challenge shall leave the accepted requirements unchanged and historical baseline exports shall remain immutable. | Must | Test |
+| MF-REQ-029 | Owners shall be able to propose, inspect and separately approve replacement responsibility allocations from requirements to active same-mission functions/components, including removal of all allocations, while preserving parent links, other relations and provenance. Invalid, duplicate or inactive targets shall be rejected at submission and acceptance. | Must | Test |
+| MF-REQ-030 | The workbench shall show current/proposed allocations, target state and incoming requirements, with advisory missing/invalid/stale allocation findings. Allocation changes shall require renewed partial criterion scope and the existing impact/recalculation process; allocation shall not imply satisfaction, verification or candidate-specific applicability. | Must | Demonstration |
 
 
 
+
+Requirement responsibility allocation (v0.28) supports zero to twenty explicit `allocated_to` links from an existing requirement to accepted/stale Function or Component records. Shared reference architecture records imply mission-level responsibility only; per-candidate allocations and function-to-component allocation editing remain outside this slice. Declaring an assignment is not evidence that the target can satisfy the requirement. Removing an assignment remains a separately reviewed change. Reassessment references current parent/target context and previously unresolved obligations; previous formalization and provenance remain in revision history.
 
 Manual requirement creation (v0.27) is an owner-authored addition to an existing mission with accepted/stale parent requirements or objectives. Source text is a declaration, not independently validated evidence. Each proposal adds one new requirement and is gated by current revision, pending proposals, archive and baseline state. Criterion definition and full-scope assessment use the existing separate formalization workflow after creation; no numeric target is inferred. General mission/objective creation and semantic sufficiency checking are not included.
 

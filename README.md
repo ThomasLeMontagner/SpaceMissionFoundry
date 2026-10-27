@@ -217,3 +217,11 @@ The server rejects invalid parents and cycles. Approval preserves the statement,
 Open **Requirements → Add a requirement** after approving the initial objectives and requirements. Enter a statement, rationale and declared source; choose its level, priority, planned verification method and parent links. **Propose new requirement for approval** creates a pending proposal. Inspect it in **Conflicts & review** and approve, reject or challenge it separately.
 
 Approval adds the requirement with a generated stable ID, no calculator criterion and partial verification scope. It appears in readiness, quality findings and parent/child navigation. Define any supported criterion later through the existing reviewed formalization workflow; selecting “analysis” alone does not verify anything. If analyses exist, recalculate and select the concept again. Existing baselines must be reopened before additions, and their saved exports remain unchanged. Declared sources are not independently validated, and requirement creation does not call an AI provider.
+
+### Allocate requirement responsibility
+
+After approving architecture functions and components, open **Requirements → Requirement readiness**, choose a requirement and expand **Allocate responsibility**. Select its responsible functions/components, review the current and proposed assignments, and provide a rationale. **Propose allocations for approval** sends the change to **Conflicts & review**. Clearing all assignments is also a reviewed change.
+
+Use **Inspect allocation target** to see the target's state and navigate its incoming requirements. Quality findings highlight absent, invalid or stale allocations; they are advisory. Approval preserves parent links and provenance, resets criterion coverage to partial, and may require impact review and recalculation. Assess the current responsibilities and previous scope obligations before proposing full coverage again.
+
+These links declare responsibility, not satisfaction or verification. The reference functions/components are shared across architecture candidates; no candidate-specific allocation is inferred. Function-to-component allocation editing remains future work.

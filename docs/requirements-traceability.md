@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.27. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.28. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -48,7 +48,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-MDL-010 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-MDL-011 | Deferred | Common typed entity metadata and selected required payload fields; generic engineering dictionaries remain. |
 | MF-REQ-001 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
-| MF-REQ-002 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
+| MF-REQ-002 | Partial | Reviewed parent links, decomposition and explicit requirement-to-function/component allocation, plus criterion-linked verification. General satisfaction evidence and function-to-component allocation editing remain incomplete. |
 | MF-REQ-003 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-004 | Partial | Advisory missing/invalid parent, circular derivation and unsupported objective checks over active accepted/stale records; general objective adequacy and semantic coverage remain incomplete. |
 | MF-REQ-005 | Partial | Deterministic selected-word/conjunction warnings, normalized duplicate statements and supported-criterion/scope checks. General ambiguity, solution bias, semantic conflicts and verifiability remain incomplete. |
@@ -75,6 +75,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-026 | Implemented | Changed links preserve other relations and decomposition provenance, force partial scope and existing dependency invalidation/recalculation; immutable historical revision and scope-bypass tests in test_requirement_links.py. |
 | MF-REQ-027 | Implemented | Strict RequirementDraft, UUID IDs, source/rationale/priority/method fields, parent validation and separate manual requirement proposal; backend/tests/test_requirement_creation.py and frontend/tests/requirement-creation.spec.ts. |
 | MF-REQ-028 | Implemented | Protocol validation preserves the exact unverified draft shape; approval clears selection and requests recalculation. Tests cover rejection/challenge, parent revalidation, stale/pending/archive/baseline guards, fresh unverified checks and immutable baseline exports. |
+| MF-REQ-029 | Implemented | EditChanges.allocation_ids uses reviewed design-change proposals and acceptance-time kind/state validation. test_requirement_allocation.py covers add/remove, rejection/challenge, invalid targets, preserved parents/provenance and immutable baselines. |
+| MF-REQ-030 | Implemented | RequirementAllocation shows assignment comparison and target-to-requirement navigation; quality report flags absent/invalid/stale links. Scope reset and transitive invalidation/recalculation retain unverified status; UI/unit/browser coverage. Shared records do not imply candidate-specific allocation. |
 
 
 

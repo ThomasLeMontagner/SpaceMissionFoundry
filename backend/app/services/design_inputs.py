@@ -6,6 +6,7 @@ from pydantic import Field, field_validator
 from app.domain.engineering_inputs import validate_inputs
 from app.domain.interfaces import DataContract
 from app.domain.models import Relation, Strict
+from app.domain.requirement_allocation import allocation_ids
 from app.domain.requirement_checks import Criterion
 from app.domain.requirement_links import parent_ids
 from app.orchestration.scenario import Q, entity, inputs
@@ -26,15 +27,16 @@ IMPACT_KINDS = {
 
 
 class EditChanges(Strict):
+    allocation_ids: list[str] | None = Field(default=None, max_length=20)
     parent_ids: list[str] | None = Field(default=None, min_length=1, max_length=20)
 
-    @field_validator("parent_ids")
+    @field_validator("parent_ids", "allocation_ids")
     @classmethod
     def distinct_parents(cls, values):
         if values is not None and (
             any(not v.strip() or len(v) > 200 for v in values) or len(set(values)) != len(values)
         ):
-            raise ValueError("Parent IDs must be nonblank, bounded and distinct")
+            raise ValueError("Relationship IDs must be nonblank, bounded and distinct")
         return values
 
     data_contract: DataContract | None = None
@@ -196,6 +198,7 @@ def edited_entity(prior, changes: EditChanges):
             "verification_method",
             "criterion",
             "parent_ids",
+            "allocation_ids",
         },
     }
     values = changes.model_dump(exclude_unset=True)
@@ -207,7 +210,11 @@ def edited_entity(prior, changes: EditChanges):
         raise ValueError("This field is not editable for this object type")
     e = prior.model_copy(deep=True)
     for key, value in values.items():
-        if key == "parent_ids":
+        if key == "allocation_ids":
+            e.relations = [r for r in e.relations if r.type != "allocated_to"] + [
+                Relation(type="allocated_to", target=target) for target in sorted(value)
+            ]
+        elif key == "parent_ids":
             e.relations = [r for r in e.relations if r.type != "derives_from"] + [
                 Relation(type="derives_from", target=target) for target in sorted(value)
             ]
@@ -226,7 +233,23 @@ def edited_entity(prior, changes: EditChanges):
             ],
             clarification_ids=[],
         )
-    if e.data == prior.data and e.title == prior.title and parent_ids(e) == parent_ids(prior):
+    if e.kind == "Requirement" and allocation_ids(e) != allocation_ids(prior):
+        e.data["formalization"] = dict(
+            statement=e.title,
+            criterion=e.data.get("criterion"),
+            coverage="partial",
+            basis="Responsibility allocations changed; reassess the criterion and all earlier scope obligations against the current parent and target context.",
+            open_questions=[
+                "Do the criterion and evidence cover the allocated responsibilities, current parents and previously unresolved obligations?"
+            ],
+            clarification_ids=[],
+        )
+    if (
+        e.data == prior.data
+        and e.title == prior.title
+        and parent_ids(e) == parent_ids(prior)
+        and allocation_ids(e) == allocation_ids(prior)
+    ):
         raise ValueError("No design changes were supplied")
     if e.kind == "Parameter":
         e.data["inputs"] = validate_inputs(e.data["tool"], e.data["inputs"])
