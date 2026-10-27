@@ -1,5 +1,14 @@
 # Validation record — 2026-09-09
 
+## Manual requirement creation — 2026-10-27
+
+- Full SQLite backend regression: **290 passed, one PostgreSQL-only skip** in 323.79 seconds. New tests cover approval-only creation, stable IDs and revision history, rejection/challenge, invalid and duplicate parent IDs, mandatory source/rationale, unsupported fields, stale/pending/archive guards, acceptance-time parent revalidation, unverified recalculation and immutable baseline exports after reopening.
+- Targeted PostgreSQL regression: **38 passed** across creation, parent editing and decomposition. A temporary UTF-8 PostgreSQL 16 instance with `max_connections=20` was migrated to head, tested and stopped without changing user databases.
+- **55 frontend unit tests passed**; production build, Ruff lint/format, Prettier and whitespace checks passed. The creation form preserves its open state through approval refreshes. Source text remains an owner declaration, and selecting a verification method does not create verification evidence.
+- All **20 browser workflows passed across the full run and targeted rerun**: 19 existing workflows passed together; the new creation test then passed after fixing draft-form closure on revision refresh and test initialization/reload handling. It verifies separate approval, unverified scope and persistence after reopening the saved mission. The resulting screen was visually inspected. The full 20-test run was not repeated after the final test-only initialization wait.
+- Specification v0.27 adds MF-REQ-027–028 and marks MF-REQ-009 implemented for the bounded owner creation/edit workflow. README, traceability and architecture are updated. No migration, dependency or provider call was introduced.
+
+
 ## Browser confirmation selector regression — 2026-10-23
 
 - Full Playwright suite: **19 passed in 3.1 minutes**, including the previously failing iteration workflow.

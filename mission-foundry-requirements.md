@@ -2,11 +2,11 @@
 
 ## System Requirements Specification
 
-**Version:** 0.26
+**Version:** 0.27
 
 **Status:** Requirements revision — initial bounded agent collaboration slice
 
-**Date:** 2026-10-23
+**Date:** 2026-10-27
 
 **Working description:** A multi-agent systems-engineering environment for designing space missions.
 
@@ -199,9 +199,13 @@ Priority uses **Must**, **Should**, and **Could**. “Must” requirements defin
 | MF-REQ-024 | The workbench shall let owners filter quality findings and navigate affected requirements for clarification or reviewed correction; findings shall refresh with mission revisions and shall not automatically edit, approve or verify requirements. | Must | Demonstration |
 | MF-REQ-025 | Owners shall be able to propose replacement parent requirement/objective links with rationale and before/after inspection through separate human approval; the system shall reject empty, duplicate, missing, inactive, wrong-kind and circular parent links at submission and acceptance, preserving other relationships and history. | Must | Test |
 | MF-REQ-026 | Accepted parent-link changes shall reset criterion scope to partial, retain the criterion and original decomposition provenance, invalidate dependent evidence and use the existing impact-review/recalculation workflow without automatically verifying any parent or child. | Must | Test |
+| MF-REQ-027 | Owners shall be able to propose a new requirement with a stable generated ID, statement, rationale, declared source, level, priority, planned verification method and one to twenty same-mission parent requirements/objectives. A separate human decision shall be required before the requirement enters the accepted model. | Must | Test |
+| MF-REQ-028 | Manually created requirements shall start without an asserted calculator criterion and with partial, unresolved verification scope. Approval shall invalidate existing concept selection and require recalculation when analyses exist; rejection/challenge shall leave the accepted requirements unchanged and historical baseline exports shall remain immutable. | Must | Test |
 
 
 
+
+Manual requirement creation (v0.27) is an owner-authored addition to an existing mission with accepted/stale parent requirements or objectives. Source text is a declaration, not independently validated evidence. Each proposal adds one new requirement and is gated by current revision, pending proposals, archive and baseline state. Criterion definition and full-scope assessment use the existing separate formalization workflow after creation; no numeric target is inferred. General mission/objective creation and semantic sufficiency checking are not included.
 
 Reviewed parent editing (v0.26) supports one to twenty same-mission parent IDs per requirement, through the existing design-change workflow. Only accepted/stale requirements and objectives can be selected; a proposal's complete resulting graph is validated again on acceptance. New or changed links may not introduce or depend on a cycle. Legacy unchanged links do not block unrelated edits. Original decomposition metadata remains historical provenance, while current `derives_from` links define the edited hierarchy. No allocation, satisfaction or general relationship editor is included.
 

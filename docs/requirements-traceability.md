@@ -1,6 +1,6 @@
 # MVP requirements traceability
 
-Aligned with specification version 0.26. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
+Aligned with specification version 0.27. **Implemented** refers to the reference vertical slice, not universal mission support. **Partial** explicitly denotes an incomplete requirement. **Planned** identifies approved requirements prioritized for future implementation, without claiming delivery. **Deferred** is outside this delivered slice. This is not a claim that all Must requirements are met.
 
 Agent collaboration and progress monitoring (section 7.14) now has bounded duty-cycle negotiation and data-system alternatives with optional structured live-provider proposals and an explicitly labeled simulation. The original reference workflow remains scripted with optional rationale refinement. No paid-provider validation or general autonomous mission design is claimed. See `architecture/agent-collaboration.md`, `backend/tests/test_collaboration.py` and `frontend/tests/collaboration.spec.ts`.
 
@@ -55,7 +55,7 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-006 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-007 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-008 | Implemented | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
-| MF-REQ-009 | Partial | Existing requirements can be edited through reviewed replacement proposals with history. Manual creation remains deferred. |
+| MF-REQ-009 | Implemented | Owner-authored creation and reviewed replacement proposals preserve IDs, revision history and baselines. Creation requires parent links and separate approval; criterion assessment remains a separate step. |
 | MF-REQ-010 | Partial | Reference requirement hierarchy and approval gates; general linting and coverage evaluator deferred. |
 | MF-REQ-011 | Implemented | Typed criterion, closed metric registry, unit conversion and invalid-input tests. |
 | MF-REQ-012 | Implemented | Per-candidate VerificationItems link requirements and AnalysisRuns with criterion, actual value and revision provenance. |
@@ -73,6 +73,8 @@ Evidence: `backend/tests/test_workflow.py`, `backend/tests/test_tools.py`, `fron
 | MF-REQ-024 | Implemented | RequirementQuality filters findings and navigates requirement readiness; mission/revision isolation, UI filtering and browser navigation tests. No automatic corrections or approvals. |
 | MF-REQ-025 | Implemented | RequirementLinks editor submits parent_ids through reviewed design changes; whole-proposal graph validation at submission/acceptance checks types, state and cycles. Backend and browser tests cover unchanged preapproval links, rejection/challenge and accepted hierarchy. |
 | MF-REQ-026 | Implemented | Changed links preserve other relations and decomposition provenance, force partial scope and existing dependency invalidation/recalculation; immutable historical revision and scope-bypass tests in test_requirement_links.py. |
+| MF-REQ-027 | Implemented | Strict RequirementDraft, UUID IDs, source/rationale/priority/method fields, parent validation and separate manual requirement proposal; backend/tests/test_requirement_creation.py and frontend/tests/requirement-creation.spec.ts. |
+| MF-REQ-028 | Implemented | Protocol validation preserves the exact unverified draft shape; approval clears selection and requests recalculation. Tests cover rejection/challenge, parent revalidation, stale/pending/archive/baseline guards, fresh unverified checks and immutable baseline exports. |
 
 
 

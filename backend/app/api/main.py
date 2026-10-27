@@ -11,6 +11,7 @@ from sqlalchemy.exc import OperationalError
 
 from app.domain.models import Proposal, Strict
 from app.domain.requirement_checks import METRICS
+from app.domain.requirement_creation import RequirementDraft
 from app.orchestration.scenario import BRIEF
 from app.persistence.store import Store
 from app.reports.export import csv_export, report
@@ -44,6 +45,10 @@ class Create(Strict):
 
 
 class Command(Strict):
+    revision: int = Field(ge=0)
+
+
+class CreateRequirement(RequirementDraft):
     revision: int = Field(ge=0)
 
 
@@ -139,6 +144,11 @@ def create_app(store=None):
     @app.get("/api/scenario")
     def scenario():
         return {"name": "Pyra · Southern Europe Wildfire Monitor", "brief": BRIEF, "version": "1.0"}
+
+    @app.post("/api/missions/{id}/requirements")
+    def create_requirement(id: str, body: CreateRequirement):
+        draft = RequirementDraft.model_validate(body.model_dump(exclude={"revision"}))
+        return service.create_requirement(id, body.revision, draft)
 
     @app.get("/api/missions/{id}/requirement-formalization")
     def formalization_overview(id: str):
