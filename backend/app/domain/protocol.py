@@ -52,6 +52,10 @@ def validate(model, proposal: Proposal):
         from app.domain.decomposition import validate_submission
 
         validate_submission(model, proposal)
+    if proposal.proposal_type == "manual requirement":
+        from app.domain.requirement_creation import validate_creation
+
+        validate_creation(model, proposal)
     validate_links(model, proposal)
     ids = [op.entity.id for op in proposal.operations]
     if len(set(ids)) != len(ids):
@@ -69,8 +73,11 @@ def validate(model, proposal: Proposal):
         )
         if e.kind not in allowed or e.owner != proposal.agent:
             raise ValueError("Agent lacks authority for object or owner")
-        if human and (op.action != "replace" or proposal.proposal_type != "design change"):
-            raise ValueError("Human proposals may only edit existing design inputs")
+        if human and not (
+            (op.action == "replace" and proposal.proposal_type == "design change")
+            or (op.action == "add" and proposal.proposal_type == "manual requirement")
+        ):
+            raise ValueError("Human proposals require an owner edit or manual requirement workflow")
         if op.action == "add" and e.id in model.entities:
             raise ValueError("Object already exists")
         if op.action == "replace" and e.id not in model.entities:

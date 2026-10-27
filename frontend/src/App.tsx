@@ -1,6 +1,7 @@
 import RequirementCollaboration from "./RequirementCollaboration";
 import { useEffect, useState, useRef } from "react";
 import { request, download, setToken, subscribe } from "./api";
+import CreateRequirement from "./CreateRequirement";
 import RequirementFormalization from "./RequirementFormalization";
 import DesignEditor from "./DesignEditor";
 import BaselineComparison from "./BaselineComparison";
@@ -900,11 +901,19 @@ export default function App() {
               </>
             )}
             {tab === "Requirements" && (
-              <RequirementFormalization
-                model={model}
-                busy={busy || pending.length > 0}
-                act={act}
-              />
+              <>
+                <CreateRequirement
+                  key={`create:${model.id}`}
+                  model={model}
+                  busy={busy || pending.length > 0}
+                  act={act}
+                />
+                <RequirementFormalization
+                  model={model}
+                  busy={busy || pending.length > 0}
+                  act={act}
+                />
+              </>
             )}
             {tab === "Design inputs" && (
               <section className="panel">

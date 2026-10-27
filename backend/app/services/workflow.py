@@ -110,6 +110,13 @@ class Workflow:
                 m.phase = "Candidate concepts"
             elif p.proposal_type == "calculation inputs":
                 self.require_recalculation(m)
+            elif p.proposal_type == "manual requirement":
+                m.selected = None
+                if "selection" in m.entities:
+                    m.entities["selection"].state = "stale"
+                    m.entities["selection"].revision = m.revision + 1
+                    m.entities["selection"].modified_at = now()
+                self.require_recalculation(m)
             elif p.proposal_type == "requirement decomposition":
                 self.require_recalculation(m)
             elif p.proposal_type == "design change":
@@ -553,6 +560,31 @@ class Workflow:
                 previous_value=prior,
                 proposed_value=trial["value"],
             ),
+        )
+
+    def create_requirement(self, id, revision, draft):
+        from app.domain.requirement_creation import make_requirement
+
+        old = self.store.get(id)
+        self.guard(old, revision)
+        self.no_pending(old)
+        requirement = make_requirement("req-" + str(uuid4()), draft)
+        proposal = Proposal(
+            agent="human",
+            proposal_type="manual requirement",
+            target_revision=old.revision,
+            operations=[Operation(action="add", entity=requirement)],
+            rationale=draft.rationale,
+            evidence_references=draft.parent_ids,
+            expected_consequences="Adds an unverified requirement after separate approval. Existing concept selection must be revisited after recalculation; criterion and scope need owner assessment.",
+            confidence=1,
+        )
+        validate(old, proposal)
+        updated = old.model_copy(deep=True)
+        proposal.target_revision += 1
+        updated.proposals[proposal.id] = proposal
+        return self.store.save(
+            updated, "human", "Proposed a new requirement for separate approval", old
         )
 
     def edit(self, id, object_id, revision, changes, reason, source_study=None):
