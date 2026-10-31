@@ -53,6 +53,45 @@ def report(model):
                 "No active parent requirement or originating objective is linked.",
                 "Identify the originating need and review its traceability link.",
             )
+        allocations = [r.target for r in e.relations if r.type == "allocated_to"]
+        invalid_allocations = [
+            key
+            for key in allocations
+            if key not in model.entities
+            or model.entities[key].kind not in {"Function", "Component"}
+            or model.entities[key].state not in ACTIVE
+        ]
+        if invalid_allocations:
+            add(
+                e,
+                "invalid_allocation",
+                "An allocation target is missing, inactive or not a function/component.",
+                "Review responsibility allocations and replace or remove invalid targets.",
+                invalid_allocations,
+            )
+        if not allocations and any(
+            t.kind in {"Function", "Component"} and t.state in ACTIVE
+            for t in model.entities.values()
+        ):
+            add(
+                e,
+                "unallocated_requirement",
+                "No explicit responsibility allocation is recorded.",
+                "Assess whether this requirement needs function or component allocation; lack of a link is advisory, not a failed verification.",
+            )
+        stale_allocations = [
+            key
+            for key in allocations
+            if key in model.entities and model.entities[key].state == "stale"
+        ]
+        if stale_allocations:
+            add(
+                e,
+                "stale_allocation",
+                "An allocated target needs impact review.",
+                "Review affected design content before relying on the responsibility assignment.",
+                stale_allocations,
+            )
         normalized = " ".join(e.title.casefold().split()).rstrip(".!?")
         if normalized:
             duplicates[normalized].append(e.id)

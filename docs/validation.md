@@ -1,5 +1,16 @@
 # Validation record — 2026-09-09
 
+## Requirement responsibility allocation — 2026-10-27
+
+- Full SQLite backend regression: **303 passed, one PostgreSQL-only skip** in 338.83 seconds.
+- Full browser suite: **21 passed** in 3.9 minutes. The allocation workflow also passed again after adding a test wait for automatic recalculation before screen inspection; the completed allocation panel was visually inspected.
+
+- Targeted PostgreSQL regression: **38 passed** across allocation, parent editing and manual creation. A temporary UTF-8 PostgreSQL 16 instance was migrated to head with `max_connections=20`, tested and stopped; user databases were untouched.
+- **56 frontend unit tests passed**, plus production build, Ruff lint/format, Prettier and whitespace checks. UI coverage verifies proposal-only changes, removal, incoming requirement navigation and baseline-disabled editing.
+- Allocation coverage includes separate approval, rejection/challenge, invalid/duplicate/missing/inactive targets, acceptance-time revalidation, parent and provenance preservation, target-driven invalidation, partial scope, impact review, unverified recalculation and immutable baseline exports. Quality checks cover absent, invalid and stale links.
+- Specification v0.28 adds MF-REQ-029–030 and clarifies the still-partial MF-REQ-002. README, traceability and architecture describe shared mission-level responsibility, separate approval and the distinction from satisfaction/verification. No migration, dependency or model call was introduced.
+
+
 ## Manual requirement creation — 2026-10-27
 
 - Full SQLite backend regression: **290 passed, one PostgreSQL-only skip** in 323.79 seconds. New tests cover approval-only creation, stable IDs and revision history, rejection/challenge, invalid and duplicate parent IDs, mandatory source/rationale, unsupported fields, stale/pending/archive guards, acceptance-time parent revalidation, unverified recalculation and immutable baseline exports after reopening.

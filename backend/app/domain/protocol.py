@@ -3,6 +3,7 @@ from app.domain.engineering_inputs import validate_inputs
 from app.domain.formalization import Formalization
 from app.domain.interfaces import DataContract, validate_endpoints
 from app.domain.models import Classification, Proposal, now
+from app.domain.requirement_allocation import validate_allocations
 from app.domain.requirement_checks import Criterion
 from app.domain.requirement_links import validate_links
 from app.engineering_tools.calculations import q
@@ -57,6 +58,7 @@ def validate(model, proposal: Proposal):
 
         validate_creation(model, proposal)
     validate_links(model, proposal)
+    validate_allocations(model, proposal)
     ids = [op.entity.id for op in proposal.operations]
     if len(set(ids)) != len(ids):
         raise ValueError("Duplicate or conflicting operations")
